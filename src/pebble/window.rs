@@ -16,13 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::{types, functions::interface};
+use crate::pebble::internal::{functions::interface, types};
+use crate::pebble::layer::Layer;
 use crate::pebble::types::GColor;
 use crate::pebble::WindowPtr;
-use crate::pebble::layer::Layer;
 
 pub struct Window {
-    internal: *mut types::Window
+    internal: *mut types::Window,
 }
 
 #[derive(Copy, Clone)]
@@ -30,7 +30,7 @@ pub struct WindowHandlers {
     pub load: extern "C" fn(WindowPtr),
     pub unload: extern "C" fn(WindowPtr),
     pub appear: extern "C" fn(WindowPtr),
-    pub disappear: extern "C" fn(WindowPtr)
+    pub disappear: extern "C" fn(WindowPtr),
 }
 
 impl Default for Window {
@@ -42,14 +42,12 @@ impl Default for Window {
 impl Window {
     pub fn new() -> Window {
         Window {
-            internal: interface::window_create()
+            internal: interface::window_create(),
         }
     }
 
     pub fn from_raw(ptr: WindowPtr) -> Window {
-        Window {
-            internal: ptr
-        }
+        Window { internal: ptr }
     }
 
     pub fn push(&self, animate: bool) {
@@ -57,10 +55,17 @@ impl Window {
     }
 
     pub fn set_handlers(&self, handlers: WindowHandlers) {
-        let WindowHandlers {load, unload,
-            appear, disappear} = handlers;
+        let WindowHandlers {
+            load,
+            unload,
+            appear,
+            disappear,
+        } = handlers;
         let converted = types::WindowHandlers {
-            load, unload, appear, disappear
+            load,
+            unload,
+            appear,
+            disappear,
         };
 
         interface::window_set_window_handlers(self.internal, converted);

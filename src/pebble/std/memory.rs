@@ -16,4 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub use crate::pebble::internal::alloc::{realloc, free, malloc, calloc, memcmp, memcpy, memmove, memset};
+pub use crate::pebble::internal::alloc::{
+    calloc, free, malloc, memcmp, memcpy, memmove, memset, realloc,
+};

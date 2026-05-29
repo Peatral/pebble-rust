@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::types::{GFont, ResHandle};
 use crate::pebble::internal::functions::declarations::*;
+use crate::pebble::internal::types::{GFont, ResHandle};
 
 pub const FONT_KEY_GOTHIC_18_BOLD: &str = "RESOURCE_ID_GOTHIC_18_BOLD\0";
 pub const FONT_KEY_GOTHIC_24: &str = "RESOURCE_ID_GOTHIC_24\0";
@@ -44,23 +44,22 @@ pub const FONT_KEY_LECO_38_BOLD_NUMBERS: &str = "RESOURCE_ID_LECO_38_BOLD_NUMBER
 pub const FONT_KEY_LECO_42_BOLD_NUMBERS: &str = "RESOURCE_ID_LECO_42_BOLD_NUMBERS\0";
 pub const FONT_KEY_LECO_28_LIGHT_NUMBERS: &str = "RESOURCE_ID_LECO_28_LIGHT_NUMBERS\0";
 
-
 pub struct Font {
-    pub internal: GFont
+    pub internal: GFont,
 }
 
 impl Font {
     pub fn get_system(resource_id: &str) -> Self {
         unsafe {
             let internal = fonts_get_system_font(resource_id.as_ptr());
-            Self {internal}
+            Self { internal }
         }
     }
 
     pub fn get_custom_from_handle(res_handle: ResHandle) -> Self {
         unsafe {
             let internal = fonts_load_custom_font(res_handle);
-            Self {internal}
+            Self { internal }
         }
     }
 

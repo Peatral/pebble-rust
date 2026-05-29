@@ -18,8 +18,10 @@
 
 use crate::pebble::event::Event;
 
+use crate::pebble::internal::functions::declarations::{
+    battery_state_service_peek, battery_state_service_subscribe, battery_state_service_unsubscribe,
+};
 pub use crate::pebble::internal::types::BatteryChargeState;
-use crate::pebble::internal::functions::declarations::{battery_state_service_subscribe, battery_state_service_unsubscribe, battery_state_service_peek};
 
 pub struct BatteryStateEvent;
 
@@ -37,8 +39,6 @@ impl Event<BatteryChargeState> for BatteryStateEvent {
     }
 
     fn peek() -> Result<BatteryChargeState, i32> {
-        unsafe {
-            Ok(battery_state_service_peek())
-        }
+        unsafe { Ok(battery_state_service_peek()) }
     }
 }

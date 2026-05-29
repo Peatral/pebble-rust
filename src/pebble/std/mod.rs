@@ -16,9 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod time;
 pub mod format;
 pub mod locale;
-pub mod string;
 pub mod math;
 pub mod memory;
+pub mod string;
+pub mod time;

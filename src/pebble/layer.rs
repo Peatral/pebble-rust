@@ -16,23 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::pebble::internal::functions::declarations::text_layer_set_text;
 use crate::pebble::internal::{functions::interface, types};
 use crate::pebble::types::{Bitmap, GCompOp, GRect};
 use crate::system::fonts::Font;
-use crate::pebble::internal::functions::declarations::text_layer_set_text;
 
 pub struct Layer {
-    internal: *mut types::Layer
+    internal: *mut types::Layer,
 }
 
 pub struct TextLayer {
     internal: *mut types::TextLayer,
-    inner: *mut types::Layer
+    inner: *mut types::Layer,
 }
 
 pub struct BitmapLayer {
     internal: *mut types::BitmapLayer,
-    inner: *mut types::Layer
+    inner: *mut types::Layer,
 }
 
 pub trait ILayer {
@@ -68,14 +68,12 @@ impl ILayer for Layer {
 impl Layer {
     pub fn new(bounds: GRect) -> Layer {
         Layer {
-            internal: interface::layer_create(bounds)
+            internal: interface::layer_create(bounds),
         }
     }
 
     pub fn from_raw(ptr: *mut types::Layer) -> Layer {
-        Layer {
-            internal: ptr
-        }
+        Layer { internal: ptr }
     }
 }
 
@@ -106,15 +104,13 @@ impl TextLayer {
         let internal = interface::text_layer_create(bounds);
         let inner = interface::text_layer_get_layer(internal);
 
-        TextLayer {
-            internal, inner
-        }
+        TextLayer { internal, inner }
     }
 
     pub fn set_text(&self, text: &str) {
         interface::text_layer_set_text(self.internal, text);
     }
-    pub unsafe fn set_text_raw(&self, text: *const u8)  {
+    pub unsafe fn set_text_raw(&self, text: *const u8) {
         text_layer_set_text(self.internal, text);
     }
 
@@ -150,9 +146,7 @@ impl BitmapLayer {
         let internal = interface::bitmap_layer_create(bounds);
         let inner = interface::bitmap_layer_get_layer(internal);
 
-        BitmapLayer {
-            internal, inner
-        }
+        BitmapLayer { internal, inner }
     }
 
     pub fn set_bitmap(&self, bitmap: &Bitmap) {

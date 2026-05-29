@@ -21,5 +21,5 @@
 /// The C types defined in <pebble.h>
 pub mod types;
 
-pub mod functions;
 pub mod alloc;
+pub mod functions;

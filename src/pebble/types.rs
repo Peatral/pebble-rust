@@ -16,22 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub use crate::pebble::internal::types::{GColor, GRect, GPoint, GSize, tm, TimeUnits, GCompOp, AppMessageResult,
-                                         Tuple, TupleValue};
+use crate::pebble::internal::functions::{declarations, interface};
 use crate::pebble::internal::types::GBitmap;
-use crate::pebble::internal::functions::{interface, declarations};
+pub use crate::pebble::internal::types::{
+    tm, AppMessageResult, GColor, GCompOp, GPoint, GRect, GSize, TimeUnits, Tuple, TupleValue,
+};
 
 pub type VoidPtr = *const crate::pebble::internal::types::c_void;
 pub type DictPtr = *mut crate::pebble::internal::types::DictionaryIterator;
 
 pub struct Bitmap {
-    pub internal: *mut GBitmap
+    pub internal: *mut GBitmap,
 }
 
 impl Bitmap {
     pub fn new(resource_id: u32) -> Bitmap {
         let internal = interface::gbitmap_create_with_resource(resource_id);
-        Bitmap {internal}
+        Bitmap { internal }
     }
 
     pub fn clean(self) {

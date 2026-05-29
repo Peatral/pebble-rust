@@ -19,14 +19,14 @@
 mod internal;
 
 pub mod app;
-pub mod window;
-pub mod types;
+pub mod app_message;
+pub mod clock;
+pub mod event;
 pub mod layer;
 pub mod std;
 pub mod system;
-pub mod app_message;
-pub mod event;
-pub mod clock;
+pub mod types;
+pub mod window;
 
 pub use internal::alloc;
 

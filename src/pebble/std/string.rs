@@ -27,33 +27,23 @@ pub fn compare_strings_bytes(str1: &str, str2: &str, max_bytes: usize) -> i32 {
 }
 
 pub fn copy_strings<'a>(source: &'a str, dest: &'a str) -> &'a str {
-    unsafe {
-        ptr_to_str(strcpy(dest.as_ptr(), source.as_ptr()))
-    }
+    unsafe { ptr_to_str(strcpy(dest.as_ptr(), source.as_ptr())) }
 }
 
 pub fn copy_strings_bytes<'a>(source: &'a str, dest: &'a str, max_bytes: usize) -> &'a str {
-    unsafe {
-        ptr_to_str(strncpy(dest.as_ptr(), source.as_ptr(), max_bytes))
-    }
+    unsafe { ptr_to_str(strncpy(dest.as_ptr(), source.as_ptr(), max_bytes)) }
 }
 
 pub fn concat_strings<'a>(source: &'a str, dest: &'a str) -> &'a str {
-    unsafe {
-        ptr_to_str(strcat(dest.as_ptr(), source.as_ptr()))
-    }
+    unsafe { ptr_to_str(strcat(dest.as_ptr(), source.as_ptr())) }
 }
 
 pub fn concat_strings_bytes<'a>(source: &'a str, dest: &'a str, max_bytes: usize) -> &'a str {
-    unsafe {
-        ptr_to_str(strncat(dest.as_ptr(), source.as_ptr(), max_bytes))
-    }
+    unsafe { ptr_to_str(strncat(dest.as_ptr(), source.as_ptr(), max_bytes)) }
 }
 
 pub fn string_length(string: &str) -> usize {
-    unsafe {
-        strlen(string.as_ptr())
-    }
+    unsafe { strlen(string.as_ptr()) }
 }
 
 unsafe fn ptr_to_str<'a>(ptr: *const u8) -> &'a str {

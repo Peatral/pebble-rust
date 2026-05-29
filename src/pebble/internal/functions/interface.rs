@@ -38,9 +38,7 @@ pub fn app_event_loop() {
 }
 
 pub fn window_create() -> *mut Window {
-    unsafe {
-        declarations::window_create()
-    }
+    unsafe { declarations::window_create() }
 }
 
 pub fn window_destroy(window: *mut Window) {
@@ -55,11 +53,17 @@ pub fn window_set_click_config_provider<T>(window: *mut Window, func: extern "C"
     }
 }
 
-pub fn window_set_click_config_provider_with_context<T>(window: *mut Window, func: extern "C" fn(*mut T), ctx: *mut T) {
+pub fn window_set_click_config_provider_with_context<T>(
+    window: *mut Window,
+    func: extern "C" fn(*mut T),
+    ctx: *mut T,
+) {
     unsafe {
-        declarations::window_set_click_config_provider_with_context(window,
-                                                                mem::transmute(func),
-                                                                ctx as *mut u8);
+        declarations::window_set_click_config_provider_with_context(
+            window,
+            mem::transmute(func),
+            ctx as *mut u8,
+        );
     }
 }
 
@@ -82,9 +86,7 @@ pub fn window_set_user_data<T>(window: *mut Window, data: *mut T) {
 }
 
 pub fn window_get_user_data<T>(window: *mut Window) -> *mut T {
-    unsafe {
-        declarations::window_get_user_data(window) as *mut T
-    }
+    unsafe { declarations::window_get_user_data(window) as *mut T }
 }
 
 pub fn window_stack_push(window: *mut Window, animate: bool) {
@@ -98,21 +100,20 @@ pub fn window_stack_push(window: *mut Window, animate: bool) {
 }
 
 pub fn window_get_root_layer(window: *mut Window) -> *mut Layer {
-    unsafe {
-        declarations::window_get_root_layer(window)
-    }
+    unsafe { declarations::window_get_root_layer(window) }
 }
 
-pub fn window_single_click_subscribe<T>(button: u8, func: extern "C" fn(*mut ClickRecognizer, *mut T)) {
+pub fn window_single_click_subscribe<T>(
+    button: u8,
+    func: extern "C" fn(*mut ClickRecognizer, *mut T),
+) {
     unsafe {
         declarations::window_single_click_subscribe(button, mem::transmute(func));
     }
 }
 
 pub fn layer_create(bounds: GRect) -> *mut Layer {
-    unsafe {
-        declarations::layer_create(bounds)
-    }
+    unsafe { declarations::layer_create(bounds) }
 }
 
 pub fn layer_destroy(layer: *mut Layer) {
@@ -122,15 +123,11 @@ pub fn layer_destroy(layer: *mut Layer) {
 }
 
 pub fn layer_get_frame(layer: *mut Layer) -> GRect {
-    unsafe {
-        declarations::layer_get_frame(layer)
-    }
+    unsafe { declarations::layer_get_frame(layer) }
 }
 
 pub fn layer_get_bounds(layer: *mut Layer) -> GRect {
-    unsafe {
-        declarations::layer_get_bounds(layer)
-    }
+    unsafe { declarations::layer_get_bounds(layer) }
 }
 
 pub fn layer_add_child(layer: *mut Layer, child: *mut Layer) {
@@ -152,9 +149,7 @@ pub fn layer_set_update_proc(layer: *mut Layer, func: extern "C" fn(*mut Layer, 
 }
 
 pub fn text_layer_create(bounds: GRect) -> *mut TextLayer {
-    unsafe {
-        declarations::text_layer_create(bounds)
-    }
+    unsafe { declarations::text_layer_create(bounds) }
 }
 
 pub fn text_layer_set_text(layer: *mut TextLayer, text: &str) {
@@ -170,21 +165,15 @@ pub fn text_layer_set_font(layer: *mut TextLayer, font: GFont) {
 }
 
 pub fn text_layer_get_layer(layer: *mut TextLayer) -> *mut Layer {
-    unsafe {
-        declarations::text_layer_get_layer(layer)
-    }
+    unsafe { declarations::text_layer_get_layer(layer) }
 }
 
 pub fn gbitmap_create_with_resource(id: u32) -> *mut GBitmap {
-    unsafe {
-        declarations::gbitmap_create_with_resource(id)
-    }
+    unsafe { declarations::gbitmap_create_with_resource(id) }
 }
 
 pub fn bitmap_layer_create(frame: GRect) -> *mut BitmapLayer {
-    unsafe {
-        declarations::bitmap_layer_create(frame)
-    }
+    unsafe { declarations::bitmap_layer_create(frame) }
 }
 
 pub fn bitmap_layer_set_bitmap(layer: *mut BitmapLayer, bitmap: *mut GBitmap) {
@@ -200,9 +189,7 @@ pub fn bitmap_layer_set_compositing_mode(layer: *mut BitmapLayer, mode: GCompOp)
 }
 
 pub fn bitmap_layer_get_layer(layer: *mut BitmapLayer) -> *mut Layer {
-    unsafe {
-        declarations::bitmap_layer_get_layer(layer)
-    }
+    unsafe { declarations::bitmap_layer_get_layer(layer) }
 }
 
 pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor) {
@@ -231,9 +218,7 @@ pub fn tick_timer_service_subscribe(unit: TimeUnits, func: extern "C" fn(*mut tm
 }
 
 pub fn time() -> usize {
-    unsafe {
-        declarations::time(core::ptr::null_mut())
-    }
+    unsafe { declarations::time(core::ptr::null_mut()) }
 }
 
 pub fn localtime(now: usize) -> *mut tm {
@@ -252,7 +237,6 @@ pub fn gmtime(now: usize) -> *mut tm {
 
 pub fn app_log(level: u8, msg: &str, name: &str) {
     unsafe {
-        declarations::app_log(level, name.as_ptr(), 2,
-                              msg.as_ptr());
+        declarations::app_log(level, name.as_ptr(), 2, msg.as_ptr());
     }
 }

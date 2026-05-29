@@ -29,9 +29,7 @@ pub fn get_time_string() -> alloc::string::String {
 }
 
 pub fn is_24h() -> bool {
-    unsafe {
-        clock_is_24h_style() != 0
-    }
+    unsafe { clock_is_24h_style() != 0 }
 }
 
 pub fn get_timezone() -> alloc::string::String {

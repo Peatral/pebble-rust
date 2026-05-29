@@ -24,15 +24,11 @@ pub struct ConnectionEvent;
 
 impl ConnectionEvent {
     pub fn peek_app() -> Result<bool, i32> {
-        unsafe {
-            Ok(connection_service_peek_pebble_app_connection())
-        }
+        unsafe { Ok(connection_service_peek_pebble_app_connection()) }
     }
 
     pub fn peek_pebblekit() -> Result<bool, i32> {
-        unsafe {
-            Ok(connection_service_peek_pebblekit_connection())
-        }
+        unsafe { Ok(connection_service_peek_pebblekit_connection()) }
     }
 
     pub fn subscribe(handlers: ConnectionHandlers) {
@@ -43,14 +39,15 @@ impl ConnectionEvent {
 }
 
 impl Event<bool> for ConnectionEvent {
-
     /// Do **NOT** use this. Use ConnectionEvent#subscribe instead.
     fn subscribe(_handler: extern "C" fn(bool)) {
         unimplemented!()
     }
 
     fn unsubscribe() {
-        unsafe { connection_service_unsubscribe(); }
+        unsafe {
+            connection_service_unsubscribe();
+        }
     }
 
     fn peek() -> Result<bool, i32> {

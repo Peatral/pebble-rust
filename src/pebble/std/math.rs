@@ -19,15 +19,11 @@
 use crate::pebble::internal::functions::declarations;
 
 pub fn rand() -> i32 {
-    unsafe {
-        declarations::rand()
-    }
+    unsafe { declarations::rand() }
 }
 
 pub fn seed_rand(seed: u32) -> i32 {
-    unsafe {
-        declarations::srand(seed)
-    }
+    unsafe { declarations::srand(seed) }
 }
 
 pub fn le_to_be_u32(num: u32) -> u32 {
@@ -43,4 +39,3 @@ pub fn le_to_be_u16(num: u16) -> u16 {
     let b1 = (num & 0xFF00) >> 8;
     (b0 << 8) | b1
 }
-
