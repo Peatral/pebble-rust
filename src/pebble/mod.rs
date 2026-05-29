@@ -38,6 +38,7 @@ pub type Result<T> = core::result::Result<T, &'static str>;
 pub use internal::functions::declarations::app_log as println;
 pub use internal::functions::declarations::snprintf;
 
+#[cfg(not(test))]
 #[inline(never)]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
