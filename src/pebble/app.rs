@@ -30,6 +30,12 @@ use crate::pebble::internal::functions::interface;
 #[derive(Copy, Clone)]
 pub struct App;
 
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl App {
     pub fn new() -> App {
         App {}

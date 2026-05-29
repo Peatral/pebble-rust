@@ -33,6 +33,12 @@ pub struct WindowHandlers {
     pub disappear: extern "C" fn(WindowPtr)
 }
 
+impl Default for Window {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Window {
     pub fn new() -> Window {
         Window {

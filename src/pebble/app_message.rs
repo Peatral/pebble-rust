@@ -37,7 +37,7 @@ pub struct Dictionary {
     internal: *mut DictionaryIterator
 }
 
-const NULL_TUPLE: *mut Tuple = 0 as *mut Tuple;
+const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
 
 impl Dictionary {
     #[allow(clippy::cast_ptr_alignment)]
