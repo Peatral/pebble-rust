@@ -25,6 +25,7 @@
 */
 
 #![allow(non_camel_case_types)]
+#![allow(clippy::from_over_into)]
 
 pub enum Window {}
 pub enum Layer {}
@@ -45,7 +46,7 @@ pub struct tm {
     pub tm_year: u32,
     pub tm_wday: u32,
     pub tm_yday: u32,
-    pub tm_isdst: u32
+    pub tm_isdst: u32,
 }
 
 #[derive(Copy, Clone)]
@@ -84,30 +85,32 @@ pub enum GCompOp {
     GCompOpOr,
     GCompOpAnd,
     GCompOpClear,
-    GCompOpSet
+    GCompOpSet,
 }
 
 #[repr(C)]
 pub enum GColor {
     GColorClear = -1,
     GColorBlack = 0,
-    GColorWhite = 1
+    GColorWhite = 1,
 }
 
 #[repr(C)]
 pub enum TimeUnits {
-    SECOND_UNIT=1,
+    SECOND_UNIT = 1,
     MINUTE_UNIT,
     HOUR_UNIT,
     DAY_UNIT,
     MONTH_UNIT,
-    YEAR_UNIT
+    YEAR_UNIT,
 }
 
 pub type ResHandle = c_void;
 
 #[repr(C)]
-pub struct FontInfo;
+pub struct FontInfo {
+    _data: [u8; 0],
+}
 
 pub type GFont = *mut FontInfo;
 
@@ -128,7 +131,7 @@ pub struct Tuple {
     #[bitfield(name = "t_type", ty = "u8", bits = "32..=39")]
     #[bitfield(name = "length", ty = "u16", bits = "40..=55")]
     pub t_type: [u8; 2],
-    value: TupleValue
+    value: TupleValue,
 }
 
 impl Tuple {
@@ -137,31 +140,21 @@ impl Tuple {
         let value_ptr = ptr + 7;
         let t = self.t_type[0];
         match t {
-            0 => {
-                Some(TupleValue {
-                    data: core::slice::from_raw_parts(value_ptr as *const u8,
-                                                      self.t_type[1] as usize)
-                })
-            },
-            1 => {
-                Some(TupleValue {
-                    cstring: core::slice::from_raw_parts(value_ptr as *const u8,
-                                                         self.t_type[1] as usize)
-                })
-            },
+            0 => Some(TupleValue {
+                data: value_ptr as *const u8,
+            }),
+            1 => Some(TupleValue {
+                cstring: value_ptr as *const u8,
+            }),
             2 => {
                 let value_ptr = value_ptr as *const u32;
-                Some(TupleValue {
-                    uint32: *value_ptr
-                })
-            },
+                Some(TupleValue { uint32: *value_ptr })
+            }
             3 => {
                 let value_ptr = value_ptr as *const i32;
-                Some(TupleValue {
-                    int32: *value_ptr
-                })
-            },
-            _ => {None}
+                Some(TupleValue { int32: *value_ptr })
+            }
+            _ => None,
         }
     }
 
@@ -169,8 +162,8 @@ impl Tuple {
         unsafe {
             let opt = self.get_value();
             if let Some(opt) = opt {
-                let cstr= opt.cstring;
-                let str = core::str::from_utf8_unchecked(cstr);
+                let slice = core::slice::from_raw_parts(opt.cstring, self.t_type[1] as usize);
+                let str = core::str::from_utf8_unchecked(slice);
                 Some(str)
             } else {
                 None
@@ -179,62 +172,79 @@ impl Tuple {
     }
 
     pub fn get_value(&self) -> Option<TupleValue> {
-        unsafe {self.read()}
+        unsafe { self.read() }
     }
-
 }
 
 #[repr(C, packed)]
 #[derive(Copy, Clone)]
 pub union TupleValue {
-    data: &'static [u8],
-    cstring: &'static [u8],
+    data: *const u8,
+    cstring: *const u8,
     pub uint32: u32,
     pub int32: i32,
 
-    // Unions are as large as the largest item.
-    // No space is wasted though.
-    placeholder: [u8; u8::max_value() as usize + 325usize]
+    placeholder: [u8; u8::MAX as usize + 325usize],
 }
 
 #[repr(u8)]
 #[derive(Copy, Clone)]
 pub enum TupleType {
-    BYTE_ARRAY, CSTRING, UINT, INT
+    ByteArray,
+    Cstring,
+    Uint,
+    Int,
 }
 
 #[repr(C)]
-pub struct Dictionary;
+pub struct Dictionary {
+    _data: [u8; 0],
+}
 
 #[repr(C)]
 pub struct DictionaryIterator {
     pub dict: *mut Dictionary,
     pub end: *const c_void,
-    pub cursor: *mut Tuple
+    pub cursor: *mut Tuple,
 }
 
 #[repr(u8)]
 pub enum DictionaryResult {
-    DICT_OK, DICT_NOT_ENOUGH_STORAGE, DICT_INVALID_ARGS, DICT_INTERNAL_INCONSISTENCY,
-    DICT_MALLOC_FAILED
+    DICT_OK,
+    DICT_NOT_ENOUGH_STORAGE,
+    DICT_INVALID_ARGS,
+    DICT_INTERNAL_INCONSISTENCY,
+    DICT_MALLOC_FAILED,
 }
 
 #[repr(u8)]
 pub enum AppMessageResult {
-    OK, SEND_TIMEOUT, SEND_REJECTED, NOT_CONNECTED, NOT_RUNNING, INVALID_ARGS, BUSY, BUFFER_OVERFLOW,
-    ALREADY_RELEASED, CALLBACK_ALREADY_REGISTERED, CALLBACK_NOT_REGISTERED, OUT_OF_MEMORY, CLOSED,
-    INTERNAL_ERROR, INVALID_STATE
+    OK,
+    SEND_TIMEOUT,
+    SEND_REJECTED,
+    NOT_CONNECTED,
+    NOT_RUNNING,
+    INVALID_ARGS,
+    BUSY,
+    BUFFER_OVERFLOW,
+    ALREADY_RELEASED,
+    CALLBACK_ALREADY_REGISTERED,
+    CALLBACK_NOT_REGISTERED,
+    OUT_OF_MEMORY,
+    CLOSED,
+    INTERNAL_ERROR,
+    INVALID_STATE,
 }
 
 #[repr(C)]
 pub struct BatteryChargeState {
     pub charge_percent: u8,
     pub is_charging: bool,
-    pub is_plugged: bool
+    pub is_plugged: bool,
 }
 
 #[repr(C)]
 pub struct ConnectionHandlers {
     pub app: extern "C" fn(bool),
-    pub pebblekit: extern "C" fn(bool)
+    pub pebblekit: extern "C" fn(bool),
 }

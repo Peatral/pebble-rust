@@ -18,8 +18,8 @@
 
 pub use crate::pebble::internal::types::Tuple;
 
-use crate::pebble::internal::types::{self, DictionaryIterator, c_void, AppMessageResult};
 use crate::pebble::internal::functions::declarations::*;
+use crate::pebble::internal::types::{self, c_void, AppMessageResult, DictionaryIterator};
 use crate::pebble::types::{DictPtr, VoidPtr};
 
 /// Represents a `DictionaryIterator`, essentially a list of `Tuple`s.
@@ -34,10 +34,16 @@ use crate::pebble::types::{DictPtr, VoidPtr};
 /// dictionary.write_int(0, 2u32);
 /// ```
 pub struct Dictionary {
-    internal: *mut DictionaryIterator
+    internal: *mut DictionaryIterator,
 }
 
 const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
+
+impl Default for Dictionary {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Dictionary {
     #[allow(clippy::cast_ptr_alignment)]
@@ -46,28 +52,33 @@ impl Dictionary {
         let mut iter = DictionaryIterator {
             end: null_ptr,
             cursor: null_ptr as *mut _,
-            dict: null_ptr as *mut types::Dictionary
+            dict: null_ptr as *mut types::Dictionary,
         };
 
         Self {
-            internal: &mut iter as *mut DictionaryIterator
+            internal: &mut iter as *mut DictionaryIterator,
         }
     }
 
     /// Fetches the underlying dictionary from a raw pointer.
     pub fn from_raw(raw: DictPtr) -> Self {
-        Self {
-            internal: raw
-        }
+        Self { internal: raw }
     }
 
     /// Prepares the dictionary for reading.
     /// Calling this is **required** after writing, before reading.
     pub fn init_read(&self, buffer: &mut [u8]) -> Option<Tuple> {
         unsafe {
-            let ptr = dict_read_begin_from_buffer(self.internal, buffer.as_mut_ptr(),
-                                             buffer.len() as u16);
-            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
+            let ptr = dict_read_begin_from_buffer(
+                self.internal,
+                buffer.as_mut_ptr(),
+                buffer.len() as u16,
+            );
+            if ptr == NULL_TUPLE {
+                None
+            } else {
+                Some(*ptr)
+            }
         }
     }
 
@@ -83,7 +94,11 @@ impl Dictionary {
     pub fn read_next(&self) -> Option<Tuple> {
         unsafe {
             let ptr = dict_read_next(self.internal);
-            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
+            if ptr == NULL_TUPLE {
+                None
+            } else {
+                Some(*ptr)
+            }
         }
     }
 
@@ -91,7 +106,11 @@ impl Dictionary {
     pub fn reset(&self) -> Option<Tuple> {
         unsafe {
             let ptr = dict_read_first(self.internal);
-            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
+            if ptr == NULL_TUPLE {
+                None
+            } else {
+                Some(*ptr)
+            }
         }
     }
 
@@ -99,7 +118,11 @@ impl Dictionary {
     pub fn find(&self, key: u32) -> Option<Tuple> {
         unsafe {
             let ptr = dict_find(self.internal, key);
-            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
+            if ptr == NULL_TUPLE {
+                None
+            } else {
+                Some(*ptr)
+            }
         }
     }
 
@@ -114,8 +137,13 @@ impl Dictionary {
     pub fn write_int<T: Integer>(&self, key: u32, int: T) {
         unsafe {
             let ptr = &int as *const T as *const c_void;
-            dict_write_int(self.internal, key, ptr,
-                           core::mem::size_of_val(&int) as u8, int.signed());
+            dict_write_int(
+                self.internal,
+                key,
+                ptr,
+                core::mem::size_of_val(&int) as u8,
+                int.signed(),
+            );
         }
     }
 }
@@ -178,6 +206,8 @@ impl AppMessage {
     }
 
     pub fn send() {
-        unsafe { app_message_outbox_send(); }
+        unsafe {
+            app_message_outbox_send();
+        }
     }
 }
