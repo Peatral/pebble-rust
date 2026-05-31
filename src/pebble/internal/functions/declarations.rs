@@ -247,4 +247,8 @@ extern "C" {
     pub fn wakeup_cancel_all();
     pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bool;
     pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool;
+
+    // Launch reason
+    pub fn launch_reason() -> u32;
+    pub fn launch_get_args() -> u32;
 }

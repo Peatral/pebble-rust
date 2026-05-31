@@ -22,6 +22,7 @@ pub mod app;
 pub mod app_message;
 pub mod clock;
 pub mod event;
+pub mod launch;
 pub mod layer;
 pub mod std;
 pub mod storage;

@@ -370,3 +370,31 @@ pub type WakeupId = i32;
 /// The type of function which can be called when a wakeup event occurs.
 pub type WakeupHandler = extern "C" fn(wakeup_id: WakeupId, cookie: i32);
 
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum AppLaunchReason {
+    System = 0,
+    User = 1,
+    Phone = 2,
+    Wakeup = 3,
+    Worker = 4,
+    QuickLaunch = 5,
+    TimelineAction = 6,
+    Smartstrap = 7,
+}
+
+impl From<u32> for AppLaunchReason {
+    fn from(value: u32) -> Self {
+        match value {
+            0 => AppLaunchReason::System,
+            1 => AppLaunchReason::User,
+            2 => AppLaunchReason::Phone,
+            3 => AppLaunchReason::Wakeup,
+            4 => AppLaunchReason::Worker,
+            5 => AppLaunchReason::QuickLaunch,
+            6 => AppLaunchReason::TimelineAction,
+            7 => AppLaunchReason::Smartstrap,
+            _ => AppLaunchReason::System,
+        }
+    }
+}

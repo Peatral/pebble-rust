@@ -395,3 +395,11 @@ pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bo
 pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool {
     unsafe { declarations::wakeup_query(wakeup_id, timestamp) }
 }
+
+pub fn launch_reason() -> u32 {
+    unsafe { declarations::launch_reason() }
+}
+
+pub fn launch_get_args() -> u32 {
+    unsafe { declarations::launch_get_args() }
+}
