@@ -176,6 +176,11 @@ pub fn layer_set_update_proc(layer: *mut Layer, func: extern "C" fn(*mut Layer, 
 pub fn text_layer_create(bounds: GRect) -> *mut TextLayer {
     unsafe { declarations::text_layer_create(bounds) }
 }
+pub fn text_layer_destroy(text_layer: *mut TextLayer) {
+    unsafe {
+        declarations::text_layer_destroy(text_layer);
+    }
+}
 
 pub fn text_layer_set_text(layer: *mut TextLayer, text: &CStr) {
     unsafe {
@@ -203,6 +208,12 @@ pub fn gbitmap_create_with_resource(id: u32) -> *mut GBitmap {
 
 pub fn bitmap_layer_create(frame: GRect) -> *mut BitmapLayer {
     unsafe { declarations::bitmap_layer_create(frame) }
+}
+
+pub fn bitmap_layer_destroy(bitmap_layer: *mut BitmapLayer) {
+    unsafe {
+        declarations::bitmap_layer_destroy(bitmap_layer);
+    }
 }
 
 pub fn bitmap_layer_set_bitmap(layer: *mut BitmapLayer, bitmap: *mut GBitmap) {

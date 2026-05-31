@@ -104,6 +104,12 @@ impl ILayer for TextLayer {
     }
 }
 
+impl Drop for Layer {
+    fn drop(&mut self) {
+        interface::layer_destroy(self.internal);
+    }
+}
+
 impl TextLayer {
     pub fn new(bounds: GRect) -> TextLayer {
         let internal = interface::text_layer_create(bounds);
@@ -124,6 +130,12 @@ impl TextLayer {
     }
     pub fn set_text_alignment(&self, alignment: GTextAlignment) {
         interface::text_layer_set_text_alignment(self.internal, alignment);
+    }
+}
+
+impl Drop for TextLayer {
+    fn drop(&mut self) {
+        interface::text_layer_destroy(self.internal);
     }
 }
 
@@ -163,5 +175,11 @@ impl BitmapLayer {
 
     pub fn set_compositing_mode(&self, mode: GCompOp) {
         interface::bitmap_layer_set_compositing_mode(self.internal, mode);
+    }
+}
+
+impl Drop for BitmapLayer {
+    fn drop(&mut self) {
+        interface::bitmap_layer_destroy(self.internal);
     }
 }
