@@ -18,10 +18,9 @@
 
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::internal::types::c_void;
+use crate::pebble::internal::types::{c_void, WindowPtr};
 use crate::pebble::layer::Layer;
 use crate::pebble::types::GColor;
-use crate::WindowPtr;
 use alloc::boxed::Box;
 
 /// A safe, non-owning reference to a Window.
@@ -31,8 +30,12 @@ pub struct WindowRef {
 }
 
 impl WindowRef {
-    pub fn push(&self, animate: bool) {
-        interface::window_stack_push(self.internal, animate);
+    pub(crate) fn from_raw(ptr: WindowPtr) -> Self {
+        Self { internal: ptr }
+    }
+
+    pub fn as_ptr(&self) -> WindowPtr {
+        self.internal
     }
 
     pub fn set_background_color(&self, color: GColor) {
@@ -54,7 +57,7 @@ pub trait WindowDelegate: Sized {
 }
 
 pub struct Window<T: WindowDelegate> {
-    internal: *mut types::Window,
+    internal: WindowPtr,
     delegate: Box<T>,
 }
 
@@ -81,10 +84,6 @@ impl<T: WindowDelegate> Window<T> {
         window
     }
 
-    pub fn push(&self, animate: bool) {
-        interface::window_stack_push(self.internal, animate);
-    }
-
     pub fn set_background_color(&self, color: GColor) {
         interface::window_set_background_color(self.internal, color);
     }
@@ -92,6 +91,10 @@ impl<T: WindowDelegate> Window<T> {
     pub fn get_root_layer(&self) -> Layer {
         let layer_ptr = interface::window_get_root_layer(self.internal);
         Layer::from_raw(layer_ptr)
+    }
+
+    pub(crate) fn as_ptr(&self) -> WindowPtr {
+        self.internal
     }
 }
 

@@ -32,11 +32,11 @@ pub mod types;
 pub mod vibes;
 pub mod wakeup;
 pub mod window;
+pub mod window_stack;
 
 pub use internal::alloc;
 
 pub use internal::types::Window as RawWindow;
-pub type WindowPtr = *mut RawWindow;
 
 pub type Result<T> = core::result::Result<T, &'static str>;
 

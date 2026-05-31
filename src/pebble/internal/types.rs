@@ -37,6 +37,8 @@ pub enum BitmapLayer {}
 pub enum MenuLayer {}
 pub enum AppTimer {}
 
+pub type WindowPtr = *mut Window;
+
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct tm {
@@ -72,7 +74,7 @@ pub struct GRect {
     pub size: GSize,
 }
 
-pub type WindowHandler = extern "C" fn(*mut Window);
+pub type WindowHandler = extern "C" fn(WindowPtr);
 
 #[repr(C)]
 pub struct WindowHandlers {

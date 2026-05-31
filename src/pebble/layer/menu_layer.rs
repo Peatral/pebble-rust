@@ -1,7 +1,7 @@
 use crate::layer::ILayer;
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::internal::types::c_void;
+use crate::pebble::internal::types::{c_void, WindowPtr};
 use alloc::boxed::Box;
 
 pub struct MenuLayer<T: MenuLayerDelegate> {
@@ -251,7 +251,7 @@ impl<T: MenuLayerDelegate> MenuLayer<T> {
         layer
     }
 
-    pub fn set_click_config_onto_window(&self, window: *mut types::Window) {
+    pub fn set_click_config_onto_window(&self, window: WindowPtr) {
         interface::menu_layer_set_click_config_onto_window(self.internal, window);
     }
 

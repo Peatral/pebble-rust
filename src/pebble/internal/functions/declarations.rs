@@ -30,20 +30,25 @@ extern "C" {
     pub fn app_event_loop();
 
     // Window
-    pub fn window_create() -> *mut Window;
-    pub fn window_destroy(window: *mut Window);
-    pub fn window_set_click_config_provider(window: *mut Window, func: extern "C" fn(*mut c_void));
+    pub fn window_create() -> WindowPtr;
+    pub fn window_destroy(window: WindowPtr);
+    pub fn window_set_click_config_provider(window: WindowPtr, func: extern "C" fn(*mut c_void));
     pub fn window_set_click_config_provider_with_context(
-        window: *mut Window,
+        window: WindowPtr,
         func: extern "C" fn(*mut u8),
         ctx: *mut u8,
     );
-    pub fn window_set_window_handlers(window: *mut Window, handlers: WindowHandlers);
-    pub fn window_set_background_color(window: *mut Window, color: GColor);
-    pub fn window_set_user_data(window: *mut Window, data: *mut c_void);
-    pub fn window_get_user_data(window: *mut Window) -> *mut c_void;
-    pub fn window_stack_push(window: *mut Window, animate: u8);
-    pub fn window_get_root_layer(window: *mut Window) -> *mut Layer;
+    pub fn window_set_window_handlers(window: WindowPtr, handlers: WindowHandlers);
+    pub fn window_set_background_color(window: WindowPtr, color: GColor);
+    pub fn window_set_user_data(window: WindowPtr, data: *mut c_void);
+    pub fn window_get_user_data(window: WindowPtr) -> *mut c_void;
+    pub fn window_stack_push(window: WindowPtr, animated: bool);
+    pub fn window_stack_pop(animated: bool) -> WindowPtr;
+    pub fn window_stack_pop_all(animated: bool);
+    pub fn window_stack_remove(window: WindowPtr, animated: bool) -> bool;
+    pub fn window_stack_get_top_window() -> WindowPtr;
+    pub fn window_stack_contains_window(window: WindowPtr) -> bool;
+    pub fn window_get_root_layer(window: WindowPtr) -> *mut Layer;
     pub fn window_single_click_subscribe(
         button: u8,
         func: extern "C" fn(*mut ClickRecognizer, *mut u8),
@@ -87,7 +92,7 @@ extern "C" {
         context: *mut c_void,
         callbacks: MenuLayerCallbacks,
     );
-    pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: *mut Window);
+    pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: WindowPtr);
     pub fn menu_layer_reload_data(menu_layer: *mut MenuLayer);
 
     // Graphics

@@ -37,17 +37,17 @@ pub fn app_event_loop() {
     }
 }
 
-pub fn window_create() -> *mut Window {
+pub fn window_create() -> WindowPtr {
     unsafe { declarations::window_create() }
 }
 
-pub fn window_destroy(window: *mut Window) {
+pub fn window_destroy(window: WindowPtr) {
     unsafe {
         declarations::window_destroy(window);
     }
 }
 
-pub fn window_set_click_config_provider<T>(window: *mut Window, func: extern "C" fn(*mut T)) {
+pub fn window_set_click_config_provider<T>(window: WindowPtr, func: extern "C" fn(*mut T)) {
     unsafe {
         declarations::window_set_click_config_provider(
             window,
@@ -57,7 +57,7 @@ pub fn window_set_click_config_provider<T>(window: *mut Window, func: extern "C"
 }
 
 pub fn window_set_click_config_provider_with_context<T>(
-    window: *mut Window,
+    window: WindowPtr,
     func: extern "C" fn(*mut T),
     ctx: *mut T,
 ) {
@@ -70,39 +70,53 @@ pub fn window_set_click_config_provider_with_context<T>(
     }
 }
 
-pub fn window_set_window_handlers(window: *mut Window, handlers: WindowHandlers) {
+pub fn window_set_window_handlers(window: WindowPtr, handlers: WindowHandlers) {
     unsafe {
         declarations::window_set_window_handlers(window, handlers);
     }
 }
 
-pub fn window_set_background_color(window: *mut Window, color: GColor) {
+pub fn window_set_background_color(window: WindowPtr, color: GColor) {
     unsafe {
         declarations::window_set_background_color(window, color);
     }
 }
 
-pub fn window_set_user_data<T>(window: *mut Window, data: *mut T) {
+pub fn window_set_user_data<T>(window: WindowPtr, data: *mut T) {
     unsafe {
         declarations::window_set_user_data(window, data as *mut c_void);
     }
 }
 
-pub fn window_get_user_data<T>(window: *mut Window) -> *mut T {
+pub fn window_get_user_data<T>(window: WindowPtr) -> *mut T {
     unsafe { declarations::window_get_user_data(window) as *mut T }
 }
 
-pub fn window_stack_push(window: *mut Window, animate: bool) {
-    unsafe {
-        if animate {
-            declarations::window_stack_push(window, 1);
-        } else {
-            declarations::window_stack_push(window, 0);
-        }
-    }
+pub fn window_stack_push(window: WindowPtr, animated: bool) {
+    unsafe { declarations::window_stack_push(window, animated) }
 }
 
-pub fn window_get_root_layer(window: *mut Window) -> *mut Layer {
+pub fn window_stack_pop(animated: bool) -> WindowPtr {
+    unsafe { declarations::window_stack_pop(animated) }
+}
+
+pub fn window_stack_pop_all(animated: bool) {
+    unsafe { declarations::window_stack_pop_all(animated) }
+}
+
+pub fn window_stack_remove(window: WindowPtr, animated: bool) -> bool {
+    unsafe { declarations::window_stack_remove(window, animated) }
+}
+
+pub fn window_stack_get_top_window() -> WindowPtr {
+    unsafe { declarations::window_stack_get_top_window() }
+}
+
+pub fn window_stack_contains_window(window: WindowPtr) -> bool {
+    unsafe { declarations::window_stack_contains_window(window) }
+}
+
+pub fn window_get_root_layer(window: WindowPtr) -> *mut Layer {
     unsafe { declarations::window_get_root_layer(window) }
 }
 
@@ -228,7 +242,7 @@ pub fn menu_layer_set_callbacks(
     }
 }
 
-pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: *mut Window) {
+pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: WindowPtr) {
     unsafe {
         declarations::menu_layer_set_click_config_onto_window(menu_layer, window);
     }
