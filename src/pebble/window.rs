@@ -16,59 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::{functions::interface, types};
+use crate::pebble::internal::functions::interface;
+use crate::pebble::internal::types;
+use crate::pebble::internal::types::c_void;
 use crate::pebble::layer::Layer;
 use crate::pebble::types::GColor;
-use crate::pebble::WindowPtr;
+use crate::WindowPtr;
+use alloc::boxed::Box;
 
-pub struct Window {
-    internal: *mut types::Window,
+/// A safe, non-owning reference to a Window.
+/// Used inside callbacks to interact with the window safely without triggering Drop.
+pub struct WindowRef {
+    internal: WindowPtr,
 }
 
-#[derive(Copy, Clone)]
-pub struct WindowHandlers {
-    pub load: extern "C" fn(WindowPtr),
-    pub unload: extern "C" fn(WindowPtr),
-    pub appear: extern "C" fn(WindowPtr),
-    pub disappear: extern "C" fn(WindowPtr),
-}
-
-impl Default for Window {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Window {
-    pub fn new() -> Window {
-        Window {
-            internal: interface::window_create(),
-        }
-    }
-
-    pub fn from_raw(ptr: WindowPtr) -> Window {
-        Window { internal: ptr }
-    }
-
+impl WindowRef {
     pub fn push(&self, animate: bool) {
         interface::window_stack_push(self.internal, animate);
-    }
-
-    pub fn set_handlers(&self, handlers: WindowHandlers) {
-        let WindowHandlers {
-            load,
-            unload,
-            appear,
-            disappear,
-        } = handlers;
-        let converted = types::WindowHandlers {
-            load,
-            unload,
-            appear,
-            disappear,
-        };
-
-        interface::window_set_window_handlers(self.internal, converted);
     }
 
     pub fn set_background_color(&self, color: GColor) {
@@ -79,8 +43,108 @@ impl Window {
         let layer_ptr = interface::window_get_root_layer(self.internal);
         Layer::from_raw(layer_ptr)
     }
+}
 
-    pub fn clean_exit(&self) {
+/// Safe Rust trait for Window lifecycle events
+pub trait WindowDelegate: Sized {
+    fn load(&self, _window: WindowRef) {}
+    fn unload(&self, _window: WindowRef) {}
+    fn appear(&self, _window: WindowRef) {}
+    fn disappear(&self, _window: WindowRef) {}
+}
+
+pub struct Window<T: WindowDelegate> {
+    internal: *mut types::Window,
+    delegate: Box<T>,
+}
+
+impl<T: WindowDelegate> Window<T> {
+    pub fn new(delegate: T) -> Self {
+        let internal = interface::window_create();
+
+        let window = Window {
+            internal,
+            delegate: Box::new(delegate),
+        };
+
+        let context_ptr = &*window.delegate as *const T as *mut c_void;
+        interface::window_set_user_data(window.internal, context_ptr);
+
+        let handlers = types::WindowHandlers {
+            load: Some(trampoline_load::<T>),
+            unload: Some(trampoline_unload::<T>),
+            appear: Some(trampoline_appear::<T>),
+            disappear: Some(trampoline_disappear::<T>),
+        };
+        interface::window_set_window_handlers(window.internal, handlers);
+
+        window
+    }
+
+    pub fn push(&self, animate: bool) {
+        interface::window_stack_push(self.internal, animate);
+    }
+
+    pub fn set_background_color(&self, color: GColor) {
+        interface::window_set_background_color(self.internal, color);
+    }
+
+    pub fn get_root_layer(&self) -> Layer {
+        let layer_ptr = interface::window_get_root_layer(self.internal);
+        Layer::from_raw(layer_ptr)
+    }
+}
+
+impl<T: WindowDelegate> Drop for Window<T> {
+    fn drop(&mut self) {
         interface::window_destroy(self.internal);
+    }
+}
+
+extern "C" fn trampoline_load<T: WindowDelegate>(window_ptr: WindowPtr) {
+    unsafe {
+        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        if !user_data.is_null() {
+            let delegate = &*(user_data as *const T);
+            delegate.load(WindowRef {
+                internal: window_ptr,
+            });
+        }
+    }
+}
+
+extern "C" fn trampoline_unload<T: WindowDelegate>(window_ptr: WindowPtr) {
+    unsafe {
+        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        if !user_data.is_null() {
+            let delegate = &*(user_data as *const T);
+            delegate.unload(WindowRef {
+                internal: window_ptr,
+            });
+        }
+    }
+}
+
+extern "C" fn trampoline_appear<T: WindowDelegate>(window_ptr: WindowPtr) {
+    unsafe {
+        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        if !user_data.is_null() {
+            let delegate = &*(user_data as *const T);
+            delegate.appear(WindowRef {
+                internal: window_ptr,
+            });
+        }
+    }
+}
+
+extern "C" fn trampoline_disappear<T: WindowDelegate>(window_ptr: WindowPtr) {
+    unsafe {
+        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        if !user_data.is_null() {
+            let delegate = &*(user_data as *const T);
+            delegate.disappear(WindowRef {
+                internal: window_ptr,
+            });
+        }
     }
 }

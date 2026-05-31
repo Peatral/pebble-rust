@@ -72,12 +72,14 @@ pub struct GRect {
     pub size: GSize,
 }
 
+pub type WindowHandler = extern "C" fn(*mut Window);
+
 #[repr(C)]
 pub struct WindowHandlers {
-    pub load: extern "C" fn(*mut Window),
-    pub appear: extern "C" fn(*mut Window),
-    pub disappear: extern "C" fn(*mut Window),
-    pub unload: extern "C" fn(*mut Window),
+    pub load: Option<WindowHandler>,
+    pub appear: Option<WindowHandler>,
+    pub disappear: Option<WindowHandler>,
+    pub unload: Option<WindowHandler>,
 }
 
 #[repr(C)]
