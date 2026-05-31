@@ -17,9 +17,13 @@
  */
 
 use crate::pebble::internal::functions::declarations::text_layer_set_text;
+use crate::pebble::internal::types::GTextAlignment;
 use crate::pebble::internal::{functions::interface, types};
 use crate::pebble::types::{Bitmap, GCompOp, GRect};
 use crate::system::fonts::Font;
+
+mod menu_layer;
+pub use menu_layer::{MenuLayer, MenuLayerDelegate};
 
 pub struct Layer {
     internal: *mut types::Layer,
@@ -116,6 +120,9 @@ impl TextLayer {
 
     pub fn set_font(&self, font: Font) {
         interface::text_layer_set_font(self.internal, font.internal)
+    }
+    pub fn set_text_alignment(&self, alignment: GTextAlignment) {
+        interface::text_layer_set_text_alignment(self.internal, alignment);
     }
 }
 

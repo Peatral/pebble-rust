@@ -34,6 +34,7 @@ pub enum ClickRecognizer {}
 pub enum GBitmap {}
 pub enum GContext {}
 pub enum BitmapLayer {}
+pub enum MenuLayer {}
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -247,4 +248,57 @@ pub struct BatteryChargeState {
 pub struct ConnectionHandlers {
     pub app: extern "C" fn(bool),
     pub pebblekit: extern "C" fn(bool),
+}
+
+#[repr(C, packed)]
+#[derive(Copy, Clone)]
+pub struct MenuIndex {
+    pub section: u16,
+    pub row: u16,
+}
+
+pub type MenuLayerGetNumberOfSectionsCallback = extern "C" fn(*mut MenuLayer, *mut c_void) -> u16;
+pub type MenuLayerGetNumberOfRowsInSectionsCallback =
+    extern "C" fn(*mut MenuLayer, u16, *mut c_void) -> u16;
+pub type MenuLayerGetCellHeightCallback =
+    extern "C" fn(*mut MenuLayer, *mut MenuIndex, *mut c_void) -> i16;
+pub type MenuLayerGetHeaderHeightCallback = extern "C" fn(*mut MenuLayer, u16, *mut c_void) -> i16;
+pub type MenuLayerGetSeparatorHeightCallback =
+    extern "C" fn(*mut MenuLayer, *mut MenuIndex, *mut c_void) -> i16;
+pub type MenuLayerDrawRowCallback =
+    extern "C" fn(*mut GContext, *const Layer, *mut MenuIndex, *mut c_void);
+pub type MenuLayerDrawHeaderCallback = extern "C" fn(*mut GContext, *const Layer, u16, *mut c_void);
+pub type MenuLayerDrawSeparatorCallback =
+    extern "C" fn(*mut GContext, *const Layer, *mut MenuIndex, *mut c_void);
+pub type MenuLayerSelectCallback = extern "C" fn(*mut MenuLayer, *mut MenuIndex, *mut c_void);
+pub type MenuLayerSelectionChangedCallback =
+    extern "C" fn(*mut MenuLayer, MenuIndex, MenuIndex, *mut c_void);
+
+pub type MenuLayerSelectionWillChangeCallback =
+    extern "C" fn(*mut MenuLayer, *mut MenuIndex, MenuIndex, *mut c_void);
+pub type MenuLayerDrawBackgroundCallback =
+    extern "C" fn(*mut GContext, *const Layer, bool, *mut c_void);
+
+#[repr(C)]
+pub struct MenuLayerCallbacks {
+    pub get_num_sections: Option<MenuLayerGetNumberOfSectionsCallback>,
+    pub get_num_rows: Option<MenuLayerGetNumberOfRowsInSectionsCallback>,
+    pub get_cell_height: Option<MenuLayerGetCellHeightCallback>,
+    pub get_header_height: Option<MenuLayerGetHeaderHeightCallback>,
+    pub draw_row: Option<MenuLayerDrawRowCallback>,
+    pub draw_header: Option<MenuLayerDrawHeaderCallback>,
+    pub select_click: Option<MenuLayerSelectCallback>,
+    pub select_long_click: Option<MenuLayerSelectCallback>,
+    pub selection_changed: Option<MenuLayerSelectionChangedCallback>,
+    pub get_separator_height: Option<MenuLayerGetSeparatorHeightCallback>,
+    pub draw_separator: Option<MenuLayerDrawSeparatorCallback>,
+    pub selection_will_change: Option<MenuLayerSelectionWillChangeCallback>,
+    pub draw_background: Option<MenuLayerDrawBackgroundCallback>,
+}
+
+#[repr(u32)]
+pub enum GTextAlignment {
+    Left = 0,
+    Center = 1,
+    Right = 2,
 }

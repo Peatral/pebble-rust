@@ -168,6 +168,10 @@ pub fn text_layer_get_layer(layer: *mut TextLayer) -> *mut Layer {
     unsafe { declarations::text_layer_get_layer(layer) }
 }
 
+pub fn text_layer_set_text_alignment(layer: *mut TextLayer, text_alignment: GTextAlignment) {
+    unsafe { declarations::text_layer_set_text_alignment(layer, text_alignment) }
+}
+
 pub fn gbitmap_create_with_resource(id: u32) -> *mut GBitmap {
     unsafe { declarations::gbitmap_create_with_resource(id) }
 }
@@ -190,6 +194,40 @@ pub fn bitmap_layer_set_compositing_mode(layer: *mut BitmapLayer, mode: GCompOp)
 
 pub fn bitmap_layer_get_layer(layer: *mut BitmapLayer) -> *mut Layer {
     unsafe { declarations::bitmap_layer_get_layer(layer) }
+}
+
+pub fn menu_layer_create(bounds: GRect) -> *mut MenuLayer {
+    unsafe { declarations::menu_layer_create(bounds) }
+}
+
+pub fn menu_layer_destroy(menu_layer: *mut MenuLayer) {
+    unsafe {
+        declarations::menu_layer_destroy(menu_layer);
+    }
+}
+pub fn menu_layer_get_layer(menu_layer: *mut MenuLayer) -> *mut Layer {
+    unsafe { declarations::menu_layer_get_layer(menu_layer) }
+}
+
+pub fn menu_layer_set_callbacks(
+    menu_layer: *mut MenuLayer,
+    context: *mut c_void,
+    callbacks: MenuLayerCallbacks,
+) {
+    unsafe {
+        declarations::menu_layer_set_callbacks(menu_layer, context, callbacks);
+    }
+}
+
+pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: *mut Window) {
+    unsafe {
+        declarations::menu_layer_set_click_config_onto_window(menu_layer, window);
+    }
+}
+pub fn menu_layer_reload_data(menu_layer: *mut MenuLayer) {
+    unsafe {
+        declarations::menu_layer_reload_data(menu_layer);
+    }
 }
 
 pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor) {

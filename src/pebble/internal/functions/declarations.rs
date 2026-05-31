@@ -63,6 +63,10 @@ extern "C" {
     pub fn text_layer_set_text(layer: *mut TextLayer, text: *const c_char);
     pub fn text_layer_get_layer(layer: *mut TextLayer) -> *mut Layer;
     pub fn text_layer_set_font(layer: *mut TextLayer, font: GFont);
+    pub fn text_layer_set_text_alignment(
+        text_layer: *mut TextLayer,
+        text_alignment: GTextAlignment,
+    );
 
     // GBitmap
     pub fn gbitmap_create_with_resource(id: u32) -> *mut GBitmap;
@@ -73,6 +77,18 @@ extern "C" {
     pub fn bitmap_layer_set_bitmap(layer: *mut BitmapLayer, bitmap: *mut GBitmap);
     pub fn bitmap_layer_set_compositing_mode(layer: *mut BitmapLayer, mode: GCompOp);
     pub fn bitmap_layer_get_layer(layer: *mut BitmapLayer) -> *mut Layer;
+
+    // Menu
+    pub fn menu_layer_create(bounds: GRect) -> *mut MenuLayer;
+    pub fn menu_layer_destroy(menu_layer: *mut MenuLayer);
+    pub fn menu_layer_get_layer(menu_layer: *mut MenuLayer) -> *mut Layer;
+    pub fn menu_layer_set_callbacks(
+        menu_layer: *mut MenuLayer,
+        context: *mut c_void,
+        callbacks: MenuLayerCallbacks,
+    );
+    pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: *mut Window);
+    pub fn menu_layer_reload_data(menu_layer: *mut MenuLayer);
 
     // Graphics
     pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor);
