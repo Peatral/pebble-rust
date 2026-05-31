@@ -22,7 +22,7 @@ use crate::pebble::internal::{functions::interface, types};
 use crate::pebble::types::{Bitmap, GCompOp, GRect};
 use crate::system::fonts::Font;
 
-mod menu_layer;
+pub mod menu_layer;
 pub use menu_layer::{MenuLayer, MenuLayerDelegate};
 
 pub struct Layer {

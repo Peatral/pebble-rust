@@ -301,6 +301,15 @@ pub struct MenuLayerCallbacks {
     pub draw_background: Option<MenuLayerDrawBackgroundCallback>,
 }
 
+#[repr(i32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum MenuRowAlign {
+    None = 0,
+    Center = 1,
+    Top = 2,
+    Bottom = 3,
+}
+
 #[repr(u32)]
 pub enum GTextAlignment {
     Left = 0,

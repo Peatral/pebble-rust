@@ -417,3 +417,79 @@ pub fn launch_reason() -> u32 {
 pub fn launch_get_args() -> u32 {
     unsafe { declarations::launch_get_args() }
 }
+
+pub fn menu_cell_basic_draw(
+    ctx: *mut GContext,
+    cell_layer: *const Layer,
+    title: *const c_char,
+    subtitle: *const c_char,
+    icon: *mut GBitmap,
+) {
+    unsafe { declarations::menu_cell_basic_draw(ctx, cell_layer, title, subtitle, icon) }
+}
+pub fn menu_cell_title_draw(ctx: *mut GContext, cell_layer: *const Layer, title: *const c_char) {
+    unsafe { declarations::menu_cell_title_draw(ctx, cell_layer, title) }
+}
+pub fn menu_cell_basic_header_draw(
+    ctx: *mut GContext,
+    cell_layer: *const Layer,
+    title: *const c_char,
+) {
+    unsafe { declarations::menu_cell_basic_header_draw(ctx, cell_layer, title) }
+}
+pub fn menu_index_compare(a: *const MenuIndex, b: *const MenuIndex) -> i16 {
+    unsafe { declarations::menu_index_compare(a, b) }
+}
+pub fn menu_layer_get_scroll_layer(menu_layer: *const MenuLayer) -> *mut Layer {
+    unsafe { declarations::menu_layer_get_scroll_layer(menu_layer) }
+}
+pub fn menu_layer_set_selected_next(
+    menu_layer: *mut MenuLayer,
+    up: bool,
+    scroll_align: MenuRowAlign,
+    animated: bool,
+) {
+    unsafe { declarations::menu_layer_set_selected_next(menu_layer, up, scroll_align, animated) }
+}
+pub fn menu_layer_set_selected_index(
+    menu_layer: *mut MenuLayer,
+    index: MenuIndex,
+    scroll_align: MenuRowAlign,
+    animated: bool,
+) {
+    unsafe {
+        declarations::menu_layer_set_selected_index(menu_layer, index, scroll_align, animated)
+    }
+}
+pub fn menu_layer_get_selected_index(menu_layer: *const MenuLayer) -> MenuIndex {
+    unsafe { declarations::menu_layer_get_selected_index(menu_layer) }
+}
+pub fn menu_cell_layer_is_highlighted(cell_layer: *const Layer) -> bool {
+    unsafe { declarations::menu_cell_layer_is_highlighted(cell_layer) }
+}
+pub fn menu_layer_set_normal_colors(
+    menu_layer: *mut MenuLayer,
+    background: GColor,
+    foreground: GColor,
+) {
+    unsafe { declarations::menu_layer_set_normal_colors(menu_layer, background, foreground) }
+}
+pub fn menu_layer_set_highlight_colors(
+    menu_layer: *mut MenuLayer,
+    background: GColor,
+    foreground: GColor,
+) {
+    unsafe { declarations::menu_layer_set_highlight_colors(menu_layer, background, foreground) }
+}
+pub fn menu_layer_pad_bottom_enable(menu_layer: *mut MenuLayer, enable: bool) {
+    unsafe { declarations::menu_layer_pad_bottom_enable(menu_layer, enable) }
+}
+pub fn menu_layer_get_center_focused(menu_layer: *const MenuLayer) -> bool {
+    unsafe { declarations::menu_layer_get_center_focused(menu_layer) }
+}
+pub fn menu_layer_set_center_focused(menu_layer: *mut MenuLayer, center_focused: bool) {
+    unsafe { declarations::menu_layer_set_center_focused(menu_layer, center_focused) }
+}
+pub fn menu_layer_is_index_selected(menu_layer: *const MenuLayer, index: *const MenuIndex) -> bool {
+    unsafe { declarations::menu_layer_is_index_selected(menu_layer, index) }
+}

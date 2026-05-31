@@ -95,6 +95,53 @@ extern "C" {
     pub fn menu_layer_set_click_config_onto_window(menu_layer: *mut MenuLayer, window: WindowPtr);
     pub fn menu_layer_reload_data(menu_layer: *mut MenuLayer);
 
+    pub fn menu_cell_basic_draw(
+        ctx: *mut GContext,
+        cell_layer: *const Layer,
+        title: *const c_char,
+        subtitle: *const c_char,
+        icon: *mut GBitmap,
+    );
+    pub fn menu_cell_title_draw(ctx: *mut GContext, cell_layer: *const Layer, title: *const c_char);
+    pub fn menu_cell_basic_header_draw(
+        ctx: *mut GContext,
+        cell_layer: *const Layer,
+        title: *const c_char,
+    );
+    pub fn menu_index_compare(a: *const MenuIndex, b: *const MenuIndex) -> i16;
+    pub fn menu_layer_get_scroll_layer(menu_layer: *const MenuLayer) -> *mut Layer; // TODO: Technically ScrollLayer*, mapped to Layer*
+    pub fn menu_layer_set_selected_next(
+        menu_layer: *mut MenuLayer,
+        up: bool,
+        scroll_align: MenuRowAlign,
+        animated: bool,
+    );
+    pub fn menu_layer_set_selected_index(
+        menu_layer: *mut MenuLayer,
+        index: MenuIndex,
+        scroll_align: MenuRowAlign,
+        animated: bool,
+    );
+    pub fn menu_layer_get_selected_index(menu_layer: *const MenuLayer) -> MenuIndex;
+    pub fn menu_cell_layer_is_highlighted(cell_layer: *const Layer) -> bool;
+    pub fn menu_layer_set_normal_colors(
+        menu_layer: *mut MenuLayer,
+        background: GColor,
+        foreground: GColor,
+    );
+    pub fn menu_layer_set_highlight_colors(
+        menu_layer: *mut MenuLayer,
+        background: GColor,
+        foreground: GColor,
+    );
+    pub fn menu_layer_pad_bottom_enable(menu_layer: *mut MenuLayer, enable: bool);
+    pub fn menu_layer_get_center_focused(menu_layer: *const MenuLayer) -> bool;
+    pub fn menu_layer_set_center_focused(menu_layer: *mut MenuLayer, center_focused: bool);
+    pub fn menu_layer_is_index_selected(
+        menu_layer: *const MenuLayer,
+        index: *const MenuIndex,
+    ) -> bool;
+
     // Graphics
     pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor);
     pub fn graphics_fill_circle(ctx: *mut GContext, center: GPoint, radius: u16);
