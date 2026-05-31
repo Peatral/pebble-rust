@@ -26,6 +26,7 @@ pub mod layer;
 pub mod std;
 pub mod system;
 pub mod types;
+pub mod vibes;
 pub mod window;
 
 pub use internal::alloc;

@@ -302,3 +302,9 @@ pub enum GTextAlignment {
     Center = 1,
     Right = 2,
 }
+
+#[repr(C)]
+pub struct VibePattern {
+    pub durations: *const u32,
+    pub num_segments: u32,
+}

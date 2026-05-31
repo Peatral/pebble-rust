@@ -204,4 +204,11 @@ extern "C" {
 
     // Logging
     pub fn app_log(level: u8, filename: *const c_char, line_num: u32, msg: *const c_char, ...);
+
+    // Vibration
+    pub fn vibes_cancel();
+    pub fn vibes_short_pulse();
+    pub fn vibes_long_pulse();
+    pub fn vibes_double_pulse();
+    pub fn vibes_enqueue_custom_pattern(pattern: VibePattern);
 }

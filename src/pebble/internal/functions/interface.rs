@@ -278,3 +278,23 @@ pub fn app_log(level: u8, msg: &str, name: &str) {
         declarations::app_log(level, name.as_ptr(), 2, msg.as_ptr());
     }
 }
+
+pub fn vibes_cancel() {
+    unsafe { declarations::vibes_cancel() }
+}
+pub fn vibes_short_pulse() {
+    unsafe { declarations::vibes_short_pulse() }
+}
+pub fn vibes_long_pulse() {
+    unsafe { declarations::vibes_long_pulse() }
+}
+pub fn vibes_double_pulse() {
+    unsafe { declarations::vibes_double_pulse() }
+}
+pub fn vibes_enqueue_custom_pattern(durations: &'static [u32]) {
+    let pattern = VibePattern {
+        durations: durations.as_ptr(),
+        num_segments: durations.len() as u32,
+    };
+    unsafe { declarations::vibes_enqueue_custom_pattern(pattern) }
+}
