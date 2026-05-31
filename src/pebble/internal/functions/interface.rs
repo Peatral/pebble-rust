@@ -30,6 +30,7 @@ use core::mem;
 use crate::pebble::internal::types::*;
 
 use crate::pebble::internal::functions::declarations;
+use crate::types::{DictPtr, VoidPtr};
 
 pub fn app_event_loop() {
     unsafe {
@@ -492,4 +493,44 @@ pub fn menu_layer_set_center_focused(menu_layer: *mut MenuLayer, center_focused:
 }
 pub fn menu_layer_is_index_selected(menu_layer: *const MenuLayer, index: *const MenuIndex) -> bool {
     unsafe { declarations::menu_layer_is_index_selected(menu_layer, index) }
+}
+
+// interface.rs (Append to existing)
+
+pub fn app_message_open(size_inbound: u32, size_outbound: u32) -> i32 {
+    unsafe { declarations::app_message_open(size_inbound, size_outbound) }
+}
+
+pub fn app_message_inbox_size_maximum() -> u32 {
+    unsafe { declarations::app_message_inbox_size_maximum() }
+}
+
+pub fn app_message_outbox_size_maximum() -> u32 {
+    unsafe { declarations::app_message_outbox_size_maximum() }
+}
+
+pub fn app_message_register_inbox_received(callback: extern "C" fn(iter: DictPtr, ctx: VoidPtr)) {
+    unsafe { declarations::app_message_register_inbox_received(callback) }
+}
+
+pub fn app_message_register_inbox_dropped(callback: extern "C" fn(reason: i32, ctx: VoidPtr)) {
+    unsafe { declarations::app_message_register_inbox_dropped(callback) }
+}
+
+pub fn app_message_register_outbox_sent(callback: extern "C" fn(iter: DictPtr, ctx: VoidPtr)) {
+    unsafe { declarations::app_message_register_outbox_sent(callback) }
+}
+
+pub fn app_message_register_outbox_failed(
+    callback: extern "C" fn(iter: DictPtr, reason: i32, ctx: VoidPtr),
+) {
+    unsafe { declarations::app_message_register_outbox_failed(callback) }
+}
+
+pub fn app_message_outbox_begin(iterator: *mut DictPtr) -> i32 {
+    unsafe { declarations::app_message_outbox_begin(iterator) }
+}
+
+pub fn app_message_outbox_send() -> i32 {
+    unsafe { declarations::app_message_outbox_send() }
 }

@@ -15,29 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 pub use crate::pebble::internal::types::Tuple;
 
 use crate::pebble::internal::functions::declarations::*;
-use crate::pebble::internal::types::{self, c_void, AppMessageResult, DictionaryIterator};
-use crate::pebble::types::{DictPtr, VoidPtr};
-
-/// Represents a `DictionaryIterator`, essentially a list of `Tuple`s.
-/// # Usage
-/// ```
-/// use pebble_rust::app_message::Dictionary;
-///
-/// let dictionary = Dictionary::new();
-/// let mut buffer: [u8; 256] = unimplemented!();
-/// dictionary.init_write(&mut buffer);
-///
-/// dictionary.write_int(0, 2u32);
-/// ```
-pub struct Dictionary {
-    internal: *mut DictionaryIterator,
-}
+use crate::pebble::internal::types::{self, c_void, DictionaryIterator};
+use crate::pebble::types::{AppMessageResult, DictPtr, VoidPtr};
+use alloc::ffi::CString;
 
 const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
+
+/// Represents a `DictionaryIterator`, essentially a list of `Tuple`s.
+pub struct Dictionary {
+    internal: DictPtr,
+}
 
 impl Default for Dictionary {
     fn default() -> Self {
@@ -126,8 +116,19 @@ impl Dictionary {
         }
     }
 
-    pub fn write_string(&self, key: u32, string: &str) {
-        unsafe { dict_write_cstring(self.internal, key, string.as_ptr()) };
+    pub fn write_string(&self, key: u32, string: &str) -> Result<(), AppMessageResult> {
+        let c_str = CString::new(string).map_err(|_| AppMessageResult::InvalidArgs)?;
+        unsafe {
+            let ptr = c_str.as_ptr() as *const types::c_char;
+            let result = dict_write_cstring(self.internal, key, ptr);
+
+            let status = AppMessageResult::from(result as i32);
+            if status == AppMessageResult::Ok {
+                Ok(())
+            } else {
+                Err(status)
+            }
+        }
     }
 
     pub fn prepare_for_read(&self) {
@@ -155,9 +156,7 @@ pub trait Integer {
 macro_rules! impl_signed {
     (for $($t:ty),+) => {
         $(impl Integer for $t {
-            fn signed(&self) -> bool {
-                true
-            }
+            fn signed(&self) -> bool { true }
         })*
     }
 }
@@ -165,9 +164,7 @@ macro_rules! impl_signed {
 macro_rules! impl_unsigned {
     (for $($t:ty),+) => {
         $(impl Integer for $t {
-            fn signed(&self) -> bool {
-                false
-            }
+            fn signed(&self) -> bool { false }
         })*
     }
 }
@@ -175,39 +172,119 @@ macro_rules! impl_unsigned {
 impl_signed!(for i32, i64, i8, i16, isize);
 impl_unsigned!(for u32, u64, u8, u16, usize);
 
+static mut INBOX_RECEIVED: Option<fn(Dictionary)> = None;
+static mut INBOX_DROPPED: Option<fn(AppMessageResult)> = None;
+static mut OUTBOX_SENT: Option<fn(Dictionary)> = None;
+static mut OUTBOX_FAILED: Option<fn(Dictionary, AppMessageResult)> = None;
+
+extern "C" fn trampoline_inbox_received(dict_ptr: DictPtr, _ctx: VoidPtr) {
+    unsafe {
+        if let Some(handler) = INBOX_RECEIVED {
+            handler(Dictionary::from_raw(dict_ptr));
+        }
+    }
+}
+
+extern "C" fn trampoline_inbox_dropped(reason: i32, _ctx: VoidPtr) {
+    unsafe {
+        if let Some(handler) = INBOX_DROPPED {
+            handler(AppMessageResult::from(reason));
+        }
+    }
+}
+
+extern "C" fn trampoline_outbox_sent(dict_ptr: DictPtr, _ctx: VoidPtr) {
+    unsafe {
+        if let Some(handler) = OUTBOX_SENT {
+            handler(Dictionary::from_raw(dict_ptr));
+        }
+    }
+}
+
+extern "C" fn trampoline_outbox_failed(dict_ptr: DictPtr, reason: i32, _ctx: VoidPtr) {
+    unsafe {
+        if let Some(handler) = OUTBOX_FAILED {
+            handler(
+                Dictionary::from_raw(dict_ptr),
+                AppMessageResult::from(reason),
+            );
+        }
+    }
+}
+
 pub struct AppMessage;
 
 impl AppMessage {
-    pub fn open(size_inbound: u32, size_outbound: u32) {
-        unsafe {
-            app_message_open(size_inbound, size_outbound);
+    /// Opens the AppMessage subsystem.
+    /// Note: Callbacks should be registered BEFORE calling open.
+    pub fn open(size_inbound: u32, size_outbound: u32) -> Result<(), AppMessageResult> {
+        let result = unsafe { app_message_open(size_inbound, size_outbound) };
+        let status = AppMessageResult::from(result);
+        if status == AppMessageResult::Ok {
+            Ok(())
+        } else {
+            Err(status)
         }
     }
 
-    pub fn register_inbox(callback: extern "C" fn(dict: DictPtr, ctx: VoidPtr)) {
+    pub fn inbox_size_maximum() -> u32 {
+        unsafe { app_message_inbox_size_maximum() }
+    }
+
+    pub fn outbox_size_maximum() -> u32 {
+        unsafe { app_message_outbox_size_maximum() }
+    }
+
+    pub fn register_inbox_received(handler: fn(Dictionary)) {
         unsafe {
-            app_message_register_inbox_received(callback);
+            INBOX_RECEIVED = Some(handler);
+            app_message_register_inbox_received(trampoline_inbox_received);
         }
     }
 
-    pub fn register_inbox_drop(callback: extern "C" fn(reason: AppMessageResult, ctx: VoidPtr)) {
+    pub fn register_inbox_dropped(handler: fn(AppMessageResult)) {
         unsafe {
-            app_message_register_inbox_dropped(callback);
+            INBOX_DROPPED = Some(handler);
+            app_message_register_inbox_dropped(trampoline_inbox_dropped);
         }
     }
 
-    pub fn init_write(dictionary: &mut Dictionary) {
+    pub fn register_outbox_sent(handler: fn(Dictionary)) {
         unsafe {
-            let internal = dictionary.internal;
-            let ptr = internal as *mut *mut DictionaryIterator;
-            app_message_outbox_begin(ptr);
-            dictionary.internal = *ptr;
+            OUTBOX_SENT = Some(handler);
+            app_message_register_outbox_sent(trampoline_outbox_sent);
         }
     }
 
-    pub fn send() {
+    pub fn register_outbox_failed(handler: fn(Dictionary, AppMessageResult)) {
         unsafe {
-            app_message_outbox_send();
+            OUTBOX_FAILED = Some(handler);
+            app_message_register_outbox_failed(trampoline_outbox_failed);
+        }
+    }
+
+    /// Prepares a new dictionary for outgoing transmission.
+    pub fn outbox_begin() -> Result<Dictionary, AppMessageResult> {
+        unsafe {
+            let mut iter: DictPtr = core::ptr::null_mut();
+            let result = app_message_outbox_begin(&mut iter);
+            let status = AppMessageResult::from(result);
+
+            if status == AppMessageResult::Ok && !iter.is_null() {
+                Ok(Dictionary::from_raw(iter))
+            } else {
+                Err(status)
+            }
+        }
+    }
+
+    pub fn send() -> Result<(), AppMessageResult> {
+        let result = unsafe { app_message_outbox_send() };
+        let status = AppMessageResult::from(result);
+        if status == AppMessageResult::Ok {
+            Ok(())
+        } else {
+            Err(status)
         }
     }
 }

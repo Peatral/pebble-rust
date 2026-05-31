@@ -223,23 +223,48 @@ pub enum DictionaryResult {
     DICT_MALLOC_FAILED,
 }
 
-#[repr(u8)]
+#[repr(i32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum AppMessageResult {
-    OK,
-    SEND_TIMEOUT,
-    SEND_REJECTED,
-    NOT_CONNECTED,
-    NOT_RUNNING,
-    INVALID_ARGS,
-    BUSY,
-    BUFFER_OVERFLOW,
-    ALREADY_RELEASED,
-    CALLBACK_ALREADY_REGISTERED,
-    CALLBACK_NOT_REGISTERED,
-    OUT_OF_MEMORY,
-    CLOSED,
-    INTERNAL_ERROR,
-    INVALID_STATE,
+    Ok = 0,
+    SendTimeout = 2,
+    SendRejected = 4,
+    NotConnected = 8,
+    AppNotRunning = 16,
+    InvalidArgs = 32,
+    Busy = 64,
+    BufferOverflow = 128,
+    AlreadyReleased = 512,
+    CallbackAlreadyRegistered = 1024,
+    CallbackNotRegistered = 2048,
+    OutOfMemory = 4096,
+    Closed = 8192,
+    InternalError = 16384,
+    InvalidState = 32768,
+    Unknown = -1,
+}
+
+impl From<i32> for AppMessageResult {
+    fn from(val: i32) -> Self {
+        match val {
+            0 => AppMessageResult::Ok,
+            2 => AppMessageResult::SendTimeout,
+            4 => AppMessageResult::SendRejected,
+            8 => AppMessageResult::NotConnected,
+            16 => AppMessageResult::AppNotRunning,
+            32 => AppMessageResult::InvalidArgs,
+            64 => AppMessageResult::Busy,
+            128 => AppMessageResult::BufferOverflow,
+            512 => AppMessageResult::AlreadyReleased,
+            1024 => AppMessageResult::CallbackAlreadyRegistered,
+            2048 => AppMessageResult::CallbackNotRegistered,
+            4096 => AppMessageResult::OutOfMemory,
+            8192 => AppMessageResult::Closed,
+            16384 => AppMessageResult::InternalError,
+            32768 => AppMessageResult::InvalidState,
+            _ => AppMessageResult::Unknown,
+        }
+    }
 }
 
 #[repr(C)]

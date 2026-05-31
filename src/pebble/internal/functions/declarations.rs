@@ -24,6 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 use crate::pebble::internal::types::*;
+use crate::types::{DictPtr, VoidPtr};
 
 extern "C" {
     // App
@@ -229,18 +230,23 @@ extern "C" {
     pub fn dict_find(iter: *mut DictionaryIterator, key: u32) -> *mut Tuple;
 
     // AppMessage
-    pub fn app_message_open(size_in: u32, size_out: u32);
+    pub fn app_message_open(size_inbound: u32, size_outbound: u32) -> i32;
+    pub fn app_message_inbox_size_maximum() -> u32;
+    pub fn app_message_outbox_size_maximum() -> u32;
+
+    // Callbacks
     pub fn app_message_register_inbox_received(
-        callback: extern "C" fn(iter: *mut DictionaryIterator, ctx: *const c_void),
+        callback: extern "C" fn(iter: DictPtr, ctx: VoidPtr),
     );
-    pub fn app_message_register_outbox_sent(
-        callback: extern "C" fn(iter: *mut DictionaryIterator, ctx: *const c_void),
+    pub fn app_message_register_inbox_dropped(callback: extern "C" fn(reason: i32, ctx: VoidPtr));
+    pub fn app_message_register_outbox_sent(callback: extern "C" fn(iter: DictPtr, ctx: VoidPtr));
+    pub fn app_message_register_outbox_failed(
+        callback: extern "C" fn(iter: DictPtr, reason: i32, ctx: VoidPtr),
     );
-    pub fn app_message_register_inbox_dropped(
-        callback: extern "C" fn(reason: AppMessageResult, ctx: *const c_void),
-    );
-    pub fn app_message_outbox_begin(iter: *mut *mut DictionaryIterator);
-    pub fn app_message_outbox_send();
+
+    // Outgoing Messages
+    pub fn app_message_outbox_begin(iterator: *mut DictPtr) -> i32;
+    pub fn app_message_outbox_send() -> i32;
 
     // EVENTS
     // Battery
