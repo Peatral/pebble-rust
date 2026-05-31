@@ -28,6 +28,7 @@
 use core::mem;
 
 use crate::pebble::internal::types::*;
+use core::ffi::{c_char, c_void, CStr};
 
 use crate::pebble::internal::functions::declarations;
 use crate::types::{DictPtr, VoidPtr};
@@ -176,7 +177,7 @@ pub fn text_layer_create(bounds: GRect) -> *mut TextLayer {
     unsafe { declarations::text_layer_create(bounds) }
 }
 
-pub fn text_layer_set_text(layer: *mut TextLayer, text: &str) {
+pub fn text_layer_set_text(layer: *mut TextLayer, text: &CStr) {
     unsafe {
         declarations::text_layer_set_text(layer, text.as_ptr());
     }
@@ -297,7 +298,7 @@ pub fn gmtime(now: usize) -> *mut tm {
     }
 }
 
-pub fn app_log(level: u8, msg: &str, name: &str) {
+pub fn app_log(level: u8, msg: &CStr, name: &CStr) {
     unsafe {
         declarations::app_log(level, name.as_ptr(), 2, msg.as_ptr());
     }
@@ -379,8 +380,8 @@ pub fn persist_write_data(key: u32, data: *const c_void, size: usize) -> i32 {
     unsafe { declarations::persist_write_data(key, data, size) }
 }
 
-pub fn persist_write_string(key: u32, cstring: *const c_char) -> i32 {
-    unsafe { declarations::persist_write_string(key, cstring) }
+pub fn persist_write_string(key: u32, cstring: &CStr) -> i32 {
+    unsafe { declarations::persist_write_string(key, cstring.as_ptr()) }
 }
 
 pub fn persist_delete(key: u32) -> Status {
@@ -422,21 +423,19 @@ pub fn launch_get_args() -> u32 {
 pub fn menu_cell_basic_draw(
     ctx: *mut GContext,
     cell_layer: *const Layer,
-    title: *const c_char,
-    subtitle: *const c_char,
+    title: &CStr,
+    subtitle: &CStr,
     icon: *mut GBitmap,
 ) {
-    unsafe { declarations::menu_cell_basic_draw(ctx, cell_layer, title, subtitle, icon) }
+    unsafe {
+        declarations::menu_cell_basic_draw(ctx, cell_layer, title.as_ptr(), subtitle.as_ptr(), icon)
+    }
 }
-pub fn menu_cell_title_draw(ctx: *mut GContext, cell_layer: *const Layer, title: *const c_char) {
-    unsafe { declarations::menu_cell_title_draw(ctx, cell_layer, title) }
+pub fn menu_cell_title_draw(ctx: *mut GContext, cell_layer: *const Layer, title: &CStr) {
+    unsafe { declarations::menu_cell_title_draw(ctx, cell_layer, title.as_ptr()) }
 }
-pub fn menu_cell_basic_header_draw(
-    ctx: *mut GContext,
-    cell_layer: *const Layer,
-    title: *const c_char,
-) {
-    unsafe { declarations::menu_cell_basic_header_draw(ctx, cell_layer, title) }
+pub fn menu_cell_basic_header_draw(ctx: *mut GContext, cell_layer: *const Layer, title: &CStr) {
+    unsafe { declarations::menu_cell_basic_header_draw(ctx, cell_layer, title.as_ptr()) }
 }
 pub fn menu_index_compare(a: *const MenuIndex, b: *const MenuIndex) -> i16 {
     unsafe { declarations::menu_index_compare(a, b) }

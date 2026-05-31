@@ -22,8 +22,9 @@ pub use crate::pebble::internal::types::{
     tm, AppLaunchReason, AppMessageResult, GColor, GCompOp, GContext, GPoint, GRect, GSize,
     GTextAlignment, Layer, MenuIndex, MenuLayer, Status, StatusCode, TimeUnits, Tuple, TupleValue,
 };
+use core::ffi::c_void;
 
-pub type VoidPtr = *const crate::pebble::internal::types::c_void;
+pub type VoidPtr = *const c_void;
 pub type DictPtr = *mut crate::pebble::internal::types::DictionaryIterator;
 
 pub struct Bitmap {

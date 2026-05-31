@@ -27,6 +27,8 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::from_over_into)]
 
+use core::ffi::c_void;
+
 pub enum Window {}
 pub enum Layer {}
 pub enum TextLayer {}
@@ -119,16 +121,6 @@ pub struct FontInfo {
 }
 
 pub type GFont = *mut FontInfo;
-
-#[allow(non_camel_case_types)]
-#[repr(u8)]
-pub enum c_void {
-    __variant1,
-    __variant2,
-}
-
-#[allow(non_camel_case_types)]
-pub type c_char = u8;
 
 #[repr(C, align(1))]
 #[derive(Copy, Clone, BitfieldStruct)]

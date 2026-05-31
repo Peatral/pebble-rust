@@ -17,14 +17,17 @@
  */
 
 use crate::pebble::internal::functions::declarations::*;
+use core::ffi::{c_char, CStr};
 
 pub fn get_time_string() -> alloc::string::String {
-    const MAX_SIZE: usize = 8usize; // 00:00 AM
+    const MAX_SIZE: usize = 8; // 00:00 AM
     let mut buf = [0u8; MAX_SIZE];
 
     unsafe {
-        clock_copy_time_string(buf.as_mut_ptr(), MAX_SIZE as u8);
-        alloc::string::String::from_utf8_unchecked(buf.to_vec())
+        clock_copy_time_string(buf.as_mut_ptr() as *mut c_char, MAX_SIZE as u8);
+
+        let c_str = CStr::from_ptr(buf.as_ptr() as *const c_char);
+        c_str.to_string_lossy().into_owned()
     }
 }
 
@@ -33,10 +36,13 @@ pub fn is_24h() -> bool {
 }
 
 pub fn get_timezone() -> alloc::string::String {
-    let mut buf = [0u8; 32];
+    const MAX_SIZE: usize = 32;
+    let mut buf = [0u8; MAX_SIZE];
 
     unsafe {
-        clock_get_timezone(buf.as_mut_ptr(), 32);
-        alloc::string::String::from_utf8_unchecked(buf.to_vec())
+        clock_get_timezone(buf.as_mut_ptr() as *mut c_char, MAX_SIZE);
+
+        let c_str = CStr::from_ptr(buf.as_ptr() as *const c_char);
+        c_str.to_string_lossy().into_owned()
     }
 }

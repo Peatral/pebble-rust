@@ -17,36 +17,61 @@
  */
 
 use crate::pebble::internal::functions::declarations::*;
+use core::ffi::{c_char, CStr};
 
-pub fn compare_strings(str1: &str, str2: &str) -> i32 {
+pub fn compare_strings(str1: &CStr, str2: &CStr) -> i32 {
     unsafe { strcmp(str1.as_ptr(), str2.as_ptr()) }
 }
 
-pub fn compare_strings_bytes(str1: &str, str2: &str, max_bytes: usize) -> i32 {
+pub fn compare_strings_bytes(str1: &CStr, str2: &CStr, max_bytes: usize) -> i32 {
     unsafe { strncmp(str1.as_ptr(), str2.as_ptr(), max_bytes) }
 }
 
-pub fn copy_strings<'a>(source: &'a str, dest: &'a str) -> &'a str {
-    unsafe { ptr_to_str(strcpy(dest.as_ptr(), source.as_ptr())) }
+/// # Safety
+/// `dest` must be a valid, mutable pointer to a buffer large enough to hold `source`.
+pub unsafe fn copy_strings<'a>(source: &CStr, dest: *mut c_char) -> &'a str {
+    let ptr = strcpy(dest, source.as_ptr());
+    ptr_to_str(ptr)
 }
 
-pub fn copy_strings_bytes<'a>(source: &'a str, dest: &'a str, max_bytes: usize) -> &'a str {
-    unsafe { ptr_to_str(strncpy(dest.as_ptr(), source.as_ptr(), max_bytes)) }
+/// # Safety
+/// `dest` must be a valid, mutable pointer.
+pub unsafe fn copy_strings_bytes<'a>(
+    source: &CStr,
+    dest: *mut c_char,
+    max_bytes: usize,
+) -> &'a str {
+    let ptr = strncpy(dest, source.as_ptr(), max_bytes);
+    ptr_to_str(ptr)
 }
 
-pub fn concat_strings<'a>(source: &'a str, dest: &'a str) -> &'a str {
-    unsafe { ptr_to_str(strcat(dest.as_ptr(), source.as_ptr())) }
+/// # Safety
+/// `dest` must be a valid, mutable pointer to a null-terminated string,
+/// with enough space to append `source`.
+pub unsafe fn concat_strings<'a>(source: &CStr, dest: *mut c_char) -> &'a str {
+    let ptr = strcat(dest, source.as_ptr());
+    ptr_to_str(ptr)
 }
 
-pub fn concat_strings_bytes<'a>(source: &'a str, dest: &'a str, max_bytes: usize) -> &'a str {
-    unsafe { ptr_to_str(strncat(dest.as_ptr(), source.as_ptr(), max_bytes)) }
+/// # Safety
+/// `dest` must be a valid, mutable pointer.
+pub unsafe fn concat_strings_bytes<'a>(
+    source: &CStr,
+    dest: *mut c_char,
+    max_bytes: usize,
+) -> &'a str {
+    let ptr = strncat(dest, source.as_ptr(), max_bytes);
+    ptr_to_str(ptr)
 }
 
-pub fn string_length(string: &str) -> usize {
+pub fn string_length(string: &CStr) -> usize {
     unsafe { strlen(string.as_ptr()) }
 }
 
-unsafe fn ptr_to_str<'a>(ptr: *const u8) -> &'a str {
-    let slc = core::slice::from_raw_parts(ptr, 5);
-    core::str::from_utf8_unchecked(slc)
+unsafe fn ptr_to_str<'a>(ptr: *const c_char) -> &'a str {
+    if ptr.is_null() {
+        return "";
+    }
+    // Safely determine length by finding the null terminator
+    CStr::from_ptr(ptr).to_str().unwrap_or("")
 }

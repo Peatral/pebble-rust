@@ -1,9 +1,8 @@
 use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{c_char, c_void, StatusCode, PERSIST_DATA_MAX_LENGTH};
-use alloc::ffi::CString;
+use crate::pebble::internal::types::{StatusCode, PERSIST_DATA_MAX_LENGTH};
 use alloc::string::String;
 use alloc::vec;
-use core::ffi::CStr;
+use core::ffi::{c_char, c_void, CStr};
 
 /// Checks whether a value has been set for a given key.
 pub fn exists(key: u32) -> bool {
@@ -61,15 +60,17 @@ pub fn read_string(key: u32) -> Result<String, StatusCode> {
 
     let mut buffer = vec![0u8; size];
 
-    let bytes_read =
-        interface::persist_read_string(key, buffer.as_mut_ptr() as *mut c_char, buffer.len());
+    unsafe {
+        let bytes_read =
+            interface::persist_read_string(key, buffer.as_mut_ptr() as *mut c_char, buffer.len());
 
-    if bytes_read < 0 {
-        return Err(StatusCode::from(bytes_read));
+        if bytes_read < 0 {
+            return Err(StatusCode::from(bytes_read));
+        }
+
+        let c_str = CStr::from_ptr(buffer.as_ptr() as *const c_char);
+        Ok(c_str.to_string_lossy().into_owned())
     }
-
-    let c_str = CStr::from_bytes_until_nul(&buffer).unwrap_or_default();
-    Ok(c_str.to_string_lossy().into_owned())
 }
 
 pub fn write_bool(key: u32, value: bool) -> Result<usize, StatusCode> {
@@ -108,10 +109,8 @@ pub fn write_data(key: u32, data: &[u8]) -> Result<usize, StatusCode> {
 }
 
 /// Safely writes a Rust string slice to persistent storage.
-pub fn write_string(key: u32, value: &str) -> Result<usize, StatusCode> {
-    let c_str = CString::new(value).map_err(|_| StatusCode::InvalidArgument)?;
-
-    let bytes_written = interface::persist_write_string(key, c_str.as_ptr() as *const c_char);
+pub fn write_string(key: u32, value: &CStr) -> Result<usize, StatusCode> {
+    let bytes_written = interface::persist_write_string(key, value);
 
     if bytes_written < 0 {
         Err(StatusCode::from(bytes_written))

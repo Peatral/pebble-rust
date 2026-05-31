@@ -1,23 +1,23 @@
 use crate::layer::ILayer;
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::internal::types::c_void;
 use crate::pebble::window::WindowRef;
 use alloc::boxed::Box;
+use core::ffi::{c_char, c_void, CStr};
 
 /// Helper to draw a basic section cell with a title, subtitle, and optional icon.
 pub fn cell_basic_draw(
     ctx: *mut types::GContext,
     cell_layer: *const types::Layer,
-    title: *const u8,
-    subtitle: *const u8,
+    title: &CStr,
+    subtitle: &CStr,
     icon: *mut types::GBitmap,
 ) {
     interface::menu_cell_basic_draw(
         ctx,
         cell_layer,
-        title as *const types::c_char,
-        subtitle as *const types::c_char,
+        title,
+        subtitle,
         icon,
     );
 }
@@ -26,18 +26,18 @@ pub fn cell_basic_draw(
 pub fn cell_title_draw(
     ctx: *mut types::GContext,
     cell_layer: *const types::Layer,
-    title: *const u8,
+    title: &CStr,
 ) {
-    interface::menu_cell_title_draw(ctx, cell_layer, title as *const types::c_char);
+    interface::menu_cell_title_draw(ctx, cell_layer, title);
 }
 
 /// Helper to draw a basic section header cell layout with the title.
 pub fn cell_basic_header_draw(
     ctx: *mut types::GContext,
     cell_layer: *const types::Layer,
-    title: *const u8,
+    title: &CStr,
 ) {
-    interface::menu_cell_basic_header_draw(ctx, cell_layer, title as *const types::c_char);
+    interface::menu_cell_basic_header_draw(ctx, cell_layer, title);
 }
 
 /// Returns whether or not the given cell layer is highlighted.

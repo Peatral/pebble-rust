@@ -1,9 +1,9 @@
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::internal::types::c_void;
 use alloc::boxed::Box;
 use alloc::rc::Rc;
 use core::cell::Cell;
+use core::ffi::c_void;
 
 /// Pauses the current thread for a specified amount of milliseconds.
 pub fn psleep(millis: i32) {

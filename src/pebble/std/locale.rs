@@ -17,17 +17,23 @@
  */
 
 use crate::pebble::internal::functions::declarations::setlocale;
+use core::ffi::{c_char, CStr};
 
-pub fn set_locale(category: i32, locale: &str) {
+pub fn set_locale(category: i32, locale: &CStr) {
     unsafe {
         setlocale(category, locale.as_ptr());
     }
 }
 
-pub fn get_locale<'a>(category: i32) -> &'a str {
+pub fn get_locale<'a>(category: i32) -> Option<&'a str> {
     unsafe {
-        let ptr = setlocale(category, core::ptr::null_mut());
-        let slc = core::slice::from_raw_parts(ptr, 5);
-        core::str::from_utf8_unchecked(slc)
+        let ptr = setlocale(category, core::ptr::null());
+
+        if ptr.is_null() {
+            return None;
+        }
+
+        let c_str = CStr::from_ptr(ptr as *const c_char);
+        c_str.to_str().ok()
     }
 }

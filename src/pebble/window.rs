@@ -18,10 +18,11 @@
 
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::internal::types::{c_void, WindowPtr};
+use crate::pebble::internal::types::WindowPtr;
 use crate::pebble::layer::Layer;
 use crate::pebble::types::GColor;
 use alloc::boxed::Box;
+use core::ffi::c_void;
 
 /// A safe, non-owning reference to a Window.
 /// Used inside callbacks to interact with the window safely without triggering Drop.

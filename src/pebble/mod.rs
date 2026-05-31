@@ -54,7 +54,7 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 macro_rules! pbl_print {
     ($lvl: expr, $name: expr, $fmt: expr $(, $arg:expr)*) => {
         unsafe {
-            pebble::println($lvl, $name.as_ptr(), 0, nt!($fmt).as_ptr() $(, $arg)*);
+            pebble::println($lvl, $name.as_ptr(), 0, $fmt.as_ptr() $(, $arg)*);
         }
     };
 }
@@ -62,21 +62,21 @@ macro_rules! pbl_print {
 #[macro_export]
 macro_rules! pbl_log {
     ($fmt: expr $(, $arg: expr)*) => {
-        pbl_print!(100, "pebble-rust (Info)\0", $fmt $(, $arg)*);
+        $crate::pbl_print!(100, c"pebble-rust (Info)", $fmt $(, $arg)*);
     };
 }
 
 #[macro_export]
 macro_rules! pbl_warn {
     ($fmt: expr $(, $arg: expr)*) => {
-        pbl_print!(50, "pebble-rust (Warning)\0", $fmt $(, $arg)*);
+        $crate::pbl_print!(50, c"pebble-rust (Warning)", $fmt $(, $arg)*);
     };
 }
 
 #[macro_export]
 macro_rules! pbl_err {
     ($fmt: expr $(, $arg: expr)*) => {
-        pbl_print!(1, "pebble-rust (Error)\0", $fmt $(, $arg)*);
+        $crate::pbl_print!(1, c"pebble-rust (Error)", $fmt $(, $arg)*);
     };
 }
 

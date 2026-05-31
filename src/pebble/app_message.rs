@@ -18,9 +18,10 @@
 pub use crate::pebble::internal::types::Tuple;
 
 use crate::pebble::internal::functions::declarations::*;
-use crate::pebble::internal::types::{self, c_void, DictionaryIterator};
+use crate::pebble::internal::types::{self, DictionaryIterator};
 use crate::pebble::types::{AppMessageResult, DictPtr, VoidPtr};
 use alloc::ffi::CString;
+use core::ffi::{c_char, c_void, CStr};
 
 const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
 
@@ -116,11 +117,9 @@ impl Dictionary {
         }
     }
 
-    pub fn write_string(&self, key: u32, string: &str) -> Result<(), AppMessageResult> {
-        let c_str = CString::new(string).map_err(|_| AppMessageResult::InvalidArgs)?;
+    pub fn write_string(&self, key: u32, string: &CStr) -> Result<(), AppMessageResult> {
         unsafe {
-            let ptr = c_str.as_ptr() as *const types::c_char;
-            let result = dict_write_cstring(self.internal, key, ptr);
+            let result = dict_write_cstring(self.internal, key, string.as_ptr());
 
             let status = AppMessageResult::from(result as i32);
             if status == AppMessageResult::Ok {

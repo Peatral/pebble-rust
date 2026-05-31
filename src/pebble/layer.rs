@@ -21,6 +21,7 @@ use crate::pebble::internal::types::GTextAlignment;
 use crate::pebble::internal::{functions::interface, types};
 use crate::pebble::types::{Bitmap, GCompOp, GRect};
 use crate::system::fonts::Font;
+use core::ffi::{c_char, CStr};
 
 pub mod menu_layer;
 pub use menu_layer::{MenuLayer, MenuLayerDelegate};
@@ -111,10 +112,10 @@ impl TextLayer {
         TextLayer { internal, inner }
     }
 
-    pub fn set_text(&self, text: &str) {
+    pub fn set_text(&self, text: &CStr) {
         interface::text_layer_set_text(self.internal, text);
     }
-    pub unsafe fn set_text_raw(&self, text: *const u8) {
+    pub unsafe fn set_text_raw(&self, text: *const c_char) {
         text_layer_set_text(self.internal, text);
     }
 
