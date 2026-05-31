@@ -362,3 +362,27 @@ pub fn persist_write_string(key: u32, cstring: *const c_char) -> i32 {
 pub fn persist_delete(key: u32) -> Status {
     unsafe { declarations::persist_delete(key) }
 }
+
+pub fn wakeup_service_subscribe(handler: WakeupHandler) {
+    unsafe { declarations::wakeup_service_subscribe(handler) }
+}
+
+pub fn wakeup_schedule(timestamp: usize, cookie: i32, notify_if_missed: bool) -> WakeupId {
+    unsafe { declarations::wakeup_schedule(timestamp, cookie, notify_if_missed) }
+}
+
+pub fn wakeup_cancel(wakeup_id: WakeupId) {
+    unsafe { declarations::wakeup_cancel(wakeup_id) }
+}
+
+pub fn wakeup_cancel_all() {
+    unsafe { declarations::wakeup_cancel_all() }
+}
+
+pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bool {
+    unsafe { declarations::wakeup_get_launch_event(wakeup_id, cookie) }
+}
+
+pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool {
+    unsafe { declarations::wakeup_query(wakeup_id, timestamp) }
+}

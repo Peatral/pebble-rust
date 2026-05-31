@@ -363,3 +363,10 @@ impl From<i32> for StatusCode {
         }
     }
 }
+
+/// Identifier for a wakeup event
+pub type WakeupId = i32;
+
+/// The type of function which can be called when a wakeup event occurs.
+pub type WakeupHandler = extern "C" fn(wakeup_id: WakeupId, cookie: i32);
+

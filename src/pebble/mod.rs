@@ -29,6 +29,7 @@ pub mod system;
 pub mod timer;
 pub mod types;
 pub mod vibes;
+pub mod wakeup;
 pub mod window;
 
 pub use internal::alloc;

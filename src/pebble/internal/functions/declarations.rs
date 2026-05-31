@@ -239,4 +239,12 @@ extern "C" {
     pub fn app_timer_reschedule(timer_handle: *mut AppTimer, new_timeout_ms: u32) -> bool;
 
     pub fn app_timer_cancel(timer_handle: *mut AppTimer);
+
+    // Wakeups
+    pub fn wakeup_service_subscribe(handler: WakeupHandler);
+    pub fn wakeup_schedule(timestamp: usize, cookie: i32, notify_if_missed: bool) -> WakeupId;
+    pub fn wakeup_cancel(wakeup_id: WakeupId);
+    pub fn wakeup_cancel_all();
+    pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bool;
+    pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool;
 }
