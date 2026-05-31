@@ -49,7 +49,10 @@ pub fn window_destroy(window: *mut Window) {
 
 pub fn window_set_click_config_provider<T>(window: *mut Window, func: extern "C" fn(*mut T)) {
     unsafe {
-        declarations::window_set_click_config_provider(window, mem::transmute(func));
+        declarations::window_set_click_config_provider(
+            window,
+            mem::transmute::<extern "C" fn(*mut T), extern "C" fn(*mut c_void)>(func),
+        );
     }
 }
 
@@ -61,7 +64,7 @@ pub fn window_set_click_config_provider_with_context<T>(
     unsafe {
         declarations::window_set_click_config_provider_with_context(
             window,
-            mem::transmute(func),
+            mem::transmute::<extern "C" fn(*mut T), extern "C" fn(*mut u8)>(func),
             ctx as *mut u8,
         );
     }
@@ -108,7 +111,13 @@ pub fn window_single_click_subscribe<T>(
     func: extern "C" fn(*mut ClickRecognizer, *mut T),
 ) {
     unsafe {
-        declarations::window_single_click_subscribe(button, mem::transmute(func));
+        declarations::window_single_click_subscribe(
+            button,
+            mem::transmute::<
+                extern "C" fn(*mut ClickRecognizer, *mut T),
+                extern "C" fn(*mut ClickRecognizer, *mut u8),
+            >(func),
+        );
     }
 }
 
