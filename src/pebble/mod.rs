@@ -24,6 +24,7 @@ pub mod clock;
 pub mod event;
 pub mod layer;
 pub mod std;
+pub mod storage;
 pub mod system;
 pub mod timer;
 pub mod types;

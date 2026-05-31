@@ -311,3 +311,55 @@ pub struct VibePattern {
 }
 
 pub type AppTimerCallback = extern "C" fn(data: *mut c_void);
+
+pub type Status = i32;
+
+pub const PERSIST_DATA_MAX_LENGTH: usize = 256;
+pub const PERSIST_STRING_MAX_LENGTH: usize = 256;
+
+#[repr(i32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum StatusCode {
+    Success = 0,
+    Error = -1,
+    Unknown = -2,
+    Internal = -3,
+    InvalidArgument = -4,
+    OutOfMemory = -5,
+    OutOfStorage = -6,
+    OutOfResources = -7,
+    Range = -8,
+    DoesNotExist = -9,
+    InvalidOperation = -10,
+    Busy = -11,
+    Again = -12,
+    True = 1,
+    False = 2,
+    NoMoreItems = 3,
+    NoActionRequired = 4,
+}
+
+impl From<i32> for StatusCode {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => StatusCode::Success,
+            -1 => StatusCode::Error,
+            -2 => StatusCode::Unknown,
+            -3 => StatusCode::Internal,
+            -4 => StatusCode::InvalidArgument,
+            -5 => StatusCode::OutOfMemory,
+            -6 => StatusCode::OutOfStorage,
+            -7 => StatusCode::OutOfResources,
+            -8 => StatusCode::Range,
+            -9 => StatusCode::DoesNotExist,
+            -10 => StatusCode::InvalidOperation,
+            -11 => StatusCode::Busy,
+            -12 => StatusCode::Again,
+            1 => StatusCode::True,
+            2 => StatusCode::False,
+            3 => StatusCode::NoMoreItems,
+            4 => StatusCode::NoActionRequired,
+            _ => StatusCode::Unknown, // Fallback for undefined status
+        }
+    }
+}

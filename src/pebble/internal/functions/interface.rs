@@ -318,3 +318,47 @@ pub fn app_timer_reschedule(timer_handle: *mut AppTimer, new_timeout_ms: u32) ->
 pub fn app_timer_cancel(timer_handle: *mut AppTimer) {
     unsafe { declarations::app_timer_cancel(timer_handle) }
 }
+
+pub fn persist_exists(key: u32) -> bool {
+    unsafe { declarations::persist_exists(key) }
+}
+
+pub fn persist_get_size(key: u32) -> i32 {
+    unsafe { declarations::persist_get_size(key) }
+}
+
+pub fn persist_read_bool(key: u32) -> bool {
+    unsafe { declarations::persist_read_bool(key) }
+}
+
+pub fn persist_read_int(key: u32) -> i32 {
+    unsafe { declarations::persist_read_int(key) }
+}
+
+pub fn persist_read_data(key: u32, buffer: *mut c_void, buffer_size: usize) -> i32 {
+    unsafe { declarations::persist_read_data(key, buffer, buffer_size) }
+}
+
+pub fn persist_read_string(key: u32, buffer: *mut c_char, buffer_size: usize) -> i32 {
+    unsafe { declarations::persist_read_string(key, buffer, buffer_size) }
+}
+
+pub fn persist_write_bool(key: u32, value: bool) -> Status {
+    unsafe { declarations::persist_write_bool(key, value) }
+}
+
+pub fn persist_write_int(key: u32, value: i32) -> Status {
+    unsafe { declarations::persist_write_int(key, value) }
+}
+
+pub fn persist_write_data(key: u32, data: *const c_void, size: usize) -> i32 {
+    unsafe { declarations::persist_write_data(key, data, size) }
+}
+
+pub fn persist_write_string(key: u32, cstring: *const c_char) -> i32 {
+    unsafe { declarations::persist_write_string(key, cstring) }
+}
+
+pub fn persist_delete(key: u32) -> Status {
+    unsafe { declarations::persist_delete(key) }
+}

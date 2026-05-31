@@ -205,6 +205,21 @@ extern "C" {
     // Logging
     pub fn app_log(level: u8, filename: *const c_char, line_num: u32, msg: *const c_char, ...);
 
+    // Persistent Storage
+    pub fn persist_exists(key: u32) -> bool;
+    pub fn persist_get_size(key: u32) -> i32;
+    pub fn persist_read_bool(key: u32) -> bool;
+    pub fn persist_read_int(key: u32) -> i32;
+    pub fn persist_read_data(key: u32, buffer: *mut c_void, buffer_size: usize) -> i32;
+    pub fn persist_read_string(key: u32, buffer: *mut c_char, buffer_size: usize) -> i32;
+
+    pub fn persist_write_bool(key: u32, value: bool) -> Status;
+    pub fn persist_write_int(key: u32, value: i32) -> Status;
+    pub fn persist_write_data(key: u32, data: *const c_void, size: usize) -> i32;
+    pub fn persist_write_string(key: u32, cstring: *const c_char) -> i32;
+
+    pub fn persist_delete(key: u32) -> Status;
+
     // Vibration
     pub fn vibes_cancel();
     pub fn vibes_short_pulse();
