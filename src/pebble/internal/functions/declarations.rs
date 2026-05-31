@@ -211,4 +211,17 @@ extern "C" {
     pub fn vibes_long_pulse();
     pub fn vibes_double_pulse();
     pub fn vibes_enqueue_custom_pattern(pattern: VibePattern);
+
+    // App Timer
+    pub fn psleep(millis: i32);
+
+    pub fn app_timer_register(
+        timeout_ms: u32,
+        callback: AppTimerCallback,
+        callback_data: *mut c_void,
+    ) -> *mut AppTimer;
+
+    pub fn app_timer_reschedule(timer_handle: *mut AppTimer, new_timeout_ms: u32) -> bool;
+
+    pub fn app_timer_cancel(timer_handle: *mut AppTimer);
 }

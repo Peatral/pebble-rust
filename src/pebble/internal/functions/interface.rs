@@ -298,3 +298,23 @@ pub fn vibes_enqueue_custom_pattern(durations: &'static [u32]) {
     };
     unsafe { declarations::vibes_enqueue_custom_pattern(pattern) }
 }
+
+pub fn psleep(millis: i32) {
+    unsafe { declarations::psleep(millis) }
+}
+
+pub fn app_timer_register(
+    timeout_ms: u32,
+    callback: AppTimerCallback,
+    callback_data: *mut c_void,
+) -> *mut AppTimer {
+    unsafe { declarations::app_timer_register(timeout_ms, callback, callback_data) }
+}
+
+pub fn app_timer_reschedule(timer_handle: *mut AppTimer, new_timeout_ms: u32) -> bool {
+    unsafe { declarations::app_timer_reschedule(timer_handle, new_timeout_ms) }
+}
+
+pub fn app_timer_cancel(timer_handle: *mut AppTimer) {
+    unsafe { declarations::app_timer_cancel(timer_handle) }
+}

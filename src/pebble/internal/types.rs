@@ -35,6 +35,7 @@ pub enum GBitmap {}
 pub enum GContext {}
 pub enum BitmapLayer {}
 pub enum MenuLayer {}
+pub enum AppTimer {}
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -308,3 +309,5 @@ pub struct VibePattern {
     pub durations: *const u32,
     pub num_segments: u32,
 }
+
+pub type AppTimerCallback = extern "C" fn(data: *mut c_void);

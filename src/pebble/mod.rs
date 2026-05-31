@@ -25,6 +25,7 @@ pub mod event;
 pub mod layer;
 pub mod std;
 pub mod system;
+pub mod timer;
 pub mod types;
 pub mod vibes;
 pub mod window;
