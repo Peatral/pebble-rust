@@ -74,6 +74,11 @@ impl AppTimer {
 
     /// Cancels the timer. Consumes the struct so it cannot be used again.
     pub fn cancel(self) {
+    }
+}
+
+impl Drop for AppTimer {
+    fn drop(&mut self) {
         if !self.executed.get() {
             interface::app_timer_cancel(self.handle);
 
