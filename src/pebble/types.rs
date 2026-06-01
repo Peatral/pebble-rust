@@ -37,11 +37,14 @@ impl Bitmap {
         let internal = interface::gbitmap_create_with_resource(resource_id);
         Bitmap { internal }
     }
+}
 
-    pub fn clean(self) {
+impl Drop for Bitmap {
+    fn drop(&mut self) {
         unsafe {
-            declarations::gbitmap_destroy(self.internal);
+            if !self.internal.is_null() {
+                declarations::gbitmap_destroy(self.internal);
+            }
         }
-        drop(self);
     }
 }
