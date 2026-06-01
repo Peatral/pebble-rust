@@ -33,6 +33,7 @@ pub use status_bar_layer::StatusBarLayer;
 
 pub struct Layer {
     internal: *mut types::Layer,
+    is_owned_by_rust: bool,
 }
 
 pub struct TextLayer {
@@ -79,11 +80,15 @@ impl Layer {
     pub fn new(bounds: GRect) -> Layer {
         Layer {
             internal: interface::layer_create(bounds),
+            is_owned_by_rust: false,
         }
     }
 
-    pub(crate) fn from_ptr(ptr: *mut types::Layer) -> Layer {
-        Layer { internal: ptr }
+    pub(crate) fn from_ptr(ptr: *mut types::Layer, is_owned_by_rust: bool) -> Layer {
+        Layer {
+            internal: ptr,
+            is_owned_by_rust,
+        }
     }
 }
 
@@ -111,7 +116,9 @@ impl ILayer for TextLayer {
 
 impl Drop for Layer {
     fn drop(&mut self) {
-        interface::layer_destroy(self.internal);
+        if self.is_owned_by_rust {
+            interface::layer_destroy(self.internal);
+        }
     }
 }
 

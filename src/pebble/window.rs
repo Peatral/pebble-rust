@@ -45,7 +45,7 @@ impl WindowRef {
 
     pub fn get_root_layer(&self) -> Layer {
         let layer_ptr = interface::window_get_root_layer(self.internal);
-        Layer::from_ptr(layer_ptr)
+        Layer::from_ptr(layer_ptr, false)
     }
 }
 
