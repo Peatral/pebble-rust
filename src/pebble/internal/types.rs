@@ -37,6 +37,7 @@ pub enum GBitmap {}
 pub enum GContext {}
 pub enum BitmapLayer {}
 pub enum MenuLayer {}
+pub enum ActionBarLayer {}
 pub enum AppTimer {}
 
 pub type WindowPtr = *mut Window;
@@ -430,3 +431,25 @@ impl From<u32> for AppLaunchReason {
 }
 
 pub type time_t = c_uint;
+
+pub type ClickConfigProvider = extern "C" fn(*mut c_void);
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ButtonId {
+    Back,
+    Up,
+    Select,
+    Down,
+    NumButtons,
+}
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ActionBarLayerIconPressAnimation {
+    None,
+    MoveLeft,
+    MoveUp,
+    MoveRight,
+    MoveDown,
+}

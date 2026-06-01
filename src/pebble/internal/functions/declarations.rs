@@ -34,7 +34,7 @@ extern "C" {
     // Window
     pub fn window_create() -> WindowPtr;
     pub fn window_destroy(window: WindowPtr);
-    pub fn window_set_click_config_provider(window: WindowPtr, func: extern "C" fn(*mut c_void));
+    pub fn window_set_click_config_provider(window: WindowPtr, func: ClickConfigProvider);
     pub fn window_set_click_config_provider_with_context(
         window: WindowPtr,
         func: extern "C" fn(*mut u8),
@@ -312,4 +312,40 @@ extern "C" {
     // Launch reason
     pub fn launch_reason() -> u32;
     pub fn launch_get_args() -> u32;
+
+    // Action Bar Layer
+    pub fn action_bar_layer_create() -> *mut ActionBarLayer;
+    pub fn action_bar_layer_destroy(action_bar_layer: *mut ActionBarLayer);
+    pub fn action_bar_layer_get_layer(action_bar_layer: *mut ActionBarLayer) -> *mut Layer;
+    pub fn action_bar_layer_set_context(
+        action_bar: *mut ActionBarLayer,
+        context: *mut core::ffi::c_void,
+    );
+    pub fn action_bar_layer_set_click_config_provider(
+        action_bar: *mut ActionBarLayer,
+        click_config_provider: ClickConfigProvider,
+    );
+    pub fn action_bar_layer_set_icon(
+        action_bar: *mut ActionBarLayer,
+        button_id: ButtonId,
+        icon: *const GBitmap,
+    );
+    pub fn action_bar_layer_clear_icon(action_bar: *mut ActionBarLayer, button_id: ButtonId);
+    pub fn action_bar_layer_add_to_window(action_bar: *mut ActionBarLayer, window: *mut Window);
+    pub fn action_bar_layer_remove_from_window(action_bar: *mut ActionBarLayer);
+    pub fn action_bar_layer_set_background_color(
+        action_bar: *mut ActionBarLayer,
+        background_color: GColor,
+    );
+    pub fn action_bar_layer_set_icon_animated(
+        action_bar: *mut ActionBarLayer,
+        button_id: ButtonId,
+        icon: *const GBitmap,
+        animated: bool,
+    );
+    pub fn action_bar_layer_set_icon_press_animation(
+        action_bar: *mut ActionBarLayer,
+        button_id: ButtonId,
+        animation: ActionBarLayerIconPressAnimation,
+    );
 }

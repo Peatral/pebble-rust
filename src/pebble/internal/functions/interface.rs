@@ -505,8 +505,6 @@ pub fn menu_layer_is_index_selected(menu_layer: *const MenuLayer, index: *const 
     unsafe { declarations::menu_layer_is_index_selected(menu_layer, index) }
 }
 
-// interface.rs (Append to existing)
-
 pub fn app_message_open(size_inbound: u32, size_outbound: u32) -> i32 {
     unsafe { declarations::app_message_open(size_inbound, size_outbound) }
 }
@@ -543,4 +541,80 @@ pub fn app_message_outbox_begin(iterator: *mut DictPtr) -> i32 {
 
 pub fn app_message_outbox_send() -> i32 {
     unsafe { declarations::app_message_outbox_send() }
+}
+
+pub fn action_bar_layer_create() -> *mut ActionBarLayer {
+    unsafe { declarations::action_bar_layer_create() }
+}
+
+pub fn action_bar_layer_destroy(action_bar_layer: *mut ActionBarLayer) {
+    unsafe { declarations::action_bar_layer_destroy(action_bar_layer) }
+}
+
+pub fn action_bar_layer_get_layer(action_bar_layer: *mut ActionBarLayer) -> *mut Layer {
+    unsafe { declarations::action_bar_layer_get_layer(action_bar_layer) }
+}
+
+pub fn action_bar_layer_set_context(
+    action_bar: *mut ActionBarLayer,
+    context: *mut core::ffi::c_void,
+) {
+    unsafe { declarations::action_bar_layer_set_context(action_bar, context) }
+}
+
+pub fn action_bar_layer_set_click_config_provider(
+    action_bar: *mut ActionBarLayer,
+    click_config_provider: ClickConfigProvider,
+) {
+    unsafe {
+        declarations::action_bar_layer_set_click_config_provider(action_bar, click_config_provider)
+    }
+}
+
+pub fn action_bar_layer_set_icon(
+    action_bar: *mut ActionBarLayer,
+    button_id: ButtonId,
+    icon: *const GBitmap,
+) {
+    unsafe { declarations::action_bar_layer_set_icon(action_bar, button_id, icon) }
+}
+
+pub fn action_bar_layer_clear_icon(action_bar: *mut ActionBarLayer, button_id: ButtonId) {
+    unsafe { declarations::action_bar_layer_clear_icon(action_bar, button_id) }
+}
+
+pub fn action_bar_layer_add_to_window(action_bar: *mut ActionBarLayer, window: *mut Window) {
+    unsafe { declarations::action_bar_layer_add_to_window(action_bar, window) }
+}
+
+pub fn action_bar_layer_remove_from_window(action_bar: *mut ActionBarLayer) {
+    unsafe { declarations::action_bar_layer_remove_from_window(action_bar) }
+}
+
+pub fn action_bar_layer_set_background_color(
+    action_bar: *mut ActionBarLayer,
+    background_color: GColor,
+) {
+    unsafe { declarations::action_bar_layer_set_background_color(action_bar, background_color) }
+}
+
+pub fn action_bar_layer_set_icon_animated(
+    action_bar: *mut ActionBarLayer,
+    button_id: ButtonId,
+    icon: *const GBitmap,
+    animated: bool,
+) {
+    unsafe {
+        declarations::action_bar_layer_set_icon_animated(action_bar, button_id, icon, animated)
+    }
+}
+
+pub fn action_bar_layer_set_icon_press_animation(
+    action_bar: *mut ActionBarLayer,
+    button_id: ButtonId,
+    animation: ActionBarLayerIconPressAnimation,
+) {
+    unsafe {
+        declarations::action_bar_layer_set_icon_press_animation(action_bar, button_id, animation)
+    }
 }
