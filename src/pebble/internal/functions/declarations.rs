@@ -348,4 +348,20 @@ extern "C" {
         button_id: ButtonId,
         animation: ActionBarLayerIconPressAnimation,
     );
+
+    // Status Bar Layer
+    pub fn status_bar_layer_create() -> *mut StatusBarLayer;
+    pub fn status_bar_layer_destroy(status_bar_layer: *mut StatusBarLayer);
+    pub fn status_bar_layer_get_layer(status_bar_layer: *mut StatusBarLayer) -> *mut Layer;
+    pub fn status_bar_layer_get_background_color(status_bar_layer: *const StatusBarLayer) -> GColor;
+    pub fn status_bar_layer_get_foreground_color(status_bar_layer: *const StatusBarLayer) -> GColor;
+    pub fn status_bar_layer_set_colors(
+        status_bar_layer: *mut StatusBarLayer,
+        background: GColor,
+        foreground: GColor,
+    );
+    pub fn status_bar_layer_set_separator_mode(
+        status_bar_layer: *mut StatusBarLayer,
+        mode: StatusBarLayerSeparatorMode,
+    );
 }

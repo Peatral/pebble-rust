@@ -25,9 +25,11 @@ use core::ffi::{c_char, CStr};
 
 pub mod action_bar_layer;
 pub mod menu_layer;
+pub mod status_bar_layer;
 
 pub use action_bar_layer::ActionBarLayer;
 pub use menu_layer::{MenuLayer, MenuLayerDelegate, MenuLayerRef};
+pub use status_bar_layer::StatusBarLayer;
 
 pub struct Layer {
     internal: *mut types::Layer,

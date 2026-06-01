@@ -38,6 +38,7 @@ pub enum GContext {}
 pub enum BitmapLayer {}
 pub enum MenuLayer {}
 pub enum ActionBarLayer {}
+pub enum StatusBarLayer {}
 pub enum AppTimer {}
 
 pub type WindowPtr = *mut Window;
@@ -452,4 +453,11 @@ pub enum ActionBarLayerIconPressAnimation {
     MoveUp,
     MoveRight,
     MoveDown,
+}
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum StatusBarLayerSeparatorMode {
+    None,
+    Dotted,
 }

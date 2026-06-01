@@ -618,3 +618,38 @@ pub fn action_bar_layer_set_icon_press_animation(
         declarations::action_bar_layer_set_icon_press_animation(action_bar, button_id, animation)
     }
 }
+
+pub fn status_bar_layer_create() -> *mut StatusBarLayer {
+    unsafe { declarations::status_bar_layer_create() }
+}
+
+pub fn status_bar_layer_destroy(status_bar_layer: *mut StatusBarLayer) {
+    unsafe { declarations::status_bar_layer_destroy(status_bar_layer) }
+}
+
+pub fn status_bar_layer_get_layer(status_bar_layer: *mut StatusBarLayer) -> *mut Layer {
+    unsafe { declarations::status_bar_layer_get_layer(status_bar_layer) }
+}
+
+pub fn status_bar_layer_get_background_color(status_bar_layer: *const StatusBarLayer) -> GColor {
+    unsafe { declarations::status_bar_layer_get_background_color(status_bar_layer) }
+}
+
+pub fn status_bar_layer_get_foreground_color(status_bar_layer: *const StatusBarLayer) -> GColor {
+    unsafe { declarations::status_bar_layer_get_foreground_color(status_bar_layer) }
+}
+
+pub fn status_bar_layer_set_colors(
+    status_bar_layer: *mut StatusBarLayer,
+    background: GColor,
+    foreground: GColor,
+) {
+    unsafe { declarations::status_bar_layer_set_colors(status_bar_layer, background, foreground) }
+}
+
+pub fn status_bar_layer_set_separator_mode(
+    status_bar_layer: *mut StatusBarLayer,
+    mode: StatusBarLayerSeparatorMode,
+) {
+    unsafe { declarations::status_bar_layer_set_separator_mode(status_bar_layer, mode) }
+}
