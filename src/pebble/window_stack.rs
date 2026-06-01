@@ -13,7 +13,7 @@ pub fn pop(animated: bool) -> Option<WindowRef> {
     if ptr.is_null() {
         None
     } else {
-        Some(WindowRef::from_raw(ptr))
+        Some(WindowRef::from_ptr(ptr))
     }
 }
 
@@ -36,7 +36,7 @@ pub fn get_top_window() -> Option<WindowRef> {
     if ptr.is_null() {
         None
     } else {
-        Some(WindowRef::from_raw(ptr))
+        Some(WindowRef::from_ptr(ptr))
     }
 }
 

@@ -73,8 +73,7 @@ impl AppTimer {
     }
 
     /// Cancels the timer. Consumes the struct so it cannot be used again.
-    pub fn cancel(self) {
-    }
+    pub fn cancel(self) {}
 }
 
 impl Drop for AppTimer {

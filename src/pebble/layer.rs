@@ -24,7 +24,7 @@ use crate::system::fonts::Font;
 use core::ffi::{c_char, CStr};
 
 pub mod menu_layer;
-pub use menu_layer::{MenuLayer, MenuLayerDelegate};
+pub use menu_layer::{MenuLayer, MenuLayerDelegate, MenuLayerRef};
 
 pub struct Layer {
     internal: *mut types::Layer,
@@ -77,7 +77,7 @@ impl Layer {
         }
     }
 
-    pub fn from_raw(ptr: *mut types::Layer) -> Layer {
+    pub(crate) fn from_ptr(ptr: *mut types::Layer) -> Layer {
         Layer { internal: ptr }
     }
 }

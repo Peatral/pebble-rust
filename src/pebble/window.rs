@@ -31,7 +31,7 @@ pub struct WindowRef {
 }
 
 impl WindowRef {
-    pub(crate) fn from_raw(ptr: WindowPtr) -> Self {
+    pub(crate) fn from_ptr(ptr: WindowPtr) -> Self {
         Self { internal: ptr }
     }
 
@@ -45,7 +45,7 @@ impl WindowRef {
 
     pub fn get_root_layer(&self) -> Layer {
         let layer_ptr = interface::window_get_root_layer(self.internal);
-        Layer::from_raw(layer_ptr)
+        Layer::from_ptr(layer_ptr)
     }
 }
 
@@ -86,16 +86,19 @@ impl<T: WindowDelegate> Window<T> {
     }
 
     pub fn set_background_color(&self, color: GColor) {
-        interface::window_set_background_color(self.internal, color);
+        self.as_ref().set_background_color(color);
     }
 
     pub fn get_root_layer(&self) -> Layer {
-        let layer_ptr = interface::window_get_root_layer(self.internal);
-        Layer::from_raw(layer_ptr)
+        self.as_ref().get_root_layer()
     }
 
     pub(crate) fn as_ptr(&self) -> WindowPtr {
         self.internal
+    }
+
+    pub fn as_ref(&self) -> WindowRef {
+        WindowRef::from_ptr(self.internal)
     }
 }
 

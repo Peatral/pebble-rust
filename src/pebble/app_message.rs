@@ -20,8 +20,7 @@ pub use crate::pebble::internal::types::Tuple;
 use crate::pebble::internal::functions::declarations::*;
 use crate::pebble::internal::types::{self, DictionaryIterator};
 use crate::pebble::types::{AppMessageResult, DictPtr, VoidPtr};
-use alloc::ffi::CString;
-use core::ffi::{c_char, c_void, CStr};
+use core::ffi::{c_void, CStr};
 
 const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
 
