@@ -27,7 +27,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::from_over_into)]
 
-use core::ffi::c_void;
+use core::ffi::{c_uint, c_void};
 
 pub enum Window {}
 pub enum Layer {}
@@ -428,3 +428,5 @@ impl From<u32> for AppLaunchReason {
         }
     }
 }
+
+pub type time_t = c_uint;

@@ -291,20 +291,20 @@ pub fn tick_timer_service_subscribe(unit: TimeUnits, func: extern "C" fn(*mut tm
     }
 }
 
-pub fn time() -> usize {
+pub fn time() -> time_t {
     unsafe { declarations::time(core::ptr::null_mut()) }
 }
 
-pub fn localtime(now: usize) -> *mut tm {
+pub fn localtime(now: time_t) -> *mut tm {
     unsafe {
-        let now_ptr = &now as *const usize;
+        let now_ptr = &now as *const time_t;
         declarations::localtime(now_ptr)
     }
 }
 
-pub fn gmtime(now: usize) -> *mut tm {
+pub fn gmtime(now: time_t) -> *mut tm {
     unsafe {
-        let now_ptr = &now as *const usize;
+        let now_ptr = &now as *const time_t;
         declarations::gmtime(now_ptr)
     }
 }
@@ -403,7 +403,7 @@ pub fn wakeup_service_subscribe(handler: WakeupHandler) {
     unsafe { declarations::wakeup_service_subscribe(handler) }
 }
 
-pub fn wakeup_schedule(timestamp: usize, cookie: i32, notify_if_missed: bool) -> WakeupId {
+pub fn wakeup_schedule(timestamp: time_t, cookie: i32, notify_if_missed: bool) -> WakeupId {
     unsafe { declarations::wakeup_schedule(timestamp, cookie, notify_if_missed) }
 }
 
@@ -419,7 +419,7 @@ pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bo
     unsafe { declarations::wakeup_get_launch_event(wakeup_id, cookie) }
 }
 
-pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool {
+pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut time_t) -> bool {
     unsafe { declarations::wakeup_query(wakeup_id, timestamp) }
 }
 

@@ -1,5 +1,5 @@
 use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{StatusCode, WakeupId};
+use crate::pebble::internal::types::{time_t, StatusCode, WakeupId};
 
 // Since Pebble lacks a context pointer for Wakeups, we use a static variable
 // to hold the user's Rust callback. This is safe because Pebble is strictly single-threaded.
@@ -25,7 +25,7 @@ pub fn subscribe(handler: fn(WakeupId, i32)) {
 /// Registers a wakeup event that triggers at the specified time.
 /// Returns the WakeupId on success, or a StatusCode error on failure.
 pub fn schedule(
-    timestamp: usize,
+    timestamp: time_t,
     cookie: i32,
     notify_if_missed: bool,
 ) -> Result<WakeupId, StatusCode> {
@@ -66,8 +66,8 @@ pub fn get_launch_event() -> Option<(WakeupId, i32)> {
 
 /// Checks if a WakeupId is still scheduled.
 /// Returns `Some(time_t)` with the scheduled time if valid, or `None` if it has occurred or was canceled.
-pub fn query(wakeup_id: WakeupId) -> Option<usize> {
-    let mut timestamp: usize = 0;
+pub fn query(wakeup_id: WakeupId) -> Option<time_t> {
+    let mut timestamp: time_t = 0;
 
     let is_scheduled = interface::wakeup_query(wakeup_id, &mut timestamp);
 

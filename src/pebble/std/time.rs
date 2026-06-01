@@ -17,9 +17,9 @@
  */
 
 use crate::pebble::internal::functions::interface::*;
-use crate::pebble::internal::types::tm;
+use crate::pebble::internal::types::{time_t, tm};
 
-pub fn get_time() -> usize {
+pub fn get_time() -> time_t {
     time()
 }
 
@@ -27,10 +27,10 @@ pub fn is_clock_24h() -> bool {
     clock_is_24h_style()
 }
 
-pub fn get_local_time(now: usize) -> tm {
+pub fn get_local_time(now: time_t) -> tm {
     unsafe { *localtime(now) }
 }
 
-pub fn get_utc_time(now: usize) -> tm {
+pub fn get_utc_time(now: time_t) -> tm {
     unsafe { *gmtime(now) }
 }

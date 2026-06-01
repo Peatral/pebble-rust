@@ -158,9 +158,9 @@ extern "C" {
     pub fn tick_timer_service_subscribe(unit: TimeUnits, func: extern "C" fn(*mut tm, TimeUnits));
 
     // Standard C - Time
-    pub fn time(t: *mut usize) -> usize;
-    pub fn localtime(now: *const usize) -> *mut tm;
-    pub fn gmtime(now: *const usize) -> *mut tm;
+    pub fn time(t: *mut time_t) -> time_t;
+    pub fn localtime(now: *const time_t) -> *mut tm;
+    pub fn gmtime(now: *const time_t) -> *mut tm;
 
     // Standard C - Locale
     pub fn setlocale(category: i32, locale: *const c_char) -> *const c_char;
@@ -303,11 +303,11 @@ extern "C" {
 
     // Wakeups
     pub fn wakeup_service_subscribe(handler: WakeupHandler);
-    pub fn wakeup_schedule(timestamp: usize, cookie: i32, notify_if_missed: bool) -> WakeupId;
+    pub fn wakeup_schedule(timestamp: time_t, cookie: i32, notify_if_missed: bool) -> WakeupId;
     pub fn wakeup_cancel(wakeup_id: WakeupId);
     pub fn wakeup_cancel_all();
     pub fn wakeup_get_launch_event(wakeup_id: *mut WakeupId, cookie: *mut i32) -> bool;
-    pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut usize) -> bool;
+    pub fn wakeup_query(wakeup_id: WakeupId, timestamp: *mut time_t) -> bool;
 
     // Launch reason
     pub fn launch_reason() -> u32;
