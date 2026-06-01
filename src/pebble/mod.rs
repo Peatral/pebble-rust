@@ -35,6 +35,7 @@ pub mod wakeup;
 pub mod window;
 pub mod window_stack;
 
+use crate::pebble;
 pub use internal::alloc;
 
 pub use internal::types::Window as RawWindow;
@@ -48,6 +49,13 @@ pub use internal::functions::declarations::snprintf;
 #[inline(never)]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
+    crate::pbl_err!(c"FATAL RUST PANIC! Forcing App Fault...");
+
+    unsafe {
+        let crash: *mut u32 = core::ptr::null_mut();
+        core::ptr::write_volatile(crash, 0xDEADBEEF);
+    }
+
     loop {}
 }
 
