@@ -20,7 +20,7 @@ pub use crate::pebble::internal::types::Tuple;
 use crate::pebble::internal::functions::declarations::*;
 use crate::pebble::internal::types::{self, DictionaryIterator};
 use crate::pebble::types::{AppMessageResult, DictPtr, VoidPtr};
-use core::ffi::{c_void, CStr};
+use core::ffi::{CStr, c_void};
 
 const NULL_TUPLE: *mut Tuple = core::ptr::null_mut::<Tuple>();
 
@@ -64,11 +64,7 @@ impl Dictionary {
                 buffer.as_mut_ptr(),
                 buffer.len() as u16,
             );
-            if ptr == NULL_TUPLE {
-                None
-            } else {
-                Some(*ptr)
-            }
+            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
         }
     }
 
@@ -84,11 +80,7 @@ impl Dictionary {
     pub fn read_next(&self) -> Option<Tuple> {
         unsafe {
             let ptr = dict_read_next(self.internal);
-            if ptr == NULL_TUPLE {
-                None
-            } else {
-                Some(*ptr)
-            }
+            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
         }
     }
 
@@ -96,11 +88,7 @@ impl Dictionary {
     pub fn reset(&self) -> Option<Tuple> {
         unsafe {
             let ptr = dict_read_first(self.internal);
-            if ptr == NULL_TUPLE {
-                None
-            } else {
-                Some(*ptr)
-            }
+            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
         }
     }
 
@@ -108,11 +96,7 @@ impl Dictionary {
     pub fn find(&self, key: u32) -> Option<Tuple> {
         unsafe {
             let ptr = dict_find(self.internal, key);
-            if ptr == NULL_TUPLE {
-                None
-            } else {
-                Some(*ptr)
-            }
+            if ptr == NULL_TUPLE { None } else { Some(*ptr) }
         }
     }
 

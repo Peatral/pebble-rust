@@ -3,7 +3,7 @@ use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::window::WindowRef;
 use alloc::boxed::Box;
-use core::ffi::{c_void, CStr};
+use core::ffi::{CStr, c_void};
 
 /// Helper to draw a basic section cell with a title, subtitle, and optional icon.
 pub fn cell_basic_draw(

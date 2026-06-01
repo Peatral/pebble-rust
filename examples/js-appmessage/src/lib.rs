@@ -1,89 +1,91 @@
 #![crate_type="staticlib"]
 #![no_std]
 #![no_builtins]
-#![feature(alloc, alloc_error_handler)]
 
 extern crate alloc;
 
 #[macro_use]
 extern crate pebble_rust as pebble;
 
-use pebble::{app, window, WindowPtr};
+use alloc::borrow::ToOwned;
+use alloc::ffi::CString;
+use core::ffi::c_char;
+use core::sync::atomic::{AtomicPtr, Ordering};
+use pebble::{app, window_stack};
 use pebble::app_message::*;
 use pebble::layer::{ILayer, TextLayer};
-use pebble::types::{GPoint, GRect, GSize};
-use pebble::window::WindowHandlers;
+use pebble::types::{GPoint, GRect, GSize, GTextAlignment};
+use pebble::window::{Window, WindowDelegate, WindowRef};
 
 const MESSAGE_KEY_EXAMPLE: u32 = 1768777472;
 
 static mut TEXT_LAYER: Option<TextLayer> = None;
+static mut SAVED_TEXT: Option<CString> = None;
+static GLOBAL_CSTRING: AtomicPtr<c_char> = AtomicPtr::new(core::ptr::null_mut());
 
-#[no_mangle]
+struct AppMessageDelegate;
+
+impl WindowDelegate for AppMessageDelegate {
+    fn load(&self, window: WindowRef) {
+        pbl_log!(c"Window loaded at address %p", window.as_ptr());
+
+        let root = window.get_root_layer();
+        let bounds = root.get_bounds();
+
+        let window_width = bounds.size.w;
+        let window_height = bounds.size.h;
+
+        let text_bounds = GRect {
+            origin: GPoint { x: 0, y: window_height / 2 - 20 },
+            size: GSize { w: window_width, h: 40 }
+        };
+
+        unsafe {
+            let text = TextLayer::new(text_bounds);
+            text.set_text(c"Loading...");
+            text.set_text_alignment(GTextAlignment::Center);
+            root.add_child(&text);
+
+            TEXT_LAYER = Some(text);
+        }
+    }
+
+    fn unload(&self, _window: WindowRef) {
+    }
+}
+
+#[unsafe(no_mangle)]
 pub fn main() -> isize {
-    AppMessage::register_inbox(message_received);
+    AppMessage::register_inbox_received(message_received);
+
+    if AppMessage::open(200, 200).is_err() {
+        pebble::pbl_err!(c"Failed to open AppMessage subsystem!");
+    }
 
     let app = app::App::new();
-    let window = window::Window::new();
-    let handlers = WindowHandlers {
-        load: load_handler,
-        unload: unload_handler,
-        appear: appear_handler,
-        disappear: disappear_handler
-    };
-    window.set_handlers(handlers);
-    window.push(false);
-    app.run_event_loop();
-    window.clean_exit();
 
-    pbl_log!("Exiting.");
+    let delegate = AppMessageDelegate;
+    let window = Window::new(delegate);
+
+    window_stack::push(&window, false);
+    app.run_event_loop();
+
+    pbl_log!(c"Exiting.");
+
     0
 }
 
-extern fn message_received(dict_ptr: pebble::types::DictPtr, ctx: pebble::types::VoidPtr) {
-    let dict = Dictionary::from_raw(dict_ptr);
-    let tuple = dict.find(MESSAGE_KEY_EXAMPLE);
-    unsafe {
-        if let Some(tuple) = tuple {
-            if let Some(layer) = &TEXT_LAYER {
-
-                // Get the string value from the tuple
-                // Note: you should probably implement proper error handling
-                let str = tuple.get_string().unwrap();
-
-                // Allocate the string on the heap so that it's available
-                // when TextLayer tries to draw it
-                let str2 = alloc::string::String::from(str);
-
-                layer.set_text(str2.as_str());
+fn message_received(dict: Dictionary) {
+    if let Some(tuple) = dict.find(MESSAGE_KEY_EXAMPLE) {
+        if let Some(text_val) = tuple.get_string() {
+            unsafe {
+                if let Some(layer) = &*(&raw const TEXT_LAYER) {
+                    // TODO: str is cleared when leaving the scope and the text vanishes.
+                    // it needs to be stored globally
+                    let str = text_val.to_owned();
+                    layer.set_text(str.as_c_str());
+                }
             }
         }
     }
 }
-
-extern fn load_handler(window: WindowPtr) {
-    pbl_log!("Window loaded at address %p", window);
-
-    let window = window::Window::from_raw(window);
-    let root = window.get_root_layer();
-    let bounds = root.get_bounds();
-
-    let window_width = bounds.size.w;
-    let window_height = bounds.size.h;
-
-    let bounds = GRect {
-        origin: GPoint {x: window_width / 9, y: window_height / 2 - 20},
-        size: GSize {w: window_width, h: 20}
-    };
-
-    unsafe {
-        let text = TextLayer::new(bounds);
-        text.set_text(nt!("Loading..."));
-        root.add_child(&text);
-        TEXT_LAYER = Some(text);
-    }
-    AppMessage::open(200, 200);
-}
-
-extern fn unload_handler(_window: WindowPtr) {}
-extern fn appear_handler(_window: WindowPtr) {}
-extern fn disappear_handler(_window: WindowPtr) {}

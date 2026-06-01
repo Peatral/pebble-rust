@@ -17,7 +17,7 @@
  */
 
 use crate::pebble::internal::functions::declarations::*;
-use core::ffi::{c_char, CStr};
+use core::ffi::{CStr, c_char};
 
 pub fn get_time_string() -> alloc::string::String {
     const MAX_SIZE: usize = 8; // 00:00 AM

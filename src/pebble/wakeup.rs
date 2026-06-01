@@ -1,5 +1,5 @@
 use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{time_t, StatusCode, WakeupId};
+use crate::pebble::internal::types::{StatusCode, WakeupId, time_t};
 
 // Since Pebble lacks a context pointer for Wakeups, we use a static variable
 // to hold the user's Rust callback. This is safe because Pebble is strictly single-threaded.
@@ -71,9 +71,5 @@ pub fn query(wakeup_id: WakeupId) -> Option<time_t> {
 
     let is_scheduled = interface::wakeup_query(wakeup_id, &mut timestamp);
 
-    if is_scheduled {
-        Some(timestamp)
-    } else {
-        None
-    }
+    if is_scheduled { Some(timestamp) } else { None }
 }

@@ -21,7 +21,7 @@ use crate::pebble::internal::types::GTextAlignment;
 use crate::pebble::internal::{functions::interface, types};
 use crate::pebble::types::{Bitmap, GCompOp, GRect};
 use crate::system::fonts::Font;
-use core::ffi::{c_char, CStr};
+use core::ffi::{CStr, c_char};
 
 pub mod action_bar_layer;
 pub mod menu_layer;

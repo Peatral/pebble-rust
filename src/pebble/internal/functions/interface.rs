@@ -28,7 +28,7 @@
 use core::mem;
 
 use crate::pebble::internal::types::*;
-use core::ffi::{c_char, c_void, CStr};
+use core::ffi::{CStr, c_char, c_void};
 
 use crate::pebble::internal::functions::declarations;
 use crate::types::{DictPtr, VoidPtr};

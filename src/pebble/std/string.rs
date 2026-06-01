@@ -17,7 +17,7 @@
  */
 
 use crate::pebble::internal::functions::declarations::*;
-use core::ffi::{c_char, CStr};
+use core::ffi::{CStr, c_char};
 
 pub fn compare_strings(str1: &CStr, str2: &CStr) -> i32 {
     unsafe { strcmp(str1.as_ptr(), str2.as_ptr()) }

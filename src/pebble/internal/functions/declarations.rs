@@ -380,9 +380,9 @@ unsafe extern "C" {
     pub fn status_bar_layer_destroy(status_bar_layer: *mut StatusBarLayer);
     pub fn status_bar_layer_get_layer(status_bar_layer: *mut StatusBarLayer) -> *mut Layer;
     pub fn status_bar_layer_get_background_color(status_bar_layer: *const StatusBarLayer)
-        -> GColor;
+    -> GColor;
     pub fn status_bar_layer_get_foreground_color(status_bar_layer: *const StatusBarLayer)
-        -> GColor;
+    -> GColor;
     pub fn status_bar_layer_set_colors(
         status_bar_layer: *mut StatusBarLayer,
         background: GColor,

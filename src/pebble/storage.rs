@@ -1,8 +1,8 @@
 use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{StatusCode, PERSIST_DATA_MAX_LENGTH};
+use crate::pebble::internal::types::{PERSIST_DATA_MAX_LENGTH, StatusCode};
 use alloc::string::String;
 use alloc::vec;
-use core::ffi::{c_char, c_void, CStr};
+use core::ffi::{CStr, c_char, c_void};
 
 /// Checks whether a value has been set for a given key.
 pub fn exists(key: u32) -> bool {

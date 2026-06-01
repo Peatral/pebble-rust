@@ -5,66 +5,66 @@
 #[macro_use]
 extern crate pebble_rust as pebble;
 
-use pebble::{app, window, WindowPtr};
-use pebble::window::WindowHandlers;
+use core::cell::RefCell;
+use pebble::{app, window_stack};
+use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::layer::{ILayer, TextLayer};
-use pebble::types::{GRect, GPoint, GSize};
+use pebble::types::{GRect, GPoint, GSize, GTextAlignment};
 
-#[no_mangle]
+struct HelloDelegate {
+    text_layer: RefCell<Option<TextLayer>>,
+}
+
+impl WindowDelegate for HelloDelegate {
+    fn load(&self, window: WindowRef) {
+        let root = window.get_root_layer();
+        let bounds = root.get_bounds();
+
+        let window_width = bounds.size.w;
+        let window_height = bounds.size.h;
+
+        let text_bounds = GRect {
+            origin: GPoint { x: 0, y: window_height / 2 - 20 },
+            size: GSize { w: window_width, h: 40 },
+        };
+
+        // We can print whatever we want.
+        pbl_log!(c"This works like a %s, I can print numbers like %d", c"printf".as_ptr(), 25);
+
+        // Or we can use other logging levels.
+        pbl_warn!(c"This is a warning.");
+        pbl_err!(c"Oops, something went wrong.");
+
+        let text = TextLayer::new(text_bounds);
+
+        text.set_text(c"Hello from Rust!");
+        text.set_font(pebble::system::fonts::Font::get_system(c"RESOURCE_ID_ROBOTO_CONDENSED_21"));
+        text.set_text_alignment(GTextAlignment::Center);
+
+        root.add_child(&text);
+
+        *self.text_layer.borrow_mut() = Some(text);
+    }
+
+    fn unload(&self, window: WindowRef) {
+    }
+}
+
+#[unsafe(no_mangle)]
 pub fn main() -> isize {
-    pbl_log!("Loading app...");
+    pbl_log!(c"Loading app...");
 
     let app = app::App::new();
-    let window = window::Window::new();
-    let handlers = WindowHandlers {
-        load: load_handler,
-        unload: unload_handler,
-        appear: appear_handler,
-        disappear: disappear_handler
+
+    let delegate = HelloDelegate {
+        text_layer: RefCell::new(None),
     };
-    window.set_handlers(handlers);
+    let window = Window::new(delegate);
 
-    window.push(false);
+    window_stack::push(&window, false);
     app.run_event_loop();
-    window.clean_exit();
 
-    pbl_log!("Exiting...");
+    pbl_log!(c"Exiting...");
+
     0
 }
-
-extern "C" fn load_handler(window: WindowPtr) {
-    let window = window::Window::from_raw(window);
-    let root = window.get_root_layer();
-    let bounds = root.get_bounds();
-
-    let window_width = bounds.size.w;
-    let window_height = bounds.size.h;
-
-    let bounds = GRect {
-        origin: GPoint {x: window_width / 4, y: window_height / 2 - 20},
-        size: GSize {w: window_width, h: 20}
-    };
-
-    // We can print whatever we want.
-    pbl_log!("This works like a %s, I can print numbers like %d", nt!("printf").as_ptr(), 25);
-
-    // Or we can use other logging levels.
-    pbl_warn!("This is a warning.");
-    pbl_err!("Oops, something went wrong.");
-
-    // These logging calls automatically null-terminate the format string, but not the arguments.
-    // Hence the nt! call in the pbl_log! call.
-
-    let text = TextLayer::new(bounds);
-
-    // The `nt!` macro appends a null byte at the end of the string.
-    text.set_text(nt!("Hello from Rust!"));
-
-    text.set_font(pebble::system::fonts::Font::get_system(nt!("RESOURCE_ID_ROBOTO_CONDENSED_21")));
-
-    root.add_child(&text);
-}
-
-extern "C" fn unload_handler(_window: WindowPtr) {}
-extern "C" fn appear_handler(_window: WindowPtr) {}
-extern "C" fn disappear_handler(_window: WindowPtr) {}

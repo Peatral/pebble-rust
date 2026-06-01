@@ -16,7 +16,7 @@
     "messageKeys": {
       "App_ExampleKey": 1768777472
     },
-    "enableMultiJS": false,
+    "enableMultiJS": true,
     "displayName": "Rust (AppMessage)",
     "watchapp": {
       "onlyShownOnCommunication": false,

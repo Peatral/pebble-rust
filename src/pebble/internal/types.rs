@@ -27,7 +27,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::from_over_into)]
 
-use core::ffi::{c_uint, c_void};
+use core::ffi::{c_uint, c_void, CStr};
 
 pub enum Window {}
 pub enum Layer {}
@@ -160,13 +160,12 @@ impl Tuple {
         }
     }
 
-    pub fn get_string(&self) -> Option<&'static str> {
+    pub fn get_string(&self) -> Option<&'static CStr> {
         unsafe {
             let opt = self.get_value();
             if let Some(opt) = opt {
-                let slice = core::slice::from_raw_parts(opt.cstring, self.t_type[1] as usize);
-                let str = core::str::from_utf8_unchecked(slice);
-                Some(str)
+                let c_str = CStr::from_ptr(opt.cstring as *const core::ffi::c_char);
+                Some(c_str)
             } else {
                 None
             }

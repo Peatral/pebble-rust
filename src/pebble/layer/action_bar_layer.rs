@@ -8,7 +8,7 @@ use crate::pebble::types::{Bitmap, GColor, GRect};
 use crate::pebble::window::WindowRef;
 
 // Import the ClickDelegate and the master trampoline we defined earlier
-use crate::pebble::clicks::{trampoline_click_config_provider, ClickDelegate};
+use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 
 /// A vertical, bar-shaped control widget on the right edge of the window.
 pub struct ActionBarLayer<T: ClickDelegate> {

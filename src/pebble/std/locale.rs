@@ -17,7 +17,7 @@
  */
 
 use crate::pebble::internal::functions::declarations::setlocale;
-use core::ffi::{c_char, CStr};
+use core::ffi::{CStr, c_char};
 
 pub fn set_locale(category: i32, locale: &CStr) {
     unsafe {
