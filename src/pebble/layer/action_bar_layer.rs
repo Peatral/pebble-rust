@@ -1,34 +1,46 @@
+use alloc::boxed::Box;
+use core::ffi::c_void;
+
 use crate::layer::ILayer;
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::types::{Bitmap, GColor, GRect};
 use crate::pebble::window::WindowRef;
-use core::ffi::c_void;
+
+// Import the ClickDelegate and the master trampoline we defined earlier
+use crate::pebble::clicks::{trampoline_click_config_provider, ClickDelegate};
 
 /// A vertical, bar-shaped control widget on the right edge of the window.
-pub struct ActionBarLayer {
+pub struct ActionBarLayer<T: ClickDelegate> {
     internal: *mut types::ActionBarLayer,
     inner: *mut types::Layer,
+    // The delegate is boxed so it lives exactly as long as the layer
+    delegate: Box<T>,
 }
 
-impl ActionBarLayer {
-    /// Creates a new ActionBarLayer on the heap and initializes it with the default values.
-    pub fn new() -> Self {
+impl<T: ClickDelegate> ActionBarLayer<T> {
+    /// Creates a new ActionBarLayer on the heap and initializes it with the given delegate.
+    pub fn new(delegate: T) -> Self {
         let internal = interface::action_bar_layer_create();
         let inner = interface::action_bar_layer_get_layer(internal);
 
-        Self { internal, inner }
-    }
+        let layer = Self {
+            internal,
+            inner,
+            delegate: Box::new(delegate),
+        };
 
-    /// Sets the context parameter, which will be passed in to ClickHandler callbacks
-    /// and the ClickConfigProvider callback of the action bar.
-    pub fn set_context(&self, context: *mut c_void) {
-        interface::action_bar_layer_set_context(self.internal, context);
-    }
+        // Extract the stable pointer from the Box to use as our C context
+        let context_ptr = &*layer.delegate as *const T as *mut c_void;
 
-    /// Sets the click configuration provider callback of the action bar.
-    pub fn set_click_config_provider(&self, click_config_provider: types::ClickConfigProvider) {
-        interface::action_bar_layer_set_click_config_provider(self.internal, click_config_provider);
+        // Automatically configure the context and route the click provider to our master trampoline
+        interface::action_bar_layer_set_context(layer.internal, context_ptr);
+        interface::action_bar_layer_set_click_config_provider(
+            layer.internal,
+            trampoline_click_config_provider::<T>,
+        );
+
+        layer
     }
 
     /// Sets an action bar icon onto one of the 3 slots as identified by button_id.
@@ -76,13 +88,13 @@ impl ActionBarLayer {
     }
 }
 
-impl Drop for ActionBarLayer {
+impl<T: ClickDelegate> Drop for ActionBarLayer<T> {
     fn drop(&mut self) {
         interface::action_bar_layer_destroy(self.internal);
     }
 }
 
-impl ILayer for ActionBarLayer {
+impl<T: ClickDelegate> ILayer for ActionBarLayer<T> {
     fn get_bounds(&self) -> GRect {
         interface::layer_get_bounds(self.inner)
     }

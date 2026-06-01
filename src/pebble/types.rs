@@ -19,8 +19,9 @@
 use crate::pebble::internal::functions::{declarations, interface};
 use crate::pebble::internal::types::GBitmap;
 pub use crate::pebble::internal::types::{
-    time_t, tm, AppLaunchReason, AppMessageResult, GColor, GCompOp, GContext, GPoint, GRect, GSize,
-    GTextAlignment, Layer, MenuIndex, MenuLayer, Status, StatusCode, TimeUnits, Tuple, TupleValue,
+    time_t, tm, AppLaunchReason, AppMessageResult, ButtonId, GColor, GCompOp, GContext, GPoint,
+    GRect, GSize, GTextAlignment, Layer, MenuIndex, MenuLayer, Status, StatusCode, TimeUnits,
+    Tuple, TupleValue,
 };
 use core::ffi::c_void;
 

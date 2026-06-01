@@ -434,6 +434,8 @@ impl From<u32> for AppLaunchReason {
 pub type time_t = c_uint;
 
 pub type ClickConfigProvider = extern "C" fn(*mut c_void);
+pub type ClickRecognizerRef = *mut c_void;
+pub type ClickHandler = extern "C" fn(recognizer: ClickRecognizerRef, context: *mut c_void);
 
 #[repr(u32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

@@ -20,6 +20,7 @@ mod internal;
 
 pub mod app;
 pub mod app_message;
+pub mod clicks;
 pub mod clock;
 pub mod event;
 pub mod launch;

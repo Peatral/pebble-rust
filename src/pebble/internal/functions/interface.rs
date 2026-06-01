@@ -49,27 +49,25 @@ pub fn window_destroy(window: WindowPtr) {
     }
 }
 
-pub fn window_set_click_config_provider<T>(window: WindowPtr, func: extern "C" fn(*mut T)) {
+pub fn window_set_click_config_provider(
+    window: *mut Window,
+    provider: Option<ClickConfigProvider>,
+) {
+    unsafe { declarations::window_set_click_config_provider(window, provider) }
+}
+
+pub fn window_set_click_config_provider_with_context(
+    window: *mut Window,
+    provider: Option<ClickConfigProvider>,
+    context: *mut c_void,
+) {
     unsafe {
-        declarations::window_set_click_config_provider(
-            window,
-            mem::transmute::<extern "C" fn(*mut T), extern "C" fn(*mut c_void)>(func),
-        );
+        declarations::window_set_click_config_provider_with_context(window, provider, context)
     }
 }
 
-pub fn window_set_click_config_provider_with_context<T>(
-    window: WindowPtr,
-    func: extern "C" fn(*mut T),
-    ctx: *mut T,
-) {
-    unsafe {
-        declarations::window_set_click_config_provider_with_context(
-            window,
-            mem::transmute::<extern "C" fn(*mut T), extern "C" fn(*mut u8)>(func),
-            ctx as *mut u8,
-        );
-    }
+pub fn window_set_click_context(button_id: ButtonId, context: *mut c_void) {
+    unsafe { declarations::window_set_click_context(button_id, context) }
 }
 
 pub fn window_set_window_handlers(window: WindowPtr, handlers: WindowHandlers) {
@@ -122,18 +120,63 @@ pub fn window_get_root_layer(window: WindowPtr) -> *mut Layer {
     unsafe { declarations::window_get_root_layer(window) }
 }
 
-pub fn window_single_click_subscribe<T>(
-    button: u8,
-    func: extern "C" fn(*mut ClickRecognizer, *mut T),
+pub fn window_single_click_subscribe(button_id: ButtonId, handler: Option<ClickHandler>) {
+    unsafe { declarations::window_single_click_subscribe(button_id, handler) }
+}
+
+pub fn window_single_repeating_click_subscribe(
+    button_id: ButtonId,
+    repeat_interval_ms: u16,
+    handler: Option<ClickHandler>,
 ) {
     unsafe {
-        declarations::window_single_click_subscribe(
-            button,
-            mem::transmute::<
-                extern "C" fn(*mut ClickRecognizer, *mut T),
-                extern "C" fn(*mut ClickRecognizer, *mut u8),
-            >(func),
-        );
+        declarations::window_single_repeating_click_subscribe(
+            button_id,
+            repeat_interval_ms,
+            handler,
+        )
+    }
+}
+
+pub fn window_multi_click_subscribe(
+    button_id: ButtonId,
+    min_clicks: u8,
+    max_clicks: u8,
+    timeout: u16,
+    last_click_only: bool,
+    handler: Option<ClickHandler>,
+) {
+    unsafe {
+        declarations::window_multi_click_subscribe(
+            button_id,
+            min_clicks,
+            max_clicks,
+            timeout,
+            last_click_only,
+            handler,
+        )
+    }
+}
+
+pub fn window_long_click_subscribe(
+    button_id: ButtonId,
+    delay_ms: u16,
+    down_handler: Option<ClickHandler>,
+    up_handler: Option<ClickHandler>,
+) {
+    unsafe {
+        declarations::window_long_click_subscribe(button_id, delay_ms, down_handler, up_handler)
+    }
+}
+
+pub fn window_raw_click_subscribe(
+    button_id: ButtonId,
+    down_handler: Option<ClickHandler>,
+    up_handler: Option<ClickHandler>,
+    context: *mut c_void,
+) {
+    unsafe {
+        declarations::window_raw_click_subscribe(button_id, down_handler, up_handler, context)
     }
 }
 
@@ -652,4 +695,16 @@ pub fn status_bar_layer_set_separator_mode(
     mode: StatusBarLayerSeparatorMode,
 ) {
     unsafe { declarations::status_bar_layer_set_separator_mode(status_bar_layer, mode) }
+}
+
+pub fn click_number_of_clicks_counted(recognizer: ClickRecognizerRef) -> u8 {
+    unsafe { declarations::click_number_of_clicks_counted(recognizer) }
+}
+
+pub fn click_recognizer_get_button_id(recognizer: ClickRecognizerRef) -> ButtonId {
+    unsafe { declarations::click_recognizer_get_button_id(recognizer) }
+}
+
+pub fn click_recognizer_is_repeating(recognizer: ClickRecognizerRef) -> bool {
+    unsafe { declarations::click_recognizer_is_repeating(recognizer) }
 }

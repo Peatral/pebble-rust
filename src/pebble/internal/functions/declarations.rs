@@ -34,12 +34,16 @@ extern "C" {
     // Window
     pub fn window_create() -> WindowPtr;
     pub fn window_destroy(window: WindowPtr);
-    pub fn window_set_click_config_provider(window: WindowPtr, func: ClickConfigProvider);
-    pub fn window_set_click_config_provider_with_context(
-        window: WindowPtr,
-        func: extern "C" fn(*mut u8),
-        ctx: *mut u8,
+    pub fn window_set_click_config_provider(
+        window: *mut Window,
+        provider: Option<ClickConfigProvider>,
     );
+    pub fn window_set_click_config_provider_with_context(
+        window: *mut Window,
+        provider: Option<ClickConfigProvider>,
+        context: *mut c_void,
+    );
+    pub fn window_set_click_context(button_id: ButtonId, context: *mut c_void);
     pub fn window_set_window_handlers(window: WindowPtr, handlers: WindowHandlers);
     pub fn window_set_background_color(window: WindowPtr, color: GColor);
     pub fn window_set_user_data(window: WindowPtr, data: *mut c_void);
@@ -51,9 +55,31 @@ extern "C" {
     pub fn window_stack_get_top_window() -> WindowPtr;
     pub fn window_stack_contains_window(window: WindowPtr) -> bool;
     pub fn window_get_root_layer(window: WindowPtr) -> *mut Layer;
-    pub fn window_single_click_subscribe(
-        button: u8,
-        func: extern "C" fn(*mut ClickRecognizer, *mut u8),
+    pub fn window_single_click_subscribe(button_id: ButtonId, handler: Option<ClickHandler>);
+    pub fn window_single_repeating_click_subscribe(
+        button_id: ButtonId,
+        repeat_interval_ms: u16,
+        handler: Option<ClickHandler>,
+    );
+    pub fn window_multi_click_subscribe(
+        button_id: ButtonId,
+        min_clicks: u8,
+        max_clicks: u8,
+        timeout: u16,
+        last_click_only: bool,
+        handler: Option<ClickHandler>,
+    );
+    pub fn window_long_click_subscribe(
+        button_id: ButtonId,
+        delay_ms: u16,
+        down_handler: Option<ClickHandler>,
+        up_handler: Option<ClickHandler>,
+    );
+    pub fn window_raw_click_subscribe(
+        button_id: ButtonId,
+        down_handler: Option<ClickHandler>,
+        up_handler: Option<ClickHandler>,
+        context: *mut c_void,
     );
 
     // Layer
@@ -353,8 +379,10 @@ extern "C" {
     pub fn status_bar_layer_create() -> *mut StatusBarLayer;
     pub fn status_bar_layer_destroy(status_bar_layer: *mut StatusBarLayer);
     pub fn status_bar_layer_get_layer(status_bar_layer: *mut StatusBarLayer) -> *mut Layer;
-    pub fn status_bar_layer_get_background_color(status_bar_layer: *const StatusBarLayer) -> GColor;
-    pub fn status_bar_layer_get_foreground_color(status_bar_layer: *const StatusBarLayer) -> GColor;
+    pub fn status_bar_layer_get_background_color(status_bar_layer: *const StatusBarLayer)
+        -> GColor;
+    pub fn status_bar_layer_get_foreground_color(status_bar_layer: *const StatusBarLayer)
+        -> GColor;
     pub fn status_bar_layer_set_colors(
         status_bar_layer: *mut StatusBarLayer,
         background: GColor,
@@ -364,4 +392,9 @@ extern "C" {
         status_bar_layer: *mut StatusBarLayer,
         mode: StatusBarLayerSeparatorMode,
     );
+
+    // Click Recognizer
+    pub fn click_number_of_clicks_counted(recognizer: ClickRecognizerRef) -> u8;
+    pub fn click_recognizer_get_button_id(recognizer: ClickRecognizerRef) -> ButtonId;
+    pub fn click_recognizer_is_repeating(recognizer: ClickRecognizerRef) -> bool;
 }
