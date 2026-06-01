@@ -30,8 +30,10 @@ pub fn compare_strings_bytes(str1: &CStr, str2: &CStr, max_bytes: usize) -> i32 
 /// # Safety
 /// `dest` must be a valid, mutable pointer to a buffer large enough to hold `source`.
 pub unsafe fn copy_strings<'a>(source: &CStr, dest: *mut c_char) -> &'a str {
-    let ptr = strcpy(dest, source.as_ptr());
-    ptr_to_str(ptr)
+    unsafe {
+        let ptr = strcpy(dest, source.as_ptr());
+        ptr_to_str(ptr)
+    }
 }
 
 /// # Safety
@@ -41,16 +43,20 @@ pub unsafe fn copy_strings_bytes<'a>(
     dest: *mut c_char,
     max_bytes: usize,
 ) -> &'a str {
-    let ptr = strncpy(dest, source.as_ptr(), max_bytes);
-    ptr_to_str(ptr)
+    unsafe {
+        let ptr = strncpy(dest, source.as_ptr(), max_bytes);
+        ptr_to_str(ptr)
+    }
 }
 
 /// # Safety
 /// `dest` must be a valid, mutable pointer to a null-terminated string,
 /// with enough space to append `source`.
 pub unsafe fn concat_strings<'a>(source: &CStr, dest: *mut c_char) -> &'a str {
-    let ptr = strcat(dest, source.as_ptr());
-    ptr_to_str(ptr)
+    unsafe {
+        let ptr = strcat(dest, source.as_ptr());
+        ptr_to_str(ptr)
+    }
 }
 
 /// # Safety
@@ -60,8 +66,10 @@ pub unsafe fn concat_strings_bytes<'a>(
     dest: *mut c_char,
     max_bytes: usize,
 ) -> &'a str {
-    let ptr = strncat(dest, source.as_ptr(), max_bytes);
-    ptr_to_str(ptr)
+    unsafe {
+        let ptr = strncat(dest, source.as_ptr(), max_bytes);
+        ptr_to_str(ptr)
+    }
 }
 
 pub fn string_length(string: &CStr) -> usize {
@@ -69,9 +77,11 @@ pub fn string_length(string: &CStr) -> usize {
 }
 
 unsafe fn ptr_to_str<'a>(ptr: *const c_char) -> &'a str {
-    if ptr.is_null() {
-        return "";
+    unsafe {
+        if ptr.is_null() {
+            return "";
+        }
+        // Safely determine length by finding the null terminator
+        CStr::from_ptr(ptr).to_str().unwrap_or("")
     }
-    // Safely determine length by finding the null terminator
-    CStr::from_ptr(ptr).to_str().unwrap_or("")
 }

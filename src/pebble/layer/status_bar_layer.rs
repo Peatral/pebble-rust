@@ -47,7 +47,6 @@ impl Default for StatusBarLayer {
     }
 }
 
-
 impl Drop for StatusBarLayer {
     fn drop(&mut self) {
         interface::status_bar_layer_destroy(self.internal);

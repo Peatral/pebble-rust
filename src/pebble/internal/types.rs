@@ -136,25 +136,27 @@ pub struct Tuple {
 
 impl Tuple {
     unsafe fn read(&self) -> Option<TupleValue> {
-        let ptr = (&self.key as *const u32) as usize;
-        let value_ptr = ptr + 7;
-        let t = self.t_type[0];
-        match t {
-            0 => Some(TupleValue {
-                data: value_ptr as *const u8,
-            }),
-            1 => Some(TupleValue {
-                cstring: value_ptr as *const u8,
-            }),
-            2 => {
-                let value_ptr = value_ptr as *const u32;
-                Some(TupleValue { uint32: *value_ptr })
+        unsafe {
+            let ptr = (&self.key as *const u32) as usize;
+            let value_ptr = ptr + 7;
+            let t = self.t_type[0];
+            match t {
+                0 => Some(TupleValue {
+                    data: value_ptr as *const u8,
+                }),
+                1 => Some(TupleValue {
+                    cstring: value_ptr as *const u8,
+                }),
+                2 => {
+                    let value_ptr = value_ptr as *const u32;
+                    Some(TupleValue { uint32: *value_ptr })
+                }
+                3 => {
+                    let value_ptr = value_ptr as *const i32;
+                    Some(TupleValue { int32: *value_ptr })
+                }
+                _ => None,
             }
-            3 => {
-                let value_ptr = value_ptr as *const i32;
-                Some(TupleValue { int32: *value_ptr })
-            }
-            _ => None,
         }
     }
 

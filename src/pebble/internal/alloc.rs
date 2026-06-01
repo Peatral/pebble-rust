@@ -2,7 +2,7 @@ use core::alloc::{GlobalAlloc, Layout};
 
 pub struct Allocator;
 
-extern "C" {
+unsafe extern "C" {
     pub fn malloc(size: usize) -> *mut u8;
     pub fn calloc(count: usize, size: usize) -> *mut u8;
     pub fn realloc(ptr: *mut u8, size: usize) -> *mut u8;
@@ -16,14 +16,16 @@ extern "C" {
 
 unsafe impl GlobalAlloc for Allocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        malloc(layout.size())
+        unsafe { malloc(layout.size()) }
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
-        free(ptr);
+        unsafe {
+            free(ptr);
+        }
     }
 
     unsafe fn realloc(&self, ptr: *mut u8, _layout: Layout, new_size: usize) -> *mut u8 {
-        realloc(ptr, new_size)
+        unsafe { realloc(ptr, new_size) }
     }
 }

@@ -27,7 +27,7 @@ use crate::pebble::internal::types::*;
 use crate::types::{DictPtr, VoidPtr};
 use core::ffi::{c_char, c_void};
 
-extern "C" {
+unsafe extern "C" {
     // App
     pub fn app_event_loop();
 

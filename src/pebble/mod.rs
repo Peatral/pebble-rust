@@ -52,29 +52,28 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 #[allow(clippy::empty_loop)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _exit(_status: i32) -> ! {
     loop {}
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _kill(_pid: i32, _sig: i32) -> i32 {
     -1
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _getpid() -> i32 {
     1
 }
 
 #[allow(non_upper_case_globals)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub static __exidx_start: u32 = 0;
 
 #[allow(non_upper_case_globals)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub static __exidx_end: u32 = 0;
-
 
 #[macro_export]
 macro_rules! pbl_print {

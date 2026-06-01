@@ -134,7 +134,9 @@ impl TextLayer {
         interface::text_layer_set_text(self.internal, text);
     }
     pub unsafe fn set_text_raw(&self, text: *const c_char) {
-        text_layer_set_text(self.internal, text);
+        unsafe {
+            text_layer_set_text(self.internal, text);
+        }
     }
 
     pub fn set_font(&self, font: Font) {
