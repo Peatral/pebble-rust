@@ -61,7 +61,7 @@ pub fn main() -> isize {
     };
     let window = Window::new(delegate);
 
-    window_stack::push(&window, false);
+    window_stack::push(window.as_ref(), false);
     app.run_event_loop();
 
     pbl_log!(c"Exiting...");

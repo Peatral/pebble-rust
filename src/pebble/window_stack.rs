@@ -2,7 +2,7 @@ use crate::pebble::internal::functions::interface;
 use crate::pebble::window::{Window, WindowDelegate, WindowRef};
 
 /// Pushes the given window on the window navigation stack, on top of the current topmost window.
-pub fn push<T: WindowDelegate>(window: &Window<T>, animated: bool) {
+pub fn push(window: WindowRef, animated: bool) {
     interface::window_stack_push(window.as_ptr(), animated);
 }
 
@@ -25,7 +25,7 @@ pub fn pop_all(animated: bool) {
 
 /// Removes a specific window from the window stack.
 /// Returns true if the window was successfully removed, false otherwise.
-pub fn remove<T: WindowDelegate>(window: &Window<T>, animated: bool) -> bool {
+pub fn remove(window: WindowRef, animated: bool) -> bool {
     interface::window_stack_remove(window.as_ptr(), animated)
 }
 
@@ -41,6 +41,6 @@ pub fn get_top_window() -> Option<WindowRef> {
 }
 
 /// Checks if a specific window is currently on the window stack.
-pub fn contains<T: WindowDelegate>(window: &Window<T>) -> bool {
+pub fn contains(window: WindowRef) -> bool {
     interface::window_stack_contains_window(window.as_ptr())
 }
