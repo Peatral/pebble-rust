@@ -21,7 +21,7 @@ use crate::pebble::internal::types::GBitmap;
 pub use crate::pebble::internal::types::{
     AppLaunchReason, AppMessageResult, ButtonId, GColor, GCompOp, GContext, GPoint, GRect, GSize,
     GTextAlignment, Layer, MenuIndex, MenuLayer, Status, StatusCode, TimeUnits, Tuple, TupleValue,
-    time_t, tm,
+    WakeupId, time_t, tm,
 };
 use core::ffi::c_void;
 

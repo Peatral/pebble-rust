@@ -27,7 +27,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::from_over_into)]
 
-use core::ffi::{c_uint, c_void, CStr};
+use core::ffi::{CStr, c_uint, c_void};
 
 pub enum Window {}
 pub enum Layer {}
