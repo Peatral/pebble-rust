@@ -26,6 +26,7 @@ use core::ffi::c_void;
 
 /// A safe, non-owning reference to a Window.
 /// Used inside callbacks to interact with the window safely without triggering Drop.
+#[derive(Debug, Clone, Copy)]
 pub struct WindowRef {
     internal: WindowPtr,
 }
