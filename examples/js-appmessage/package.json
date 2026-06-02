@@ -13,9 +13,9 @@
     },
     "projectType": "native",
     "uuid": "19a34205-309a-47fc-8833-30fd68f685f7",
-    "messageKeys": {
-      "App_ExampleKey": 1768777472
-    },
+    "messageKeys": [
+      "EXAMPLE"
+    ],
     "enableMultiJS": true,
     "displayName": "Rust (AppMessage)",
     "watchapp": {

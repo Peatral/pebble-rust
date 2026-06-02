@@ -16,7 +16,7 @@ use pebble::types::{GPoint, GRect, GSize, GTextAlignment, GlobalCell};
 use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::{app, window_stack};
 
-const MESSAGE_KEY_EXAMPLE: u32 = 1768777472;
+include_message_keys!();
 
 static TEXT_LAYER: GlobalCell<Option<TextLayer>> = GlobalCell::new(None);
 static SAVED_TEXT: GlobalCell<Option<CString>> = GlobalCell::new(None);
@@ -81,7 +81,7 @@ pub fn main() -> isize {
 }
 
 fn message_received(dict: Dictionary) {
-    if let Some(tuple) = dict.find(MESSAGE_KEY_EXAMPLE) {
+    if let Some(tuple) = dict.find(message_keys::MESSAGE_KEY_EXAMPLE) {
         if let Some(text_val) = tuple.get_string() {
             let new_str = text_val.to_owned();
 

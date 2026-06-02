@@ -126,3 +126,19 @@ macro_rules! nt {
         null_term!($content);
     };
 }
+
+#[macro_export]
+macro_rules! include_generated {
+    ($mod_name:ident, $file_name:expr) => {
+        pub mod $mod_name {
+            include!(concat!(env!("OUT_DIR"), "/", $file_name));
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! include_message_keys {
+    () => {
+        $crate::include_generated!(message_keys, "message_keys.rs");
+    };
+}

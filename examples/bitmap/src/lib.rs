@@ -5,10 +5,12 @@
 extern crate pebble_rust as pebble;
 
 use core::cell::RefCell;
-use pebble::{app, window_stack};
+use pebble::{app, include_message_keys, window_stack};
 use pebble::layer::{ILayer, BitmapLayer};
 use pebble::types::{Bitmap, GCompOp};
 use pebble::window::{Window, WindowDelegate, WindowRef};
+
+include_message_keys!();
 
 struct BitmapExampleDelegate {
     bitmap: RefCell<Option<Bitmap>>,
