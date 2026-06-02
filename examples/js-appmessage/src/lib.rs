@@ -1,4 +1,4 @@
-#![crate_type="staticlib"]
+#![crate_type = "staticlib"]
 #![no_std]
 #![no_builtins]
 
@@ -9,19 +9,17 @@ extern crate pebble_rust as pebble;
 
 use alloc::borrow::ToOwned;
 use alloc::ffi::CString;
-use core::ffi::c_char;
-use core::sync::atomic::{AtomicPtr, Ordering};
-use pebble::{app, window_stack};
+
 use pebble::app_message::*;
 use pebble::layer::{ILayer, TextLayer};
-use pebble::types::{GPoint, GRect, GSize, GTextAlignment};
+use pebble::types::{GPoint, GRect, GSize, GTextAlignment, GlobalCell};
 use pebble::window::{Window, WindowDelegate, WindowRef};
+use pebble::{app, window_stack};
 
 const MESSAGE_KEY_EXAMPLE: u32 = 1768777472;
 
-static mut TEXT_LAYER: Option<TextLayer> = None;
-static mut SAVED_TEXT: Option<CString> = None;
-static GLOBAL_CSTRING: AtomicPtr<c_char> = AtomicPtr::new(core::ptr::null_mut());
+static TEXT_LAYER: GlobalCell<Option<TextLayer>> = GlobalCell::new(None);
+static SAVED_TEXT: GlobalCell<Option<CString>> = GlobalCell::new(None);
 
 struct AppMessageDelegate;
 
@@ -36,21 +34,27 @@ impl WindowDelegate for AppMessageDelegate {
         let window_height = bounds.size.h;
 
         let text_bounds = GRect {
-            origin: GPoint { x: 0, y: window_height / 2 - 20 },
-            size: GSize { w: window_width, h: 40 }
+            origin: GPoint {
+                x: 0,
+                y: window_height / 2 - 20,
+            },
+            size: GSize {
+                w: window_width,
+                h: 40,
+            },
         };
 
-        unsafe {
-            let text = TextLayer::new(text_bounds);
-            text.set_text(c"Loading...");
-            text.set_text_alignment(GTextAlignment::Center);
-            root.add_child(&text);
+        let text = TextLayer::new(text_bounds);
+        text.set_text(c"Loading...");
+        text.set_text_alignment(GTextAlignment::Center);
+        root.add_child(&text);
 
-            TEXT_LAYER = Some(text);
-        }
+        *TEXT_LAYER.borrow_mut() = Some(text);
     }
 
     fn unload(&self, _window: WindowRef) {
+        TEXT_LAYER.borrow_mut().take();
+        SAVED_TEXT.borrow_mut().take();
     }
 }
 
@@ -68,6 +72,7 @@ pub fn main() -> isize {
     let window = Window::new(delegate);
 
     window_stack::push(window.as_ref(), false);
+
     app.run_event_loop();
 
     pbl_log!(c"Exiting.");
@@ -78,12 +83,13 @@ pub fn main() -> isize {
 fn message_received(dict: Dictionary) {
     if let Some(tuple) = dict.find(MESSAGE_KEY_EXAMPLE) {
         if let Some(text_val) = tuple.get_string() {
-            unsafe {
-                if let Some(layer) = &*(&raw const TEXT_LAYER) {
-                    // TODO: str is cleared when leaving the scope and the text vanishes.
-                    // it needs to be stored globally
-                    let str = text_val.to_owned();
-                    layer.set_text(str.as_c_str());
+            let new_str = text_val.to_owned();
+
+            *SAVED_TEXT.borrow_mut() = Some(new_str);
+
+            if let Some(layer) = TEXT_LAYER.borrow().as_ref() {
+                if let Some(saved_str) = SAVED_TEXT.borrow().as_ref() {
+                    layer.set_text(saved_str.as_c_str());
                 }
             }
         }

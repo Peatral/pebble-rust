@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 use crate::pebble::internal::functions::{declarations, interface};
 use crate::pebble::internal::types::GBitmap;
 pub use crate::pebble::internal::types::{
@@ -23,6 +22,7 @@ pub use crate::pebble::internal::types::{
     GTextAlignment, Layer, MenuIndex, MenuLayer, Status, StatusCode, TimeUnits, Tuple, TupleValue,
     WakeupId, time_t, tm,
 };
+use core::cell::{Ref, RefCell, RefMut};
 use core::ffi::c_void;
 
 pub type VoidPtr = *const c_void;
@@ -48,3 +48,28 @@ impl Drop for Bitmap {
         }
     }
 }
+
+/// A wrapper for global state in a single-threaded environment (like Pebble).
+pub struct GlobalCell<T>(RefCell<T>);
+
+impl<T> GlobalCell<T> {
+    pub const fn new(value: T) -> Self {
+        Self(RefCell::new(value))
+    }
+
+    /// Immutably borrows the wrapped value.
+    /// Panics if the value is currently mutably borrowed.
+    pub fn borrow(&self) -> Ref<'_, T> {
+        self.0.borrow()
+    }
+
+    /// Mutably borrows the wrapped value.
+    /// Panics if the value is currently borrowed.
+    pub fn borrow_mut(&self) -> RefMut<'_, T> {
+        self.0.borrow_mut()
+    }
+}
+
+// We promise the compiler this is safe to share globally
+// ONLY because Pebble is single-threaded.
+unsafe impl<T> Sync for GlobalCell<T> {}
