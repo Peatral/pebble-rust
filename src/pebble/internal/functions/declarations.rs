@@ -218,6 +218,7 @@ unsafe extern "C" {
     // Fonts
     pub fn fonts_get_system_font(key: *const c_char) -> GFont;
     pub fn fonts_load_custom_font(res: ResHandle) -> GFont;
+    pub fn fonts_unload_custom_font(font: GFont);
 
     // Resources
     pub fn resource_get_handle(id: u32) -> ResHandle;

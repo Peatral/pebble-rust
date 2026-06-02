@@ -17,6 +17,7 @@
  */
 
 use crate::pebble::internal::functions::declarations::*;
+use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types::{GFont, ResHandle};
 use core::ffi::CStr;
 
@@ -47,27 +48,37 @@ pub const FONT_KEY_LECO_28_LIGHT_NUMBERS: &CStr = c"RESOURCE_ID_LECO_28_LIGHT_NU
 
 pub struct Font {
     pub internal: GFont,
+    /// Tracks whether this font needs to be manually freed
+    is_custom: bool,
 }
 
 impl Font {
-    pub fn get_system(resource_id: &CStr) -> Self {
-        unsafe {
-            let internal = fonts_get_system_font(resource_id.as_ptr());
-            Self { internal }
+    pub fn get_system(font_key: &CStr) -> Self {
+        let internal = interface::fonts_get_system_font(font_key.as_ptr());
+        Self {
+            internal,
+            is_custom: false,
         }
     }
 
     pub fn get_custom_from_handle(res_handle: ResHandle) -> Self {
-        unsafe {
-            let internal = fonts_load_custom_font(res_handle);
-            Self { internal }
+        let internal = interface::fonts_load_custom_font(res_handle);
+        Self {
+            internal,
+            is_custom: true,
         }
     }
 
     pub fn get_custom(resource_id: u32) -> Self {
-        unsafe {
-            let res_handle = resource_get_handle(resource_id);
-            Self::get_custom_from_handle(res_handle)
+        let res_handle = interface::resource_get_handle(resource_id);
+        Self::get_custom_from_handle(res_handle)
+    }
+}
+
+impl Drop for Font {
+    fn drop(&mut self) {
+        if self.is_custom && !self.internal.is_null() {
+            interface::fonts_unload_custom_font(self.internal);
         }
     }
 }

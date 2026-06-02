@@ -708,3 +708,19 @@ pub fn click_recognizer_get_button_id(recognizer: ClickRecognizerRef) -> ButtonI
 pub fn click_recognizer_is_repeating(recognizer: ClickRecognizerRef) -> bool {
     unsafe { declarations::click_recognizer_is_repeating(recognizer) }
 }
+
+pub fn fonts_get_system_font(font_key: *const c_char) -> GFont {
+    unsafe { declarations::fonts_get_system_font(font_key) }
+}
+
+pub fn fonts_load_custom_font(handle: ResHandle) -> GFont {
+    unsafe { declarations::fonts_load_custom_font(handle) }
+}
+
+pub fn fonts_unload_custom_font(font: GFont) {
+    unsafe { declarations::fonts_unload_custom_font(font) }
+}
+
+pub fn resource_get_handle(resource_id: u32) -> ResHandle {
+    unsafe { declarations::resource_get_handle(resource_id) }
+}
