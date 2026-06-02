@@ -28,6 +28,7 @@
 #![allow(clippy::from_over_into)]
 
 use core::ffi::{CStr, c_uint, c_void};
+use core::ptr;
 
 pub enum Window {}
 pub enum Layer {}
@@ -148,24 +149,48 @@ impl Tuple {
                     cstring: value_ptr as *const u8,
                 }),
                 2 => {
-                    let value_ptr = value_ptr as *const u32;
-                    Some(TupleValue { uint32: *value_ptr })
+                    let val_ptr = value_ptr as *const u32;
+                    Some(TupleValue {
+                        uint32: ptr::read_unaligned(val_ptr),
+                    })
                 }
                 3 => {
-                    let value_ptr = value_ptr as *const i32;
-                    Some(TupleValue { int32: *value_ptr })
+                    let val_ptr = value_ptr as *const i32;
+                    Some(TupleValue {
+                        int32: ptr::read_unaligned(val_ptr),
+                    })
                 }
                 _ => None,
             }
         }
     }
 
-    pub fn get_string(&self) -> Option<&'static CStr> {
+    pub fn get_string(&self) -> Option<&CStr> {
         unsafe {
             let opt = self.get_value();
             if let Some(opt) = opt {
                 let c_str = CStr::from_ptr(opt.cstring as *const core::ffi::c_char);
                 Some(c_str)
+            } else {
+                None
+            }
+        }
+    }
+
+    pub fn get_i32(&self) -> Option<i32> {
+        unsafe {
+            if self.t_type[0] == 3 {
+                self.get_value().map(|val| val.int32)
+            } else {
+                None
+            }
+        }
+    }
+
+    pub fn get_u32(&self) -> Option<u32> {
+        unsafe {
+            if self.t_type[0] == 2 {
+                self.get_value().map(|val| val.uint32)
             } else {
                 None
             }
