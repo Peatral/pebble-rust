@@ -4,15 +4,19 @@ use core::ffi::c_void;
 use core::marker::PhantomData;
 
 /// A safe wrapper around the Pebble ClickRecognizerRef.
+#[repr(transparent)]
+#[derive(Clone, Copy)]
 pub struct ClickRecognizer {
     internal: types::ClickRecognizerRef,
 }
 
-impl ClickRecognizer {
-    pub(crate) fn from_ptr(internal: types::ClickRecognizerRef) -> Self {
+impl From<types::ClickRecognizerRef> for ClickRecognizer {
+    fn from(internal: types::ClickRecognizerRef) -> Self {
         Self { internal }
     }
+}
 
+impl ClickRecognizer {
     /// Gets the number of consecutive clicks, or the number of repetitions for auto-repeating.
     pub fn clicks_counted(&self) -> u8 {
         interface::click_number_of_clicks_counted(self.internal)
@@ -35,7 +39,6 @@ pub trait ClickDelegate: Sized {
     /// Use the provided `config` to subscribe to the clicks you want.
     fn click_config(&self, config: &ClickConfigurator<Self>);
 
-    // Event Handlers (Defaults do nothing)
     fn on_single_click(&self, _recognizer: ClickRecognizer) {}
     fn on_repeating_click(&self, _recognizer: ClickRecognizer) {}
     fn on_multi_click(&self, _recognizer: ClickRecognizer) {}
@@ -95,71 +98,87 @@ impl<'a, T: ClickDelegate> ClickConfigurator<'a, T> {
             button,
             Some(trampoline_raw_down::<T>),
             Some(trampoline_raw_up::<T>),
-            core::ptr::null_mut(), // Context is already handled globally by the provider
+            core::ptr::null_mut(),
         );
     }
 }
 
 pub(crate) extern "C" fn trampoline_click_config_provider<T: ClickDelegate>(ctx: *mut c_void) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    let config = ClickConfigurator {
-        _marker: PhantomData,
-    };
-    delegate.click_config(&config);
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        let config = ClickConfigurator {
+            _marker: PhantomData,
+        };
+        delegate.click_config(&config);
+    }
 }
 
 extern "C" fn trampoline_single_click<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_single_click(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_single_click(rec.into());
+    }
 }
 
 extern "C" fn trampoline_repeating_click<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_repeating_click(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_repeating_click(rec.into());
+    }
 }
 
 extern "C" fn trampoline_multi_click<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_multi_click(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_multi_click(rec.into());
+    }
 }
 
 extern "C" fn trampoline_long_click_start<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_long_click_start(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_long_click_start(rec.into());
+    }
 }
 
 extern "C" fn trampoline_long_click_release<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_long_click_release(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_long_click_release(rec.into());
+    }
 }
 
 extern "C" fn trampoline_raw_down<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_raw_down(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_raw_down(rec.into());
+    }
 }
 
 extern "C" fn trampoline_raw_up<T: ClickDelegate>(
     rec: types::ClickRecognizerRef,
     ctx: *mut c_void,
 ) {
-    let delegate = unsafe { &*(ctx as *const T) };
-    delegate.on_raw_up(ClickRecognizer::from_ptr(rec));
+    unsafe {
+        let delegate = &*(ctx as *const T);
+        delegate.on_raw_up(rec.into());
+    }
 }

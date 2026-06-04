@@ -1,14 +1,14 @@
-use crate::layer::{ILayerMut, ILayer};
+use crate::layer::{ILayer, ILayerMut};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::internal::types::StatusBarLayerSeparatorMode;
-use crate::pebble::types::{GColor, GRect};
+use crate::pebble::types::GColor;
 use crate::types::Layer;
 
 /// A layer that serves as a configurable status bar.
+#[repr(transparent)]
 pub struct StatusBarLayer {
     internal: *mut types::StatusBarLayer,
-    inner: *mut types::Layer,
 }
 
 impl StatusBarLayer {
@@ -16,9 +16,8 @@ impl StatusBarLayer {
     /// (Text color: GColorBlack, Background color: GColorWhite)
     pub fn new() -> Self {
         let internal = interface::status_bar_layer_create();
-        let inner = interface::status_bar_layer_get_layer(internal);
 
-        Self { internal, inner }
+        Self { internal }
     }
 
     /// Gets background color of StatusBarLayer.
@@ -48,20 +47,20 @@ impl Default for StatusBarLayer {
     }
 }
 
-impl Drop for StatusBarLayer {
-    fn drop(&mut self) {
-        interface::status_bar_layer_destroy(self.internal);
-    }
-}
-
 impl ILayer for StatusBarLayer {
     fn as_ptr(&self) -> *const Layer {
-        self.inner
+        interface::status_bar_layer_get_layer(self.internal)
     }
 }
 
 impl ILayerMut for StatusBarLayer {
     fn as_mut_ptr(&self) -> *mut Layer {
-        self.inner
+        interface::status_bar_layer_get_layer(self.internal)
+    }
+}
+
+impl Drop for StatusBarLayer {
+    fn drop(&mut self) {
+        interface::status_bar_layer_destroy(self.internal);
     }
 }

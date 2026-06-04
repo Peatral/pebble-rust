@@ -1,49 +1,22 @@
-use alloc::boxed::Box;
-use core::ffi::c_void;
-
-use crate::layer::{ILayerMut, ILayer};
+use crate::layer::{ILayer, ILayerMut};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::pebble::types::{Bitmap, GColor, GRect};
+use crate::pebble::types::{Bitmap, GColor};
 use crate::pebble::window::WindowRef;
+use alloc::boxed::Box;
+use core::ffi::c_void;
+use core::ops::{Deref, DerefMut};
 
-// Import the ClickDelegate and the master trampoline we defined earlier
 use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 use crate::types::Layer;
 
-/// A vertical, bar-shaped control widget on the right edge of the window.
-pub struct ActionBarLayer<T: ClickDelegate> {
+#[repr(transparent)]
+#[derive(Clone, Copy)]
+pub struct ActionBarLayerRef {
     internal: *mut types::ActionBarLayer,
-    inner: *mut types::Layer,
-    // The delegate is boxed so it lives exactly as long as the layer
-    delegate: Box<T>,
 }
 
-impl<T: ClickDelegate> ActionBarLayer<T> {
-    /// Creates a new ActionBarLayer on the heap and initializes it with the given delegate.
-    pub fn new(delegate: T) -> Self {
-        let internal = interface::action_bar_layer_create();
-        let inner = interface::action_bar_layer_get_layer(internal);
-
-        let layer = Self {
-            internal,
-            inner,
-            delegate: Box::new(delegate),
-        };
-
-        // Extract the stable pointer from the Box to use as our C context
-        let context_ptr = &*layer.delegate as *const T as *mut c_void;
-
-        // Automatically configure the context and route the click provider to our master trampoline
-        interface::action_bar_layer_set_context(layer.internal, context_ptr);
-        interface::action_bar_layer_set_click_config_provider(
-            layer.internal,
-            trampoline_click_config_provider::<T>,
-        );
-
-        layer
-    }
-
+impl ActionBarLayerRef {
     /// Sets an action bar icon onto one of the 3 slots as identified by button_id.
     pub fn set_icon(&self, button_id: types::ButtonId, icon: &Bitmap) {
         interface::action_bar_layer_set_icon(self.internal, button_id, icon.internal);
@@ -89,20 +62,80 @@ impl<T: ClickDelegate> ActionBarLayer<T> {
     }
 }
 
-impl<T: ClickDelegate> Drop for ActionBarLayer<T> {
-    fn drop(&mut self) {
-        interface::action_bar_layer_destroy(self.internal);
+impl ILayer for ActionBarLayerRef {
+    fn as_ptr(&self) -> *const Layer {
+        interface::action_bar_layer_get_layer(self.internal)
+    }
+}
+
+impl ILayerMut for ActionBarLayerRef {
+    fn as_mut_ptr(&self) -> *mut Layer {
+        interface::action_bar_layer_get_layer(self.internal)
+    }
+}
+
+impl From<*mut types::ActionBarLayer> for ActionBarLayerRef {
+    fn from(internal: *mut types::ActionBarLayer) -> Self {
+        Self { internal }
+    }
+}
+
+/// A vertical, bar-shaped control widget on the right edge of the window.
+pub struct ActionBarLayer<T: ClickDelegate> {
+    layer_ref: ActionBarLayerRef,
+    delegate: Box<T>,
+}
+
+impl<T: ClickDelegate> ActionBarLayer<T> {
+    /// Creates a new ActionBarLayer on the heap and initializes it with the given delegate.
+    pub fn new(delegate: T) -> Self {
+        let internal = interface::action_bar_layer_create();
+
+        let layer = Self {
+            layer_ref: internal.into(),
+            delegate: Box::new(delegate),
+        };
+
+        let context_ptr = &*layer.delegate as *const T as *mut c_void;
+
+        interface::action_bar_layer_set_context(internal, context_ptr);
+        interface::action_bar_layer_set_click_config_provider(
+            internal,
+            trampoline_click_config_provider::<T>,
+        );
+
+        layer
     }
 }
 
 impl<T: ClickDelegate> ILayer for ActionBarLayer<T> {
     fn as_ptr(&self) -> *const Layer {
-        self.inner
+        self.layer_ref.as_ptr()
     }
 }
 
 impl<T: ClickDelegate> ILayerMut for ActionBarLayer<T> {
     fn as_mut_ptr(&self) -> *mut Layer {
-        self.inner
+        self.layer_ref.as_mut_ptr()
+    }
+}
+
+impl<T: ClickDelegate> Deref for ActionBarLayer<T> {
+    type Target = ActionBarLayerRef;
+
+    fn deref(&self) -> &Self::Target {
+        &self.layer_ref
+    }
+}
+
+impl<T: ClickDelegate> DerefMut for ActionBarLayer<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.layer_ref
+    }
+}
+
+impl<T: ClickDelegate> Drop for ActionBarLayer<T> {
+    fn drop(&mut self) {
+        interface::action_bar_layer_destroy(self.internal);
     }
 }

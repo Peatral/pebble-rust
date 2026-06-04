@@ -1,5 +1,5 @@
 use crate::pebble::internal::functions::interface;
-use crate::pebble::window::{Window, WindowDelegate, WindowRef};
+use crate::pebble::window::WindowRef;
 
 /// Pushes the given window on the window navigation stack, on top of the current topmost window.
 pub fn push(window: WindowRef, animated: bool) {
@@ -13,7 +13,7 @@ pub fn pop(animated: bool) -> Option<WindowRef> {
     if ptr.is_null() {
         None
     } else {
-        Some(WindowRef::from_ptr(ptr))
+        Some(ptr.into())
     }
 }
 
@@ -36,7 +36,7 @@ pub fn get_top_window() -> Option<WindowRef> {
     if ptr.is_null() {
         None
     } else {
-        Some(WindowRef::from_ptr(ptr))
+        Some(ptr.into())
     }
 }
 
