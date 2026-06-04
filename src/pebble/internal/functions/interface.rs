@@ -184,6 +184,9 @@ pub fn layer_create(bounds: GRect) -> *mut Layer {
     unsafe { declarations::layer_create(bounds) }
 }
 
+pub fn layer_create_with_data(bounds: GRect, data_size: usize) -> *mut Layer {
+    unsafe { declarations::layer_create_with_data(bounds, data_size) }
+}
 pub fn layer_destroy(layer: *mut Layer) {
     unsafe {
         declarations::layer_destroy(layer);
@@ -257,6 +260,9 @@ pub fn layer_convert_rect_to_screen(layer: *const Layer, rect: GRect) -> GRect {
 }
 pub fn layer_get_window(layer: *const Layer) -> WindowPtr {
     unsafe { declarations::layer_get_window(layer) }
+}
+pub fn layer_get_data(layer: *const Layer) -> *mut c_void {
+    unsafe { declarations::layer_get_data(layer) }
 }
 
 pub fn text_layer_create(bounds: GRect) -> *mut TextLayer {

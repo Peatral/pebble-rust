@@ -84,6 +84,7 @@ unsafe extern "C" {
 
     // Layer
     pub fn layer_create(bounds: GRect) -> *mut Layer;
+    pub fn layer_create_with_data(bounds: GRect, data_size: usize) -> *mut Layer;
     pub fn layer_destroy(layer: *mut Layer);
     pub fn layer_get_frame(layer: *const Layer) -> GRect;
     pub fn layer_get_bounds(layer: *const Layer) -> GRect;
@@ -103,6 +104,7 @@ unsafe extern "C" {
     pub fn layer_get_hidden(layer: *const Layer) -> bool;
     pub fn layer_set_clips(layer: *mut Layer, clips: bool);
     pub fn layer_get_clips(layer: *const Layer) -> bool;
+    pub fn layer_get_data(layer: *const Layer) -> *mut c_void;
 
     pub fn layer_convert_point_to_screen(layer: *const Layer, point: GPoint) -> GPoint;
     pub fn layer_convert_rect_to_screen(layer: *const Layer, rect: GRect) -> GRect;

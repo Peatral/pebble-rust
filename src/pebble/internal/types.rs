@@ -99,12 +99,7 @@ pub enum GCompOp {
     GCompOpSet,
 }
 
-#[repr(C)]
-pub enum GColor {
-    GColorClear = -1,
-    GColorBlack = 0,
-    GColorWhite = 1,
-}
+pub type GColor = GColor8;
 
 #[repr(C)]
 pub enum TimeUnits {

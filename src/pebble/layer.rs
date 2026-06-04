@@ -24,13 +24,15 @@ use crate::system::fonts::Font;
 use core::ffi::{CStr, c_char};
 
 pub mod action_bar_layer;
+pub mod canvas_layer;
 pub mod menu_layer;
 pub mod status_bar_layer;
 
+use crate::types::GPoint;
 pub use action_bar_layer::ActionBarLayer;
+pub use canvas_layer::CanvasLayer;
 pub use menu_layer::{MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
 pub use status_bar_layer::StatusBarLayer;
-use crate::types::GPoint;
 
 /// A safe, immutable reference to a standard UI Layer.
 /// Used primarily for reading properties of layers you don't own (like the menu background).
@@ -124,6 +126,10 @@ pub trait ILayerMut: ILayer {
 
     fn set_clips(&self, clips: bool) {
         interface::layer_set_clips(self.as_mut_ptr(), clips);
+    }
+
+    fn set_update_proc(&self, func: extern "C" fn(*mut types::Layer, *mut types::GContext)) {
+        interface::layer_set_update_proc(self.as_mut_ptr(), func);
     }
 }
 
