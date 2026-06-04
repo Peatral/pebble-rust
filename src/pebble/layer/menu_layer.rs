@@ -6,6 +6,48 @@ use crate::pebble::window::WindowRef;
 use alloc::boxed::Box;
 use core::ffi::{CStr, c_void};
 
+pub struct MenuIndexRef {
+    internal: *mut types::MenuIndex,
+}
+
+impl MenuIndexRef {
+    pub(crate) fn from_ptr(ptr: *mut types::MenuIndex) -> Self {
+        MenuIndexRef { internal: ptr }
+    }
+
+    pub fn as_ptr(&self) -> *mut types::MenuIndex {
+        self.internal
+    }
+
+    pub fn section(&self) -> u16 {
+        assert!(!self.internal.is_null(), "MenuIndex pointer was null!");
+
+        unsafe { (*self.internal).section }
+    }
+
+    pub fn set_section(&mut self, section: u16) {
+        assert!(!self.internal.is_null(), "MenuIndex pointer was null!");
+
+        unsafe {
+            (*self.internal).section = section;
+        }
+    }
+
+    pub fn row(&self) -> u16 {
+        assert!(!self.internal.is_null(), "MenuIndex pointer was null!");
+
+        unsafe { (*self.internal).row }
+    }
+
+    pub fn set_row(&mut self, row: u16) {
+        assert!(!self.internal.is_null(), "MenuIndex pointer was null!");
+
+        unsafe {
+            (*self.internal).row = row;
+        }
+    }
+}
+
 /// Helper to draw a basic section cell with a title, subtitle, and optional icon.
 pub fn cell_basic_draw(
     ctx: GContext,
@@ -30,11 +72,6 @@ pub fn cell_basic_header_draw(ctx: GContext, cell_layer: *const types::Layer, ti
 /// Returns whether or not the given cell layer is highlighted.
 pub fn cell_layer_is_highlighted(cell_layer: *const types::Layer) -> bool {
     interface::menu_cell_layer_is_highlighted(cell_layer)
-}
-
-/// Comparator function to determine the order of two MenuIndex values.
-pub fn index_compare(a: &types::MenuIndex, b: &types::MenuIndex) -> i16 {
-    interface::menu_index_compare(a as *const types::MenuIndex, b as *const types::MenuIndex)
 }
 
 pub struct MenuLayer<T: MenuLayerDelegate> {
@@ -109,40 +146,27 @@ pub trait MenuLayerDelegate {
         1
     }
     fn get_num_rows(&self, menu_layer: MenuLayerRef, section_index: u16) -> u16;
-    fn get_cell_height(
-        &self,
-        _menu_layer: MenuLayerRef,
-        _cell_index: *mut types::MenuIndex,
-    ) -> i16 {
+    fn get_cell_height(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) -> i16 {
         44
     }
     fn get_header_height(&self, _menu_layer: MenuLayerRef, _section_index: u16) -> i16 {
         0
     }
-    fn get_separator_height(
-        &self,
-        _menu_layer: MenuLayerRef,
-        _cell_index: *mut types::MenuIndex,
-    ) -> i16 {
+    fn get_separator_height(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) -> i16 {
         0
     }
-    fn draw_row(
-        &self,
-        ctx: GContext,
-        cell_layer: *const types::Layer,
-        cell_index: *mut types::MenuIndex,
-    );
+    fn draw_row(&self, ctx: GContext, cell_layer: *const types::Layer, cell_index: MenuIndexRef);
     fn draw_header(&self, _ctx: GContext, _cell_layer: *const types::Layer, _section_index: u16) {}
     fn draw_separator(
         &self,
         _ctx: GContext,
         _cell_layer: *const types::Layer,
-        _cell_index: *mut types::MenuIndex,
+        _cell_index: MenuIndexRef,
     ) {
     }
     fn draw_background(&self, _ctx: GContext, _bg_layer: *const types::Layer, _highlight: bool) {}
-    fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: *mut types::MenuIndex) {}
-    fn select_long_click(&self, _menu_layer: MenuLayerRef, _cell_index: *mut types::MenuIndex) {}
+    fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
+    fn select_long_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
     fn selection_changed(
         &self,
         _menu_layer: MenuLayerRef,
@@ -153,7 +177,7 @@ pub trait MenuLayerDelegate {
     fn selection_will_change(
         &self,
         _menu_layer: MenuLayerRef,
-        _new_index: *mut types::MenuIndex,
+        _new_index: MenuIndexRef,
         _old_index: types::MenuIndex,
     ) {
     }
@@ -180,7 +204,10 @@ extern "C" fn trampoline_get_cell_height<T: MenuLayerDelegate>(
     ctx: *mut c_void,
 ) -> i16 {
     let delegate = unsafe { &*(ctx as *const T) };
-    delegate.get_cell_height(MenuLayerRef::from_ptr(layer), cell_index)
+    delegate.get_cell_height(
+        MenuLayerRef::from_ptr(layer),
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_get_header_height<T: MenuLayerDelegate>(
     layer: *mut types::MenuLayer,
@@ -196,7 +223,10 @@ extern "C" fn trampoline_get_separator_height<T: MenuLayerDelegate>(
     ctx: *mut c_void,
 ) -> i16 {
     let delegate = unsafe { &*(ctx as *const T) };
-    delegate.get_separator_height(MenuLayerRef::from_ptr(layer), cell_index)
+    delegate.get_separator_height(
+        MenuLayerRef::from_ptr(layer),
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -205,7 +235,11 @@ extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_row(GContext::from_ptr(ctx), cell_layer, cell_index)
+    delegate.draw_row(
+        GContext::from_ptr(ctx),
+        cell_layer,
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -223,7 +257,11 @@ extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_separator(GContext::from_ptr(ctx), cell_layer, cell_index)
+    delegate.draw_separator(
+        GContext::from_ptr(ctx),
+        cell_layer,
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -240,7 +278,10 @@ extern "C" fn trampoline_select_click<T: MenuLayerDelegate>(
     ctx: *mut c_void,
 ) {
     let delegate = unsafe { &*(ctx as *const T) };
-    delegate.select_click(MenuLayerRef::from_ptr(layer), cell_index)
+    delegate.select_click(
+        MenuLayerRef::from_ptr(layer),
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_select_long_click<T: MenuLayerDelegate>(
     layer: *mut types::MenuLayer,
@@ -248,7 +289,10 @@ extern "C" fn trampoline_select_long_click<T: MenuLayerDelegate>(
     ctx: *mut c_void,
 ) {
     let delegate = unsafe { &*(ctx as *const T) };
-    delegate.select_long_click(MenuLayerRef::from_ptr(layer), cell_index)
+    delegate.select_long_click(
+        MenuLayerRef::from_ptr(layer),
+        MenuIndexRef::from_ptr(cell_index),
+    )
 }
 extern "C" fn trampoline_selection_changed<T: MenuLayerDelegate>(
     layer: *mut types::MenuLayer,
@@ -266,7 +310,11 @@ extern "C" fn trampoline_selection_will_change<T: MenuLayerDelegate>(
     ctx: *mut c_void,
 ) {
     let delegate = unsafe { &*(ctx as *const T) };
-    delegate.selection_will_change(MenuLayerRef::from_ptr(layer), new_index, old_index)
+    delegate.selection_will_change(
+        MenuLayerRef::from_ptr(layer),
+        MenuIndexRef::from_ptr(new_index),
+        old_index,
+    )
 }
 
 impl<T: MenuLayerDelegate> MenuLayer<T> {

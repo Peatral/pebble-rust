@@ -301,7 +301,7 @@ pub struct ConnectionHandlers {
 }
 
 #[repr(C, packed)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MenuIndex {
     pub section: u16,
     pub row: u16,

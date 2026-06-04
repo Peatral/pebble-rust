@@ -28,7 +28,7 @@ pub mod menu_layer;
 pub mod status_bar_layer;
 
 pub use action_bar_layer::ActionBarLayer;
-pub use menu_layer::{MenuLayer, MenuLayerDelegate, MenuLayerRef};
+pub use menu_layer::{MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
 pub use status_bar_layer::StatusBarLayer;
 
 pub struct Layer {
