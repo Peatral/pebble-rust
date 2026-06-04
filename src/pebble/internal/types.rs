@@ -58,21 +58,21 @@ pub struct tm {
     pub tm_isdst: u32,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(C)]
 pub struct GPoint {
-    pub x: u16,
-    pub y: u16,
+    pub x: i16,
+    pub y: i16,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(C)]
 pub struct GSize {
-    pub w: u16,
-    pub h: u16,
+    pub w: i16,
+    pub h: i16,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(C)]
 pub struct GRect {
     pub origin: GPoint,
@@ -521,4 +521,10 @@ pub enum GCornerMask {
 pub enum GOvalScaleMode {
     FitCircle,
     FillCircle,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GColor8 {
+    pub argb: u8,
 }

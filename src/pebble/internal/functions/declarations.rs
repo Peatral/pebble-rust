@@ -231,6 +231,14 @@ unsafe extern "C" {
         size: GSize,
     ) -> GRect;
 
+    pub fn gcolor_legible_over(background_color: GColor8) -> GColor8;
+    pub fn grect_is_empty(rect: *const GRect) -> bool;
+    pub fn grect_standardize(rect: *mut GRect);
+    pub fn grect_clip(rect_to_clip: *mut GRect, rect_clipper: *const GRect);
+    pub fn grect_contains_point(rect: *const GRect, point: *const GPoint) -> bool;
+    pub fn grect_center_point(rect: *const GRect) -> GPoint;
+    pub fn grect_crop(rect: GRect, crop_size_px: i32) -> GRect;
+
     // Wall Time
     pub fn clock_copy_time_string(buffer: *mut c_char, size: u8);
     pub fn clock_is_24h_style() -> u8;

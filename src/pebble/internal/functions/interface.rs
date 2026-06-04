@@ -30,7 +30,7 @@ use core::mem;
 use crate::pebble::internal::types::*;
 use core::ffi::{CStr, c_char, c_int, c_void};
 
-use crate::pebble::internal::functions::declarations;
+use crate::pebble::internal::functions::{declarations, interface};
 use crate::types::{DictPtr, VoidPtr};
 
 pub fn app_event_loop() {
@@ -855,4 +855,26 @@ pub fn fonts_unload_custom_font(font: GFont) {
 
 pub fn resource_get_handle(resource_id: u32) -> ResHandle {
     unsafe { declarations::resource_get_handle(resource_id) }
+}
+
+pub fn gcolor_legible_over(background_color: GColor8) -> GColor8 {
+    unsafe { declarations::gcolor_legible_over(background_color) }
+}
+pub fn grect_is_empty(rect: *const GRect) -> bool {
+    unsafe { declarations::grect_is_empty(rect) }
+}
+pub fn grect_standardize(rect: *mut GRect) {
+    unsafe { declarations::grect_standardize(rect) }
+}
+pub fn grect_clip(rect_to_clip: *mut GRect, rect_clipper: *const GRect) {
+    unsafe { declarations::grect_clip(rect_to_clip, rect_clipper) }
+}
+pub fn grect_contains_point(rect: *const GRect, point: *const GPoint) -> bool {
+    unsafe { declarations::grect_contains_point(rect, point) }
+}
+pub fn grect_center_point(rect: *const GRect) -> GPoint {
+    unsafe { declarations::grect_center_point(rect) }
+}
+pub fn grect_crop(rect: GRect, crop_size_px: i32) -> GRect {
+    unsafe { declarations::grect_crop(rect, crop_size_px) }
 }
