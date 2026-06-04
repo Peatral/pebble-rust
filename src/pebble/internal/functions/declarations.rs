@@ -85,11 +85,28 @@ unsafe extern "C" {
     // Layer
     pub fn layer_create(bounds: GRect) -> *mut Layer;
     pub fn layer_destroy(layer: *mut Layer);
-    pub fn layer_get_frame(layer: *mut Layer) -> GRect;
-    pub fn layer_get_bounds(layer: *mut Layer) -> GRect;
+    pub fn layer_get_frame(layer: *const Layer) -> GRect;
+    pub fn layer_get_bounds(layer: *const Layer) -> GRect;
     pub fn layer_add_child(layer: *mut Layer, child: *mut Layer);
     pub fn layer_mark_dirty(layer: *mut Layer);
     pub fn layer_set_update_proc(layer: *mut Layer, func: extern "C" fn(*mut Layer, *mut GContext));
+
+    pub fn layer_set_frame(layer: *mut Layer, frame: GRect);
+    pub fn layer_set_bounds(layer: *mut Layer, bounds: GRect);
+    pub fn layer_get_unobstructed_bounds(layer: *const Layer) -> GRect;
+    pub fn layer_remove_from_parent(child: *mut Layer);
+    pub fn layer_remove_child_layers(parent: *mut Layer);
+    pub fn layer_insert_below_sibling(layer_to_insert: *mut Layer, below_sibling: *mut Layer);
+    pub fn layer_insert_above_sibling(layer_to_insert: *mut Layer, above_sibling: *mut Layer);
+
+    pub fn layer_set_hidden(layer: *mut Layer, hidden: bool);
+    pub fn layer_get_hidden(layer: *const Layer) -> bool;
+    pub fn layer_set_clips(layer: *mut Layer, clips: bool);
+    pub fn layer_get_clips(layer: *const Layer) -> bool;
+
+    pub fn layer_convert_point_to_screen(layer: *const Layer, point: GPoint) -> GPoint;
+    pub fn layer_convert_rect_to_screen(layer: *const Layer, rect: GRect) -> GRect;
+    pub fn layer_get_window(layer: *const Layer) -> WindowPtr;
 
     // TextLayer
     pub fn text_layer_create(bounds: GRect) -> *mut TextLayer;

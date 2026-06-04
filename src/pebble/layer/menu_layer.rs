@@ -1,5 +1,5 @@
 use crate::graphics::context::GContext;
-use crate::layer::ILayer;
+use crate::layer::{ILayer, LayerRef};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::window::WindowRef;
@@ -82,6 +82,10 @@ impl MenuCellLayer {
     /// Returns whether or not this cell layer is currently highlighted.
     pub fn is_highlighted(&self) -> bool {
         interface::menu_cell_layer_is_highlighted(self.internal)
+    }
+
+    pub fn as_layer(&self) -> LayerRef {
+        LayerRef::from_ptr(self.internal)
     }
 }
 
@@ -175,7 +179,7 @@ pub trait MenuLayerDelegate {
         _cell_index: MenuIndexRef,
     ) {
     }
-    fn draw_background(&self, _ctx: GContext, _bg_layer: *const types::Layer, _highlight: bool) {}
+    fn draw_background(&self, _ctx: GContext, _bg_layer: LayerRef, _highlight: bool) {}
     fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
     fn select_long_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
     fn selection_changed(
@@ -259,7 +263,11 @@ extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_header(GContext::from_ptr(ctx), MenuCellLayer::from_ptr(cell_layer), section_index)
+    delegate.draw_header(
+        GContext::from_ptr(ctx),
+        MenuCellLayer::from_ptr(cell_layer),
+        section_index,
+    )
 }
 extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -281,7 +289,11 @@ extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_background(GContext::from_ptr(ctx), bg_layer, highlight)
+    delegate.draw_background(
+        GContext::from_ptr(ctx),
+        LayerRef::from_ptr(bg_layer),
+        highlight,
+    )
 }
 extern "C" fn trampoline_select_click<T: MenuLayerDelegate>(
     layer: *mut types::MenuLayer,
@@ -425,22 +437,6 @@ impl<T: MenuLayerDelegate> Drop for MenuLayer<T> {
 }
 
 impl<T: MenuLayerDelegate> ILayer for MenuLayer<T> {
-    fn get_bounds(&self) -> types::GRect {
-        interface::layer_get_bounds(self.inner)
-    }
-
-    fn get_frame(&self) -> types::GRect {
-        interface::layer_get_frame(self.inner)
-    }
-
-    fn add_child(&self, layer: &dyn ILayer) {
-        interface::layer_add_child(self.inner, layer.get_internal())
-    }
-
-    fn mark_dirty(&self) {
-        interface::layer_mark_dirty(self.inner)
-    }
-
     fn get_internal(&self) -> *mut types::Layer {
         self.inner
     }

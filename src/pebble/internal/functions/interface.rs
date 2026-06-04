@@ -190,11 +190,11 @@ pub fn layer_destroy(layer: *mut Layer) {
     }
 }
 
-pub fn layer_get_frame(layer: *mut Layer) -> GRect {
+pub fn layer_get_frame(layer: *const Layer) -> GRect {
     unsafe { declarations::layer_get_frame(layer) }
 }
 
-pub fn layer_get_bounds(layer: *mut Layer) -> GRect {
+pub fn layer_get_bounds(layer: *const Layer) -> GRect {
     unsafe { declarations::layer_get_bounds(layer) }
 }
 
@@ -214,6 +214,49 @@ pub fn layer_set_update_proc(layer: *mut Layer, func: extern "C" fn(*mut Layer, 
     unsafe {
         declarations::layer_set_update_proc(layer, func);
     }
+}
+
+pub fn layer_set_frame(layer: *mut Layer, frame: GRect) {
+    unsafe { declarations::layer_set_frame(layer, frame) }
+}
+pub fn layer_set_bounds(layer: *mut Layer, bounds: GRect) {
+    unsafe { declarations::layer_set_bounds(layer, bounds) }
+}
+pub fn layer_get_unobstructed_bounds(layer: *const Layer) -> GRect {
+    unsafe { declarations::layer_get_unobstructed_bounds(layer) }
+}
+pub fn layer_remove_from_parent(child: *mut Layer) {
+    unsafe { declarations::layer_remove_from_parent(child) }
+}
+pub fn layer_remove_child_layers(parent: *mut Layer) {
+    unsafe { declarations::layer_remove_child_layers(parent) }
+}
+pub fn layer_insert_below_sibling(layer_to_insert: *mut Layer, below_sibling: *mut Layer) {
+    unsafe { declarations::layer_insert_below_sibling(layer_to_insert, below_sibling) }
+}
+pub fn layer_insert_above_sibling(layer_to_insert: *mut Layer, above_sibling: *mut Layer) {
+    unsafe { declarations::layer_insert_above_sibling(layer_to_insert, above_sibling) }
+}
+pub fn layer_set_hidden(layer: *mut Layer, hidden: bool) {
+    unsafe { declarations::layer_set_hidden(layer, hidden) }
+}
+pub fn layer_get_hidden(layer: *const Layer) -> bool {
+    unsafe { declarations::layer_get_hidden(layer) }
+}
+pub fn layer_set_clips(layer: *mut Layer, clips: bool) {
+    unsafe { declarations::layer_set_clips(layer, clips) }
+}
+pub fn layer_get_clips(layer: *const Layer) -> bool {
+    unsafe { declarations::layer_get_clips(layer) }
+}
+pub fn layer_convert_point_to_screen(layer: *const Layer, point: GPoint) -> GPoint {
+    unsafe { declarations::layer_convert_point_to_screen(layer, point) }
+}
+pub fn layer_convert_rect_to_screen(layer: *const Layer, rect: GRect) -> GRect {
+    unsafe { declarations::layer_convert_rect_to_screen(layer, rect) }
+}
+pub fn layer_get_window(layer: *const Layer) -> WindowPtr {
+    unsafe { declarations::layer_get_window(layer) }
 }
 
 pub fn text_layer_create(bounds: GRect) -> *mut TextLayer {
