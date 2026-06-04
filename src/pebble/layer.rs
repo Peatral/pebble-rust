@@ -155,7 +155,7 @@ impl Layer {
     pub fn new(bounds: GRect) -> Layer {
         Layer {
             internal: interface::layer_create(bounds),
-            is_owned_by_rust: false,
+            is_owned_by_rust: true,
         }
     }
 
