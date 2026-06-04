@@ -25,7 +25,7 @@
 */
 use crate::pebble::internal::types::*;
 use crate::types::{DictPtr, VoidPtr};
-use core::ffi::{c_char, c_void};
+use core::ffi::{c_char, c_int, c_void};
 
 unsafe extern "C" {
     // App
@@ -179,7 +179,57 @@ unsafe extern "C" {
     pub fn graphics_context_set_compositing_mode(ctx: *mut GContext, mode: GCompOp);
     pub fn graphics_context_set_antialiased(ctx: *mut GContext, enable: bool);
     pub fn graphics_context_set_stroke_width(ctx: *mut GContext, stroke_width: u8);
+
+    // Graphics - Primitives
+    pub fn graphics_draw_pixel(ctx: *mut GContext, center: GPoint);
+    pub fn graphics_draw_line(ctx: *mut GContext, p0: GPoint, p1: GPoint);
+    pub fn graphics_draw_rect(ctx: *mut GContext, rect: GRect);
+    pub fn graphics_fill_rect(
+        ctx: *mut GContext,
+        rect: GRect,
+        corner_radius: u16,
+        corner_mask: GCornerMask,
+    );
+    pub fn graphics_draw_circle(ctx: *mut GContext, center: GPoint, radius: u16);
     pub fn graphics_fill_circle(ctx: *mut GContext, center: GPoint, radius: u16);
+    pub fn graphics_draw_round_rect(ctx: *mut GContext, rect: GRect, radius: u16);
+    pub fn graphics_draw_bitmap_in_rect(ctx: *mut GContext, bitmap: *const GBitmap, rect: GRect);
+    pub fn graphics_capture_frame_buffer(ctx: *mut GContext) -> *mut GBitmap;
+    pub fn graphics_capture_frame_buffer_format(
+        ctx: *mut GContext,
+        format: GBitmapFormat,
+    ) -> *mut GBitmap;
+    pub fn graphics_release_frame_buffer(ctx: *mut GContext, buffer: *mut GBitmap) -> bool;
+    pub fn graphics_frame_buffer_is_captured(ctx: *mut GContext) -> bool;
+    pub fn graphics_draw_rotated_bitmap(
+        ctx: *mut GContext,
+        src: *mut GBitmap,
+        src_ic: GPoint,
+        rotation: c_int,
+        dest_ic: GPoint,
+    );
+    pub fn graphics_draw_arc(
+        ctx: *mut GContext,
+        rect: GRect,
+        scale_mode: GOvalScaleMode,
+        angle_start: i32,
+        angle_end: i32,
+    );
+    pub fn graphics_fill_radial(
+        ctx: *mut GContext,
+        rect: GRect,
+        scale_mode: GOvalScaleMode,
+        inset_thickness: u16,
+        angle_start: i32,
+        angle_end: i32,
+    );
+    pub fn gpoint_from_polar(rect: GRect, scale_mode: GOvalScaleMode, angle: i32) -> GPoint;
+    pub fn grect_centered_from_polar(
+        rect: GRect,
+        scale_mode: GOvalScaleMode,
+        angle: i32,
+        size: GSize,
+    ) -> GRect;
 
     // Wall Time
     pub fn clock_copy_time_string(buffer: *mut c_char, size: u8);

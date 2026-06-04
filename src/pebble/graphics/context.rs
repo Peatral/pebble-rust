@@ -1,6 +1,8 @@
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
-use crate::types::{GColor, GCompOp};
+use crate::pebble::internal::types::{GBitmap, GBitmapFormat, GCornerMask, GOvalScaleMode};
+use crate::types::{GColor, GCompOp, GPoint, GRect, GSize};
+use core::ffi::c_int;
 
 pub struct GContext {
     internal: *mut types::GContext,

@@ -489,3 +489,36 @@ pub enum StatusBarLayerSeparatorMode {
     None,
     Dotted,
 }
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum GBitmapFormat {
+    Format1Bit,
+    Format8Bit,
+    Format1BitPalette,
+    Format2BitPalette,
+    Format4BitPalette,
+    Format8BitCircular,
+}
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum GCornerMask {
+    CornerNone,
+    CornerTopLeft,
+    CornerTopRight,
+    CornerBottomLeft,
+    CornerBottomRight,
+    CornersAll,
+    CornersTop,
+    CornersBottom,
+    CornersLeft,
+    CornersRight,
+}
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum GOvalScaleMode {
+    FitCircle,
+    FillCircle,
+}

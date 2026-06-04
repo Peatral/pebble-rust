@@ -28,7 +28,7 @@
 use core::mem;
 
 use crate::pebble::internal::types::*;
-use core::ffi::{CStr, c_char, c_void};
+use core::ffi::{CStr, c_char, c_int, c_void};
 
 use crate::pebble::internal::functions::declarations;
 use crate::types::{DictPtr, VoidPtr};
@@ -340,10 +340,117 @@ pub fn graphics_context_set_stroke_width(ctx: *mut GContext, stroke_width: u8) {
     }
 }
 
+pub fn graphics_draw_pixel(ctx: *mut GContext, center: GPoint) {
+    unsafe {
+        declarations::graphics_draw_pixel(ctx, center);
+    }
+}
+pub fn graphics_draw_line(ctx: *mut GContext, p0: GPoint, p1: GPoint) {
+    unsafe {
+        declarations::graphics_draw_line(ctx, p0, p1);
+    }
+}
+pub fn graphics_draw_rect(ctx: *mut GContext, rect: GRect) {
+    unsafe {
+        declarations::graphics_draw_rect(ctx, rect);
+    }
+}
+pub fn graphics_fill_rect(
+    ctx: *mut GContext,
+    rect: GRect,
+    corner_radius: u16,
+    corner_mask: GCornerMask,
+) {
+    unsafe {
+        declarations::graphics_fill_rect(ctx, rect, corner_radius, corner_mask);
+    }
+}
+pub fn graphics_draw_circle(ctx: *mut GContext, center: GPoint, radius: u16) {
+    unsafe {
+        declarations::graphics_draw_circle(ctx, center, radius);
+    }
+}
 pub fn graphics_fill_circle(ctx: *mut GContext, center: GPoint, radius: u16) {
     unsafe {
         declarations::graphics_fill_circle(ctx, center, radius);
     }
+}
+pub fn graphics_draw_round_rect(ctx: *mut GContext, rect: GRect, radius: u16) {
+    unsafe {
+        declarations::graphics_draw_round_rect(ctx, rect, radius);
+    }
+}
+pub fn graphics_draw_bitmap_in_rect(ctx: *mut GContext, bitmap: *const GBitmap, rect: GRect) {
+    unsafe {
+        declarations::graphics_draw_bitmap_in_rect(ctx, bitmap, rect);
+    }
+}
+pub fn graphics_capture_frame_buffer(ctx: *mut GContext) -> *mut GBitmap {
+    unsafe { declarations::graphics_capture_frame_buffer(ctx) }
+}
+pub fn graphics_capture_frame_buffer_format(
+    ctx: *mut GContext,
+    format: GBitmapFormat,
+) -> *mut GBitmap {
+    unsafe { declarations::graphics_capture_frame_buffer_format(ctx, format) }
+}
+pub fn graphics_release_frame_buffer(ctx: *mut GContext, buffer: *mut GBitmap) -> bool {
+    unsafe { declarations::graphics_release_frame_buffer(ctx, buffer) }
+}
+pub fn graphics_frame_buffer_is_captured(ctx: *mut GContext) -> bool {
+    unsafe { declarations::graphics_frame_buffer_is_captured(ctx) }
+}
+pub fn graphics_draw_rotated_bitmap(
+    ctx: *mut GContext,
+    src: *mut GBitmap,
+    src_ic: GPoint,
+    rotation: c_int,
+    dest_ic: GPoint,
+) {
+    unsafe {
+        declarations::graphics_draw_rotated_bitmap(ctx, src, src_ic, rotation, dest_ic);
+    }
+}
+pub fn graphics_draw_arc(
+    ctx: *mut GContext,
+    rect: GRect,
+    scale_mode: GOvalScaleMode,
+    angle_start: i32,
+    angle_end: i32,
+) {
+    unsafe {
+        declarations::graphics_draw_arc(ctx, rect, scale_mode, angle_start, angle_end);
+    }
+}
+pub fn graphics_fill_radial(
+    ctx: *mut GContext,
+    rect: GRect,
+    scale_mode: GOvalScaleMode,
+    inset_thickness: u16,
+    angle_start: i32,
+    angle_end: i32,
+) {
+    unsafe {
+        declarations::graphics_fill_radial(
+            ctx,
+            rect,
+            scale_mode,
+            inset_thickness,
+            angle_start,
+            angle_end,
+        );
+    }
+}
+pub fn gpoint_from_polar(rect: GRect, scale_mode: GOvalScaleMode, angle: i32) -> GPoint {
+    unsafe { declarations::gpoint_from_polar(rect, scale_mode, angle) }
+}
+pub fn grect_centered_from_polar(
+    rect: GRect,
+    scale_mode: GOvalScaleMode,
+    angle: i32,
+    size: GSize,
+) -> GRect {
+    unsafe { declarations::grect_centered_from_polar(rect, scale_mode, angle, size) }
 }
 
 pub fn clock_is_24h_style() -> bool {
