@@ -6,7 +6,7 @@ extern crate pebble_rust as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, include_message_keys, window_stack};
-use pebble::layer::{ILayer, BitmapLayer};
+use pebble::layer::{ILayerMut, BitmapLayer};
 use pebble::types::{Bitmap, GCompOp};
 use pebble::window::{Window, WindowDelegate, WindowRef};
 

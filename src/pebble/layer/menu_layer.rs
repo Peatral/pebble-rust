@@ -1,8 +1,9 @@
 use crate::graphics::context::GContext;
-use crate::layer::{ILayer, LayerRef};
+use crate::layer::{ILayerMut, ILayer, LayerRef};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::window::WindowRef;
+use crate::types::Layer;
 use alloc::boxed::Box;
 use core::ffi::{CStr, c_void};
 
@@ -53,6 +54,12 @@ pub struct MenuCellLayer {
     internal: *const types::Layer,
 }
 
+impl ILayer for MenuCellLayer {
+    fn as_ptr(&self) -> *const Layer {
+        self.internal
+    }
+}
+
 impl MenuCellLayer {
     pub(crate) fn from_ptr(ptr: *const types::Layer) -> Self {
         Self { internal: ptr }
@@ -82,10 +89,6 @@ impl MenuCellLayer {
     /// Returns whether or not this cell layer is currently highlighted.
     pub fn is_highlighted(&self) -> bool {
         interface::menu_cell_layer_is_highlighted(self.internal)
-    }
-
-    pub fn as_layer(&self) -> LayerRef {
-        LayerRef::from_ptr(self.internal)
     }
 }
 
@@ -437,7 +440,13 @@ impl<T: MenuLayerDelegate> Drop for MenuLayer<T> {
 }
 
 impl<T: MenuLayerDelegate> ILayer for MenuLayer<T> {
-    fn get_internal(&self) -> *mut types::Layer {
+    fn as_ptr(&self) -> *const Layer {
+        self.inner
+    }
+}
+
+impl<T: MenuLayerDelegate> ILayerMut for MenuLayer<T> {
+    fn as_mut_ptr(&self) -> *mut Layer {
         self.inner
     }
 }

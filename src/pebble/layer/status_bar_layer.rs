@@ -1,8 +1,9 @@
-use crate::layer::ILayer;
+use crate::layer::{ILayerMut, ILayer};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::internal::types::StatusBarLayerSeparatorMode;
 use crate::pebble::types::{GColor, GRect};
+use crate::types::Layer;
 
 /// A layer that serves as a configurable status bar.
 pub struct StatusBarLayer {
@@ -54,23 +55,13 @@ impl Drop for StatusBarLayer {
 }
 
 impl ILayer for StatusBarLayer {
-    fn get_bounds(&self) -> GRect {
-        interface::layer_get_bounds(self.inner)
+    fn as_ptr(&self) -> *const Layer {
+        self.inner
     }
+}
 
-    fn get_frame(&self) -> GRect {
-        interface::layer_get_frame(self.inner)
-    }
-
-    fn add_child(&self, layer: &dyn ILayer) {
-        interface::layer_add_child(self.inner, layer.get_internal())
-    }
-
-    fn mark_dirty(&self) {
-        interface::layer_mark_dirty(self.inner)
-    }
-
-    fn get_internal(&self) -> *mut types::Layer {
+impl ILayerMut for StatusBarLayer {
+    fn as_mut_ptr(&self) -> *mut Layer {
         self.inner
     }
 }

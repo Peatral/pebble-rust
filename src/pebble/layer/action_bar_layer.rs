@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 use core::ffi::c_void;
 
-use crate::layer::ILayer;
+use crate::layer::{ILayerMut, ILayer};
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
 use crate::pebble::types::{Bitmap, GColor, GRect};
@@ -9,6 +9,7 @@ use crate::pebble::window::WindowRef;
 
 // Import the ClickDelegate and the master trampoline we defined earlier
 use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
+use crate::types::Layer;
 
 /// A vertical, bar-shaped control widget on the right edge of the window.
 pub struct ActionBarLayer<T: ClickDelegate> {
@@ -95,23 +96,13 @@ impl<T: ClickDelegate> Drop for ActionBarLayer<T> {
 }
 
 impl<T: ClickDelegate> ILayer for ActionBarLayer<T> {
-    fn get_bounds(&self) -> GRect {
-        interface::layer_get_bounds(self.inner)
+    fn as_ptr(&self) -> *const Layer {
+        self.inner
     }
+}
 
-    fn get_frame(&self) -> GRect {
-        interface::layer_get_frame(self.inner)
-    }
-
-    fn add_child(&self, layer: &dyn ILayer) {
-        interface::layer_add_child(self.inner, layer.get_internal())
-    }
-
-    fn mark_dirty(&self) {
-        interface::layer_mark_dirty(self.inner)
-    }
-
-    fn get_internal(&self) -> *mut types::Layer {
+impl<T: ClickDelegate> ILayerMut for ActionBarLayer<T> {
+    fn as_mut_ptr(&self) -> *mut Layer {
         self.inner
     }
 }

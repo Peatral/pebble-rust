@@ -11,7 +11,7 @@ use alloc::borrow::ToOwned;
 use alloc::ffi::CString;
 
 use pebble::app_message::*;
-use pebble::layer::{ILayer, TextLayer};
+use pebble::layer::{ILayerMut, ILayer, TextLayer};
 use pebble::types::{GPoint, GRect, GSize, GTextAlignment, GlobalCell};
 use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::{app, window_stack};

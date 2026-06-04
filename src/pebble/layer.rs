@@ -30,6 +30,7 @@ pub mod status_bar_layer;
 pub use action_bar_layer::ActionBarLayer;
 pub use menu_layer::{MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
 pub use status_bar_layer::StatusBarLayer;
+use crate::types::GPoint;
 
 /// A safe, immutable reference to a standard UI Layer.
 /// Used primarily for reading properties of layers you don't own (like the menu background).
@@ -53,57 +54,82 @@ pub struct BitmapLayer {
 }
 
 pub trait ILayer {
-    fn get_internal(&self) -> *mut types::Layer;
+    fn as_ptr(&self) -> *const types::Layer;
 
     fn get_bounds(&self) -> GRect {
-        interface::layer_get_bounds(self.get_internal())
+        interface::layer_get_bounds(self.as_ptr())
     }
-    fn set_bounds(&self, bounds: GRect) {
-        interface::layer_set_bounds(self.get_internal(), bounds);
-    }
+
     fn get_unobstructed_bounds(&self) -> GRect {
-        interface::layer_get_unobstructed_bounds(self.get_internal())
+        interface::layer_get_unobstructed_bounds(self.as_ptr())
+    }
+
+    fn convert_point_to_screen(&self, point: GPoint) -> GPoint {
+        interface::layer_convert_point_to_screen(self.as_ptr(), point)
+    }
+
+    fn convert_rect_to_screen(&self, rect: GRect) -> GRect {
+        interface::layer_convert_rect_to_screen(self.as_ptr(), rect)
     }
 
     fn get_frame(&self) -> GRect {
-        interface::layer_get_frame(self.get_internal())
-    }
-    fn set_frame(&self, frame: GRect) {
-        interface::layer_set_frame(self.get_internal(), frame);
+        interface::layer_get_frame(self.as_ptr())
     }
 
-    fn add_child(&self, child: &dyn ILayer) {
-        interface::layer_add_child(self.get_internal(), child.get_internal());
+    fn get_hidden(&self) -> bool {
+        interface::layer_get_hidden(self.as_ptr())
+    }
+    fn get_clips(&self) -> bool {
+        interface::layer_get_clips(self.as_ptr())
+    }
+}
+
+pub trait ILayerMut: ILayer {
+    fn as_mut_ptr(&self) -> *mut types::Layer;
+
+    fn set_bounds(&self, bounds: GRect) {
+        interface::layer_set_bounds(self.as_mut_ptr(), bounds);
+    }
+    fn get_unobstructed_bounds(&self) -> GRect {
+        interface::layer_get_unobstructed_bounds(self.as_mut_ptr())
+    }
+
+    fn set_frame(&self, frame: GRect) {
+        interface::layer_set_frame(self.as_mut_ptr(), frame);
+    }
+
+    fn add_child(&self, child: &dyn ILayerMut) {
+        interface::layer_add_child(self.as_mut_ptr(), child.as_mut_ptr());
     }
     fn remove_from_parent(&self) {
-        interface::layer_remove_from_parent(self.get_internal());
+        interface::layer_remove_from_parent(self.as_mut_ptr());
     }
     fn remove_child_layers(&self) {
-        interface::layer_remove_child_layers(self.get_internal());
+        interface::layer_remove_child_layers(self.as_mut_ptr());
     }
-    fn insert_below_sibling(&self, sibling: &dyn ILayer) {
-        interface::layer_insert_below_sibling(self.get_internal(), sibling.get_internal());
+    fn insert_below_sibling(&self, sibling: &dyn ILayerMut) {
+        interface::layer_insert_below_sibling(self.as_mut_ptr(), sibling.as_mut_ptr());
     }
-    fn insert_above_sibling(&self, sibling: &dyn ILayer) {
-        interface::layer_insert_above_sibling(self.get_internal(), sibling.get_internal());
+    fn insert_above_sibling(&self, sibling: &dyn ILayerMut) {
+        interface::layer_insert_above_sibling(self.as_mut_ptr(), sibling.as_mut_ptr());
     }
 
     fn mark_dirty(&self) {
-        interface::layer_mark_dirty(self.get_internal());
+        interface::layer_mark_dirty(self.as_mut_ptr());
     }
 
     fn set_hidden(&self, hidden: bool) {
-        interface::layer_set_hidden(self.get_internal(), hidden);
-    }
-    fn get_hidden(&self) -> bool {
-        interface::layer_get_hidden(self.get_internal())
+        interface::layer_set_hidden(self.as_mut_ptr(), hidden);
     }
 
     fn set_clips(&self, clips: bool) {
-        interface::layer_set_clips(self.get_internal(), clips);
+        interface::layer_set_clips(self.as_mut_ptr(), clips);
     }
-    fn get_clips(&self) -> bool {
-        interface::layer_get_clips(self.get_internal())
+}
+
+impl ILayer for LayerRef {
+    fn as_ptr(&self) -> *const types::Layer {
+        self.internal
     }
 }
 
@@ -111,29 +137,16 @@ impl LayerRef {
     pub(crate) fn from_ptr(ptr: *const types::Layer) -> Self {
         Self { internal: ptr }
     }
-
-    pub fn get_bounds(&self) -> GRect {
-        interface::layer_get_bounds(self.internal)
-    }
-
-    pub fn get_unobstructed_bounds(&self) -> GRect {
-        interface::layer_get_unobstructed_bounds(self.internal)
-    }
-
-    pub fn get_frame(&self) -> GRect {
-        interface::layer_get_frame(self.internal)
-    }
-
-    pub fn get_hidden(&self) -> bool {
-        interface::layer_get_hidden(self.internal)
-    }
-    pub fn get_clips(&self) -> bool {
-        interface::layer_get_clips(self.internal)
-    }
 }
 
 impl ILayer for Layer {
-    fn get_internal(&self) -> *mut types::Layer {
+    fn as_ptr(&self) -> *const types::Layer {
+        self.internal
+    }
+}
+
+impl ILayerMut for Layer {
+    fn as_mut_ptr(&self) -> *mut types::Layer {
         self.internal
     }
 }
@@ -155,7 +168,13 @@ impl Layer {
 }
 
 impl ILayer for TextLayer {
-    fn get_internal(&self) -> *mut types::Layer {
+    fn as_ptr(&self) -> *const types::Layer {
+        self.inner
+    }
+}
+
+impl ILayerMut for TextLayer {
+    fn as_mut_ptr(&self) -> *mut types::Layer {
         self.inner
     }
 }
@@ -200,7 +219,13 @@ impl Drop for TextLayer {
 }
 
 impl ILayer for BitmapLayer {
-    fn get_internal(&self) -> *mut types::Layer {
+    fn as_ptr(&self) -> *const types::Layer {
+        self.inner
+    }
+}
+
+impl ILayerMut for BitmapLayer {
+    fn as_mut_ptr(&self) -> *mut types::Layer {
         self.inner
     }
 }

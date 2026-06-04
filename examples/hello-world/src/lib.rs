@@ -8,7 +8,7 @@ extern crate pebble_rust as pebble;
 use core::cell::RefCell;
 use pebble::{app, window_stack};
 use pebble::window::{Window, WindowDelegate, WindowRef};
-use pebble::layer::{ILayer, TextLayer};
+use pebble::layer::{ILayerMut, TextLayer};
 use pebble::types::{GRect, GPoint, GSize, GTextAlignment};
 
 include_message_keys!();
