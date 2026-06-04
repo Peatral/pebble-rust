@@ -173,7 +173,12 @@ unsafe extern "C" {
     ) -> bool;
 
     // Graphics
+    pub fn graphics_context_set_stroke_color(ctx: *mut GContext, color: GColor);
     pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor);
+    pub fn graphics_context_set_text_color(ctx: *mut GContext, color: GColor);
+    pub fn graphics_context_set_compositing_mode(ctx: *mut GContext, mode: GCompOp);
+    pub fn graphics_context_set_antialiased(ctx: *mut GContext, enable: bool);
+    pub fn graphics_context_set_stroke_width(ctx: *mut GContext, stroke_width: u8);
     pub fn graphics_fill_circle(ctx: *mut GContext, center: GPoint, radius: u16);
 
     // Wall Time

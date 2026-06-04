@@ -23,6 +23,7 @@ pub mod app_message;
 pub mod clicks;
 pub mod clock;
 pub mod event;
+pub mod graphics;
 pub mod launch;
 pub mod layer;
 pub mod std;

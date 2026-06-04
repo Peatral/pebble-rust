@@ -1,3 +1,4 @@
+use crate::graphics::context::GContext;
 use crate::layer::ILayer;
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types;
@@ -7,27 +8,23 @@ use core::ffi::{CStr, c_void};
 
 /// Helper to draw a basic section cell with a title, subtitle, and optional icon.
 pub fn cell_basic_draw(
-    ctx: *mut types::GContext,
+    ctx: GContext,
     cell_layer: *const types::Layer,
     title: &CStr,
     subtitle: &CStr,
     icon: *mut types::GBitmap,
 ) {
-    interface::menu_cell_basic_draw(ctx, cell_layer, title, subtitle, icon);
+    interface::menu_cell_basic_draw(ctx.as_ptr(), cell_layer, title, subtitle, icon);
 }
 
 /// Helper to draw a cell layout with only one big title.
-pub fn cell_title_draw(ctx: *mut types::GContext, cell_layer: *const types::Layer, title: &CStr) {
-    interface::menu_cell_title_draw(ctx, cell_layer, title);
+pub fn cell_title_draw(ctx: GContext, cell_layer: *const types::Layer, title: &CStr) {
+    interface::menu_cell_title_draw(ctx.as_ptr(), cell_layer, title);
 }
 
 /// Helper to draw a basic section header cell layout with the title.
-pub fn cell_basic_header_draw(
-    ctx: *mut types::GContext,
-    cell_layer: *const types::Layer,
-    title: &CStr,
-) {
-    interface::menu_cell_basic_header_draw(ctx, cell_layer, title);
+pub fn cell_basic_header_draw(ctx: GContext, cell_layer: *const types::Layer, title: &CStr) {
+    interface::menu_cell_basic_header_draw(ctx.as_ptr(), cell_layer, title);
 }
 
 /// Returns whether or not the given cell layer is highlighted.
@@ -131,31 +128,19 @@ pub trait MenuLayerDelegate {
     }
     fn draw_row(
         &self,
-        ctx: *mut types::GContext,
+        ctx: GContext,
         cell_layer: *const types::Layer,
         cell_index: *mut types::MenuIndex,
     );
-    fn draw_header(
-        &self,
-        _ctx: *mut types::GContext,
-        _cell_layer: *const types::Layer,
-        _section_index: u16,
-    ) {
-    }
+    fn draw_header(&self, _ctx: GContext, _cell_layer: *const types::Layer, _section_index: u16) {}
     fn draw_separator(
         &self,
-        _ctx: *mut types::GContext,
+        _ctx: GContext,
         _cell_layer: *const types::Layer,
         _cell_index: *mut types::MenuIndex,
     ) {
     }
-    fn draw_background(
-        &self,
-        _ctx: *mut types::GContext,
-        _bg_layer: *const types::Layer,
-        _highlight: bool,
-    ) {
-    }
+    fn draw_background(&self, _ctx: GContext, _bg_layer: *const types::Layer, _highlight: bool) {}
     fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: *mut types::MenuIndex) {}
     fn select_long_click(&self, _menu_layer: MenuLayerRef, _cell_index: *mut types::MenuIndex) {}
     fn selection_changed(
@@ -220,7 +205,7 @@ extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_row(ctx, cell_layer, cell_index)
+    delegate.draw_row(GContext::from_ptr(ctx), cell_layer, cell_index)
 }
 extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -229,7 +214,7 @@ extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_header(ctx, cell_layer, section_index)
+    delegate.draw_header(GContext::from_ptr(ctx), cell_layer, section_index)
 }
 extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -238,7 +223,7 @@ extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_separator(ctx, cell_layer, cell_index)
+    delegate.draw_separator(GContext::from_ptr(ctx), cell_layer, cell_index)
 }
 extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -247,7 +232,7 @@ extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_background(ctx, bg_layer, highlight)
+    delegate.draw_background(GContext::from_ptr(ctx), bg_layer, highlight)
 }
 extern "C" fn trampoline_select_click<T: MenuLayerDelegate>(
     layer: *mut types::MenuLayer,

@@ -309,9 +309,34 @@ pub fn menu_layer_reload_data(menu_layer: *mut MenuLayer) {
     }
 }
 
+pub fn graphics_context_set_stroke_color(ctx: *mut GContext, color: GColor) {
+    unsafe {
+        declarations::graphics_context_set_stroke_color(ctx, color);
+    }
+}
 pub fn graphics_context_set_fill_color(ctx: *mut GContext, color: GColor) {
     unsafe {
         declarations::graphics_context_set_fill_color(ctx, color);
+    }
+}
+pub fn graphics_context_set_text_color(ctx: *mut GContext, color: GColor) {
+    unsafe {
+        declarations::graphics_context_set_text_color(ctx, color);
+    }
+}
+pub fn graphics_context_set_compositing_mode(ctx: *mut GContext, mode: GCompOp) {
+    unsafe {
+        declarations::graphics_context_set_compositing_mode(ctx, mode);
+    }
+}
+pub fn graphics_context_set_antialiased(ctx: *mut GContext, enable: bool) {
+    unsafe {
+        declarations::graphics_context_set_antialiased(ctx, enable);
+    }
+}
+pub fn graphics_context_set_stroke_width(ctx: *mut GContext, stroke_width: u8) {
+    unsafe {
+        declarations::graphics_context_set_stroke_width(ctx, stroke_width);
     }
 }
 
