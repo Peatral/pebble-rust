@@ -48,30 +48,41 @@ impl MenuIndexRef {
     }
 }
 
-/// Helper to draw a basic section cell with a title, subtitle, and optional icon.
-pub fn cell_basic_draw(
-    ctx: GContext,
-    cell_layer: *const types::Layer,
-    title: &CStr,
-    subtitle: &CStr,
-    icon: *mut types::GBitmap,
-) {
-    interface::menu_cell_basic_draw(ctx.as_ptr(), cell_layer, title, subtitle, icon);
+/// A safe wrapper representing a single menu cell layer during a draw callback.
+pub struct MenuCellLayer {
+    internal: *const types::Layer,
 }
 
-/// Helper to draw a cell layout with only one big title.
-pub fn cell_title_draw(ctx: GContext, cell_layer: *const types::Layer, title: &CStr) {
-    interface::menu_cell_title_draw(ctx.as_ptr(), cell_layer, title);
-}
+impl MenuCellLayer {
+    pub(crate) fn from_ptr(ptr: *const types::Layer) -> Self {
+        Self { internal: ptr }
+    }
 
-/// Helper to draw a basic section header cell layout with the title.
-pub fn cell_basic_header_draw(ctx: GContext, cell_layer: *const types::Layer, title: &CStr) {
-    interface::menu_cell_basic_header_draw(ctx.as_ptr(), cell_layer, title);
-}
+    /// Draws a basic section cell with a title, subtitle, and optional icon.
+    pub fn draw_basic(
+        &self,
+        ctx: GContext,
+        title: &CStr,
+        subtitle: &CStr,
+        icon: *mut types::GBitmap,
+    ) {
+        interface::menu_cell_basic_draw(ctx.as_ptr(), self.internal, title, subtitle, icon);
+    }
 
-/// Returns whether or not the given cell layer is highlighted.
-pub fn cell_layer_is_highlighted(cell_layer: *const types::Layer) -> bool {
-    interface::menu_cell_layer_is_highlighted(cell_layer)
+    /// Draws a cell layout with only one big title.
+    pub fn draw_title(&self, ctx: GContext, title: &CStr) {
+        interface::menu_cell_title_draw(ctx.as_ptr(), self.internal, title);
+    }
+
+    /// Draws a basic section header cell layout with the title.
+    pub fn draw_basic_header(&self, ctx: GContext, title: &CStr) {
+        interface::menu_cell_basic_header_draw(ctx.as_ptr(), self.internal, title);
+    }
+
+    /// Returns whether or not this cell layer is currently highlighted.
+    pub fn is_highlighted(&self) -> bool {
+        interface::menu_cell_layer_is_highlighted(self.internal)
+    }
 }
 
 pub struct MenuLayer<T: MenuLayerDelegate> {
@@ -155,12 +166,12 @@ pub trait MenuLayerDelegate {
     fn get_separator_height(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) -> i16 {
         0
     }
-    fn draw_row(&self, ctx: GContext, cell_layer: *const types::Layer, cell_index: MenuIndexRef);
-    fn draw_header(&self, _ctx: GContext, _cell_layer: *const types::Layer, _section_index: u16) {}
+    fn draw_row(&self, ctx: GContext, cell_layer: MenuCellLayer, cell_index: MenuIndexRef);
+    fn draw_header(&self, _ctx: GContext, _cell_layer: MenuCellLayer, _section_index: u16) {}
     fn draw_separator(
         &self,
         _ctx: GContext,
-        _cell_layer: *const types::Layer,
+        _cell_layer: MenuCellLayer,
         _cell_index: MenuIndexRef,
     ) {
     }
@@ -237,7 +248,7 @@ extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
     let delegate = unsafe { &*(callback_context as *const T) };
     delegate.draw_row(
         GContext::from_ptr(ctx),
-        cell_layer,
+        MenuCellLayer::from_ptr(cell_layer),
         MenuIndexRef::from_ptr(cell_index),
     )
 }
@@ -248,7 +259,7 @@ extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
     callback_context: *mut c_void,
 ) {
     let delegate = unsafe { &*(callback_context as *const T) };
-    delegate.draw_header(GContext::from_ptr(ctx), cell_layer, section_index)
+    delegate.draw_header(GContext::from_ptr(ctx), MenuCellLayer::from_ptr(cell_layer), section_index)
 }
 extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     ctx: *mut types::GContext,
@@ -259,7 +270,7 @@ extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
     let delegate = unsafe { &*(callback_context as *const T) };
     delegate.draw_separator(
         GContext::from_ptr(ctx),
-        cell_layer,
+        MenuCellLayer::from_ptr(cell_layer),
         MenuIndexRef::from_ptr(cell_index),
     )
 }
