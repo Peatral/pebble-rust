@@ -1,24 +1,20 @@
 use crate::pebble::internal::functions::interface;
 use crate::pebble::internal::types::{StatusCode, WakeupId, time_t};
+use crate::types::GlobalCell;
 
-// Since Pebble lacks a context pointer for Wakeups, we use a static variable
-// to hold the user's Rust callback. This is safe because Pebble is strictly single-threaded.
-static mut GLOBAL_WAKEUP_HANDLER: Option<fn(WakeupId, i32)> = None;
+// Since Pebble lacks a context pointer for Wakeups, we use a static variable to hold the user's Rust callback.
+static GLOBAL_WAKEUP_HANDLER: GlobalCell<Option<fn(WakeupId, i32)>> = GlobalCell::new(None);
 
 /// The C trampoline that routes the event to the user's Rust function.
 extern "C" fn wakeup_trampoline(wakeup_id: WakeupId, cookie: i32) {
-    unsafe {
-        if let Some(handler) = GLOBAL_WAKEUP_HANDLER {
-            handler(wakeup_id, cookie);
-        }
+    if let Some(handler) = GLOBAL_WAKEUP_HANDLER.get() {
+        handler(wakeup_id, cookie);
     }
 }
 
 /// Registers a callback to be called when wakeup events occur while the app is running.
 pub fn subscribe(handler: fn(WakeupId, i32)) {
-    unsafe {
-        GLOBAL_WAKEUP_HANDLER = Some(handler);
-    }
+    GLOBAL_WAKEUP_HANDLER.set(Some(handler));
     interface::wakeup_service_subscribe(wakeup_trampoline);
 }
 

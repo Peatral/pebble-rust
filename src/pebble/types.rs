@@ -22,7 +22,7 @@ pub use crate::pebble::internal::types::{
     GOvalScaleMode, GPoint, GRect, GSize, GTextAlignment, Layer, MenuIndex, MenuLayer, Status,
     StatusCode, TimeUnits, Tuple, TupleValue, WakeupId, time_t, tm,
 };
-use core::cell::{Ref, RefCell, RefMut};
+use core::cell::{Cell, Ref, RefCell, RefMut};
 use core::ffi::c_void;
 
 pub type VoidPtr = *const c_void;
@@ -49,10 +49,10 @@ impl Drop for Bitmap {
     }
 }
 
-/// A wrapper for global state in a single-threaded environment (like Pebble).
-pub struct GlobalCell<T>(RefCell<T>);
+/// A wrapper for global state in a single-threaded environment.
+pub struct GlobalRefCell<T>(RefCell<T>);
 
-impl<T> GlobalCell<T> {
+impl<T> GlobalRefCell<T> {
     pub const fn new(value: T) -> Self {
         Self(RefCell::new(value))
     }
@@ -67,6 +67,32 @@ impl<T> GlobalCell<T> {
     /// Panics if the value is currently borrowed.
     pub fn borrow_mut(&self) -> RefMut<'_, T> {
         self.0.borrow_mut()
+    }
+}
+
+// We promise the compiler this is safe to share globally
+// ONLY because Pebble is single-threaded.
+unsafe impl<T> Sync for GlobalRefCell<T> {}
+
+/// A wrapper for global state in a single-threaded environment.
+pub struct GlobalCell<T>(Cell<T>);
+
+impl<T> GlobalCell<T> {
+    pub const fn new(value: T) -> Self {
+        Self(Cell::new(value))
+    }
+
+    /// Gets the wrapped value (only works if T is Copy).
+    pub fn get(&self) -> T
+    where
+        T: Copy,
+    {
+        self.0.get()
+    }
+
+    /// Sets the wrapped value.
+    pub fn set(&self, value: T) {
+        self.0.set(value)
     }
 }
 

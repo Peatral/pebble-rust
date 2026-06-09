@@ -11,13 +11,13 @@ use alloc::borrow::ToOwned;
 
 use pebble::app_message::*;
 use pebble::layer::{ILayerMut, ILayer, TextLayer};
-use pebble::types::{GPoint, GRect, GSize, GTextAlignment, GlobalCell};
+use pebble::types::{GPoint, GRect, GSize, GTextAlignment, GlobalRefCell};
 use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::{app, window_stack};
 
 include_message_keys!();
 
-static TEXT_LAYER: GlobalCell<Option<TextLayer>> = GlobalCell::new(None);
+static TEXT_LAYER: GlobalRefCell<Option<TextLayer>> = GlobalRefCell::new(None);
 
 struct AppMessageDelegate;
 
