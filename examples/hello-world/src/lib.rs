@@ -3,7 +3,7 @@
 #![no_builtins]
 
 #[macro_use]
-extern crate pebble_rust as pebble;
+extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, window_stack};

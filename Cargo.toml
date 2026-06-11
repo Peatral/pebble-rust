@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "pebble-sys",
+    "pebble-rs",
+    "examples/*"
+]
+resolver = "2"

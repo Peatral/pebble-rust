@@ -8,7 +8,7 @@ edition = "2024"
 crate-type = ["staticlib"]
 
 [dependencies]
-pebble-rust = {path = "../../pebble-rust"}
+pebble-rs = {path = "../../pebble-rs" }
 
 [profile.dev]
 panic = "abort"

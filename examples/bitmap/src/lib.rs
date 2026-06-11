@@ -2,7 +2,7 @@
 #![no_std]
 #![no_builtins]
 
-extern crate pebble_rust as pebble;
+extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, include_message_keys, window_stack};

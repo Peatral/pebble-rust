@@ -1,0 +1,22 @@
+[package]
+name = "pebble-rs"
+version = "0.1.0"
+authors = ["RoccoDev <hey@rocco.dev>", "Peatral <contact@peatral.xyz>"]
+description = "Pebble bindings for Rust. See repository for instructions."
+documentation = "https://docs.rs/pebble-rust"
+repository = "https://github.com/pebble-rust/pebble-rust"
+readme = "README.md"
+keywords = ["pebble", "watch", "cortex", "rebble", "arm"]
+categories = ["embedded", "no-std", "hardware-support", "external-ffi-bindings"]
+edition = "2024"
+license = "GPL-3.0-or-later AND BSD-3-Clause"
+include = [
+    "src/**/*.rs",
+    "Cargo.toml",
+]
+
+[badges]
+travis-ci = { repository = "pebble-rust/pebble-rust", branch = "master" }
+
+[dependencies]
+c2rust-bitfields = {version = "0.22.1", default-features = false, features = ["no_std"]}

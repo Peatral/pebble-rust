@@ -5,7 +5,7 @@
 extern crate alloc;
 
 #[macro_use]
-extern crate pebble_rust as pebble;
+extern crate pebble_rs as pebble;
 
 use alloc::borrow::ToOwned;
 
