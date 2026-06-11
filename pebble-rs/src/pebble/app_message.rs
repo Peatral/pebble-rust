@@ -17,7 +17,7 @@
  */
 
 use core::ffi::{CStr, c_void};
-use pebble_sys::{AppMessageResult, AppMessageResult_APP_MSG_OK, DictionaryIterator, Tuple};
+use pebble_sys::{AppMessageResult, DictionaryIterator, DictionaryResult, Tuple};
 
 /// Represents a `DictionaryIterator`, essentially a list of `Tuple`s.
 pub struct Dictionary {
@@ -95,12 +95,10 @@ impl Dictionary {
         }
     }
 
-    pub fn write_string(&self, key: u32, string: &CStr) -> Result<(), AppMessageResult> {
+    pub fn write_string(&self, key: u32, string: &CStr) -> Result<(), DictionaryResult> {
         unsafe {
-            let result = pebble_sys::dict_write_cstring(self.internal, key, string.as_ptr());
-
-            let status = AppMessageResult::from(result);
-            if status == AppMessageResult::APP_MSG_OK {
+            let status = pebble_sys::dict_write_cstring(self.internal, key, string.as_ptr());
+            if status == DictionaryResult::DICT_OK {
                 Ok(())
             } else {
                 Err(status)

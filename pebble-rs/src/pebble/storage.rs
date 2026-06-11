@@ -2,8 +2,7 @@ use alloc::string::String;
 use alloc::vec;
 use core::ffi::{CStr, c_char, c_void};
 use pebble_sys::{
-    PERSIST_DATA_MAX_LENGTH, StatusCode, StatusCode_E_RANGE, StatusCode_S_SUCCESS,
-    StatusCode_S_TRUE,
+    PERSIST_DATA_MAX_LENGTH, StatusCode
 };
 
 /// Checks whether a value has been set for a given key.
@@ -16,7 +15,7 @@ pub fn get_size(key: u32) -> Result<usize, StatusCode> {
     unsafe {
         let size = pebble_sys::persist_get_size(key);
         if size < 0 {
-            Err(StatusCode::from(size))
+            Err(StatusCode(size))
         } else {
             Ok(size as usize)
         }
@@ -27,8 +26,8 @@ pub fn get_size(key: u32) -> Result<usize, StatusCode> {
 pub fn delete(key: u32) -> Result<(), StatusCode> {
     unsafe {
         let status = pebble_sys::persist_delete(key);
-        let code = StatusCode::from(status);
-        if code >= 0 { Ok(()) } else { Err(code) }
+        let code = StatusCode(status);
+        if code == StatusCode::S_TRUE { Ok(()) } else { Err(code) }
     }
 }
 
@@ -48,7 +47,7 @@ pub fn read_data(key: u32, buffer: &mut [u8]) -> Result<usize, StatusCode> {
             pebble_sys::persist_read_data(key, buffer.as_mut_ptr() as *mut c_void, buffer.len());
 
         if bytes_read < 0 {
-            Err(StatusCode::from(bytes_read))
+            Err(StatusCode(bytes_read))
         } else {
             Ok(bytes_read as usize)
         }
@@ -69,7 +68,7 @@ pub fn read_string(key: u32) -> Result<String, StatusCode> {
             pebble_sys::persist_read_string(key, buffer.as_mut_ptr() as *mut c_char, buffer.len());
 
         if bytes_read < 0 {
-            return Err(StatusCode::from(bytes_read));
+            return Err(StatusCode(bytes_read));
         }
 
         let c_str = CStr::from_ptr(buffer.as_ptr() as *const c_char);
@@ -79,22 +78,22 @@ pub fn read_string(key: u32) -> Result<String, StatusCode> {
 
 pub fn write_bool(key: u32, value: bool) -> Result<usize, StatusCode> {
     unsafe {
-        let status = pebble_sys::persist_write_bool(key, value);
-        if status == StatusCode::S_TRUE || status == StatusCode::S_SUCCESS {
-            Err(StatusCode::from(status))
+        let bytes_written = pebble_sys::persist_write_bool(key, value);
+        if bytes_written < 0 {
+            Err(StatusCode(bytes_written))
         } else {
-            Ok(status as usize)
+            Ok(bytes_written as usize)
         }
     }
 }
 
 pub fn write_int(key: u32, value: i32) -> Result<usize, StatusCode> {
     unsafe {
-        let status = pebble_sys::persist_write_int(key, value);
-        if status < 0 {
-            Err(StatusCode::from(status))
+        let bytes_written = pebble_sys::persist_write_int(key, value);
+        if bytes_written < 0 {
+            Err(StatusCode(bytes_written))
         } else {
-            Ok(status as usize)
+            Ok(bytes_written as usize)
         }
     }
 }
@@ -111,7 +110,7 @@ pub fn write_data(key: u32, data: &[u8]) -> Result<usize, StatusCode> {
             pebble_sys::persist_write_data(key, data.as_ptr() as *const c_void, data.len());
 
         if bytes_written < 0 {
-            Err(StatusCode::from(bytes_written))
+            Err(StatusCode(bytes_written))
         } else {
             Ok(bytes_written as usize)
         }
@@ -124,7 +123,7 @@ pub fn write_string(key: u32, value: &CStr) -> Result<usize, StatusCode> {
         let bytes_written = pebble_sys::persist_write_string(key, value.as_ptr());
 
         if bytes_written < 0 {
-            Err(StatusCode::from(bytes_written))
+            Err(StatusCode(bytes_written))
         } else {
             Ok(bytes_written as usize)
         }

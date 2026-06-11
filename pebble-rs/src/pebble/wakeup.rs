@@ -30,7 +30,7 @@ pub fn schedule(
         let result = pebble_sys::wakeup_schedule(timestamp, cookie, notify_if_missed);
 
         if result < 0 {
-            Err(StatusCode::from(result))
+            Err(pebble_sys::StatusCode(result))
         } else {
             Ok(result)
         }

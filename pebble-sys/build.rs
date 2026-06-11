@@ -65,6 +65,7 @@ fn main() {
             .clang_arg("-Wno-macro-redefined")
             .clang_arg("-D_TIME_H_")
             .rustified_enum(".*")
+            .newtype_enum("StatusCode|AppMessageResult|DictionaryResult")
             .generate()
             .unwrap_or_else(|_| panic!("Unable to generate bindings for {}", platform));
 
