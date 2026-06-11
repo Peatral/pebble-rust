@@ -1,0 +1,24 @@
+[package]
+name = "pebble-sys"
+version = "0.1.0"
+authors = ["Peatral <contact@peatral.xyz"]
+keywords = ["pebble", "watch", "cortex", "rebble", "arm"]
+categories = ["embedded", "no-std", "hardware-support", "external-ffi-bindings"]
+edition = "2024"
+
+[features]
+default = ["emery"]
+aplite = []
+basalt = []
+chalk = []
+diorite = []
+emery = []
+flint = []
+gabbro = []
+
+[build-dependencies]
+bindgen = "0.72.1"
+
+[dependencies]
+cty = "0.2"
+cfg-if = "1.0"
