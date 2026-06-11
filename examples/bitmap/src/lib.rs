@@ -26,7 +26,7 @@ impl WindowDelegate for BitmapExampleDelegate {
         let bitmap = Bitmap::new(1);
 
         let bitmap_layer = BitmapLayer::new(bounds);
-        bitmap_layer.set_bitmap(&bitmap);
+        bitmap_layer.set_bitmap(bitmap.as_mut());
         bitmap_layer.set_compositing_mode(GCompOp::GCompOpSet);
 
         root.add_child(&bitmap_layer);
@@ -36,6 +36,8 @@ impl WindowDelegate for BitmapExampleDelegate {
     }
 
     fn unload(&self, _window: WindowRef) {
+        self.bitmap.borrow_mut().take();
+        self.bitmap_layer.take();
     }
 }
 

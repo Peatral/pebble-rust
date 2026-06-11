@@ -1,7 +1,41 @@
 use crate::graphics::context::Context;
 use core::ffi::c_int;
-use pebble_sys::{GBitmap, GBitmapFormat, GCornerMask, GOvalScaleMode};
+use core::ops::{Deref, DerefMut};
+use pebble_sys::{GBitmapFormat, GCornerMask, GOvalScaleMode};
+use crate::graphics::bitmap::{BitmapMut, BitmapRef, IBitmap, IBitmapMut};
 use crate::graphics::types::{Point, Rect};
+
+/// An RAII guard that safely manages a captured frame buffer.
+/// When this goes out of scope, the frame buffer is automatically released.
+pub struct FrameBufferGuard<'a> {
+    context: &'a mut Context,
+    bitmap: BitmapMut,
+}
+
+impl<'a> Deref for FrameBufferGuard<'a> {
+    type Target = BitmapMut;
+
+    fn deref(&self) -> &Self::Target {
+        &self.bitmap
+    }
+}
+
+impl<'a> DerefMut for FrameBufferGuard<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.bitmap
+    }
+}
+
+impl<'a> Drop for FrameBufferGuard<'a> {
+    fn drop(&mut self) {
+        unsafe {
+            pebble_sys::graphics_release_frame_buffer(
+                self.context.as_ptr(),
+                self.bitmap.as_mut_ptr(),
+            );
+        }
+    }
+}
 
 impl Context {
     pub fn draw_pixel(&self, center: Point) {
@@ -25,38 +59,57 @@ impl Context {
     pub fn draw_round_rect(&self, rect: Rect, radius: u16) {
         unsafe { pebble_sys::graphics_draw_round_rect(self.as_ptr(), rect.0, radius); }
     }
-    pub fn draw_bitmap_in_rect(&self, bitmap: *const GBitmap, rect: Rect) {
-        unsafe { pebble_sys::graphics_draw_bitmap_in_rect(self.as_ptr(), bitmap, rect.0); }
+    pub fn draw_bitmap_in_rect(&self, bitmap: BitmapRef, rect: Rect) {
+        unsafe { pebble_sys::graphics_draw_bitmap_in_rect(self.as_ptr(), bitmap.as_ptr(), rect.0); }
     }
-    pub fn capture_frame_buffer(&self) -> *mut GBitmap {
+
+    /// Captures the frame buffer safely.
+    /// Taking `&mut self` ensures no other graphics functions can be called
+    /// on this Context until the returned Guard is dropped.
+    pub fn capture_frame_buffer(&mut self) -> Option<FrameBufferGuard<'_>> {
         unsafe {
-            pebble_sys::graphics_capture_frame_buffer(self.as_ptr())
+            let ptr = pebble_sys::graphics_capture_frame_buffer(self.as_ptr());
+            if ptr.is_null() {
+                None
+            } else {
+                Some(FrameBufferGuard {
+                    context: self,
+                    bitmap: ptr.into(),
+                })
+            }
         }
     }
-    pub fn capture_frame_buffer_format(&self, format: GBitmapFormat) -> *mut GBitmap {
+
+    /// Captures the frame buffer with a specific format safely.
+    pub fn capture_frame_buffer_format(&mut self, format: GBitmapFormat) -> Option<FrameBufferGuard<'_>> {
         unsafe {
-            pebble_sys::graphics_capture_frame_buffer_format(self.as_ptr(), format)
+            let ptr = pebble_sys::graphics_capture_frame_buffer_format(self.as_ptr(), format);
+            if ptr.is_null() {
+                None
+            } else {
+                Some(FrameBufferGuard {
+                    context: self,
+                    bitmap: ptr.into(),
+                })
+            }
         }
     }
-    pub fn release_frame_buffer(&self, buffer: *mut GBitmap) -> bool {
-        unsafe {
-            pebble_sys::graphics_release_frame_buffer(self.as_ptr(), buffer)
-        }
-    }
+
     pub fn frame_buffer_is_captured(&self) -> bool {
         unsafe {
             pebble_sys::graphics_frame_buffer_is_captured(self.as_ptr())
         }
     }
+
     pub fn draw_rotated_bitmap(
         &self,
-        src: *mut GBitmap,
+        src: BitmapMut,
         src_ic: Point,
         rotation: c_int,
         dest_ic: Point,
     ) {
         unsafe {
-            pebble_sys::graphics_draw_rotated_bitmap(self.as_ptr(), src, src_ic.0, rotation, dest_ic.0);
+            pebble_sys::graphics_draw_rotated_bitmap(self.as_ptr(), src.as_mut_ptr(), src_ic.0, rotation, dest_ic.0);
         }
     }
     pub fn draw_arc(

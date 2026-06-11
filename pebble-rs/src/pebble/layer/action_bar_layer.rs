@@ -1,11 +1,11 @@
 use crate::layer::{ILayer, ILayerMut};
 use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 use crate::pebble::window::WindowRef;
-use crate::types::Bitmap;
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 use pebble_sys::Layer;
+use crate::graphics::bitmap::{BitmapRef, IBitmap};
 use crate::graphics::types::Color;
 
 #[repr(transparent)]
@@ -16,9 +16,9 @@ pub struct ActionBarLayerRef {
 
 impl ActionBarLayerRef {
     /// Sets an action bar icon onto one of the 3 slots as identified by button_id.
-    pub fn set_icon(&self, button_id: pebble_sys::ButtonId, icon: &Bitmap) {
+    pub fn set_icon(&self, button_id: pebble_sys::ButtonId, icon: BitmapRef) {
         unsafe {
-            pebble_sys::action_bar_layer_set_icon(self.internal, button_id, icon.internal);
+            pebble_sys::action_bar_layer_set_icon(self.internal, button_id, icon.as_ptr());
         }
     }
 
@@ -54,14 +54,14 @@ impl ActionBarLayerRef {
     pub fn set_icon_animated(
         &self,
         button_id: pebble_sys::ButtonId,
-        icon: &Bitmap,
+        icon: BitmapRef,
         animated: bool,
     ) {
         unsafe {
             pebble_sys::action_bar_layer_set_icon_animated(
                 self.internal,
                 button_id,
-                icon.internal,
+                icon.as_ptr(),
                 animated,
             );
         }

@@ -1,6 +1,6 @@
 use crate::layer::{ILayer, ILayerMut};
-use crate::types::Bitmap;
 use pebble_sys::GCompOp;
+use crate::graphics::bitmap::{BitmapMut, IBitmapMut};
 use crate::graphics::types::Rect;
 
 #[repr(transparent)]
@@ -17,9 +17,9 @@ impl BitmapLayer {
         }
     }
 
-    pub fn set_bitmap(&self, bitmap: &Bitmap) {
+    pub fn set_bitmap(&self, bitmap: BitmapMut) {
         unsafe {
-            pebble_sys::bitmap_layer_set_bitmap(self.internal, bitmap.internal);
+            pebble_sys::bitmap_layer_set_bitmap(self.internal, bitmap.as_mut_ptr());
         }
     }
 

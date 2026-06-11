@@ -1,6 +1,7 @@
 use pebble_sys::GCompOp;
 use crate::graphics::types::Color;
 
+
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct Context {

@@ -1,6 +1,6 @@
 /*
  * This file is part of pebble-rs.
- * Copyright (c) 2019 RoccoDev
+ * Copyright (c) 2026 Peatral
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,30 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 use core::cell::{Cell, Ref, RefCell, RefMut};
-use pebble_sys::GBitmap;
-
-pub struct Bitmap {
-    pub internal: *mut GBitmap,
-}
-
-impl Bitmap {
-    pub fn new(resource_id: u32) -> Bitmap {
-        unsafe {
-            let internal = pebble_sys::gbitmap_create_with_resource(resource_id);
-            Bitmap { internal }
-        }
-    }
-}
-
-impl Drop for Bitmap {
-    fn drop(&mut self) {
-        unsafe {
-            if !self.internal.is_null() {
-                pebble_sys::gbitmap_destroy(self.internal);
-            }
-        }
-    }
-}
 
 /// A wrapper for global state in a single-threaded environment.
 pub struct GlobalRefCell<T>(RefCell<T>);
