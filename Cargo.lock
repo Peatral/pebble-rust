@@ -41,28 +41,8 @@ checksum = "b4388bee8683e3d04af747c73422af53102d2bd24d9eadb6cbc100baef4b43f8"
 name = "bitmap"
 version = "0.1.0"
 dependencies = [
- "pebble-rust",
-]
-
-[[package]]
-name = "c2rust-bitfields"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e91b9a85391b09c224053f3c45344f0639822e641f9d2b4f351bb3152600742d"
-dependencies = [
- "c2rust-bitfields-derive",
-]
-
-[[package]]
-name = "c2rust-bitfields-derive"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "153187c06ed005d5cb75ed9f0a2f274836f54f6b2efdc1f45136e728764875f9"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "unicode-ident",
+ "pebble-rs",
+ "pebble-sys",
 ]
 
 [[package]]
@@ -113,7 +93,8 @@ checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 name = "hello-world"
 version = "0.1.0"
 dependencies = [
- "pebble-rust",
+ "pebble-rs",
+ "pebble-sys",
 ]
 
 [[package]]
@@ -129,7 +110,8 @@ dependencies = [
 name = "js-appmessage"
 version = "0.1.0"
 dependencies = [
- "pebble-rust",
+ "pebble-rs",
+ "pebble-sys",
 ]
 
 [[package]]
@@ -177,10 +159,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "pebble-rust"
+name = "pebble-rs"
 version = "0.1.0"
 dependencies = [
- "c2rust-bitfields",
+ "cty",
+ "pebble-sys",
 ]
 
 [[package]]

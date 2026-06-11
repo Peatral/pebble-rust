@@ -9,6 +9,7 @@ crate-type = ["staticlib"]
 
 [dependencies]
 pebble-rs = {path = "../../pebble-rs" }
+pebble-sys = {path = "../../pebble-sys" }
 
 [profile.dev]
 panic = "abort"

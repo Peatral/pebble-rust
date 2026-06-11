@@ -7,9 +7,10 @@ extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, window_stack};
+use pebble::graphics::types::{GPoint, GRect, GSize};
 use pebble::window::{Window, WindowDelegate, WindowRef};
-use pebble::layer::{ILayerMut, TextLayer};
-use pebble::types::{GRect, GPoint, GSize, GTextAlignment};
+use pebble::layer::{ILayer, ILayerMut, TextLayer};
+use pebble_sys::GTextAlignment;
 
 include_message_keys!();
 
@@ -25,10 +26,10 @@ impl WindowDelegate for HelloDelegate {
         let window_width = bounds.size.w;
         let window_height = bounds.size.h;
 
-        let text_bounds = GRect {
-            origin: GPoint { x: 0, y: window_height / 2 - 20 },
-            size: GSize { w: window_width, h: 40 },
-        };
+        let text_bounds = GRect::new(
+            GPoint::new(0, window_height / 2 - 20),
+            GSize::new(window_width, 40)
+        );
 
         // We can print whatever we want.
         pbl_log!(c"This works like a %s, I can print numbers like %d", c"printf".as_ptr(), 25);
@@ -37,11 +38,11 @@ impl WindowDelegate for HelloDelegate {
         pbl_warn!(c"This is a warning.");
         pbl_err!(c"Oops, something went wrong.");
 
-        let text = TextLayer::new(text_bounds);
+        let mut text = TextLayer::new(text_bounds);
 
-        text.set_text(c"Hello from Rust!");
+        text.set_text_static(c"Hello from Rust!");
         text.set_font(pebble::system::fonts::Font::get_system(c"RESOURCE_ID_ROBOTO_CONDENSED_21"));
-        text.set_text_alignment(GTextAlignment::Center);
+        text.set_text_alignment(GTextAlignment::GTextAlignmentCenter);
 
         root.add_child(&text);
 
@@ -63,7 +64,7 @@ pub fn main() -> isize {
     };
     let window = Window::new(delegate);
 
-    window_stack::push(window.as_ref(), false);
+    window_stack::push(*window, false);
     app.run_event_loop();
 
     pbl_log!(c"Exiting...");

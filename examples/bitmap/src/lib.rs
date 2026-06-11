@@ -6,9 +6,10 @@ extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, include_message_keys, window_stack};
-use pebble::layer::{ILayerMut, BitmapLayer};
-use pebble::types::{Bitmap, GCompOp};
+use pebble::graphics::bitmap::Bitmap;
+use pebble::layer::{ILayerMut, BitmapLayer, ILayer};
 use pebble::window::{Window, WindowDelegate, WindowRef};
+use pebble_sys::GCompOp;
 
 include_message_keys!();
 
@@ -48,7 +49,7 @@ pub fn main() -> isize {
     };
     let window = Window::new(delegate);
 
-    window_stack::push(window.as_ref(), false);
+    window_stack::push(*window, false);
 
     app.run_event_loop();
 
