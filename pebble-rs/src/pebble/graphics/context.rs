@@ -1,28 +1,28 @@
 use pebble_sys::GCompOp;
-use crate::graphics::types::GColor8;
+use crate::graphics::types::Color;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct GContext {
+pub struct Context {
     internal: *mut pebble_sys::GContext,
 }
 
-impl GContext {
+impl Context {
     pub fn as_ptr(&self) -> *mut pebble_sys::GContext {
         self.internal
     }
 
-    pub fn set_stroke_color(&self, color: GColor8) {
+    pub fn set_stroke_color(&self, color: Color) {
         unsafe {
             pebble_sys::graphics_context_set_stroke_color(self.internal, color.0);
         }
     }
-    pub fn set_fill_color(&self, color: GColor8) {
+    pub fn set_fill_color(&self, color: Color) {
         unsafe {
             pebble_sys::graphics_context_set_fill_color(self.internal, color.0);
         }
     }
-    pub fn set_text_color(&self, color: GColor8) {
+    pub fn set_text_color(&self, color: Color) {
         unsafe {
             pebble_sys::graphics_context_set_text_color(self.internal, color.0);
         }
@@ -44,7 +44,7 @@ impl GContext {
     }
 }
 
-impl From<*mut pebble_sys::GContext> for GContext {
+impl From<*mut pebble_sys::GContext> for Context {
     fn from(internal: *mut pebble_sys::GContext) -> Self {
         Self { internal }
     }

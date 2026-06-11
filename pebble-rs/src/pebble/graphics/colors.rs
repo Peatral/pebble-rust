@@ -1,6 +1,6 @@
-use crate::graphics::types::GColor8;
+use crate::graphics::types::Color;
 
-impl GColor8 {
+impl Color {
     // Basic Grayscale & Clear
     pub const CLEAR: Self = Self::new(0b0000_0000);
     pub const BLACK: Self = Self::new(0b1100_0000);

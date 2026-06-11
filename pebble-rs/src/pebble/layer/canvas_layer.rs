@@ -1,11 +1,11 @@
-use crate::graphics::context::GContext;
+use crate::graphics::context::Context;
 use crate::layer::{ILayer, ILayerMut, Layer, LayerMut};
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
-use crate::graphics::types::GRect;
+use crate::graphics::types::Rect;
 
-type DrawCallback = dyn Fn(LayerMut, GContext);
+type DrawCallback = dyn Fn(LayerMut, Context);
 
 pub struct CanvasLayer {
     layer_ref: Layer,
@@ -26,9 +26,9 @@ extern "C" fn trampoline_update_proc(
 
 impl CanvasLayer {
     /// Creates a new CanvasLayer with a custom drawing closure.
-    pub fn new<F>(bounds: GRect, draw_logic: F) -> Self
+    pub fn new<F>(bounds: Rect, draw_logic: F) -> Self
     where
-        F: Fn(LayerMut, GContext) + 'static,
+        F: Fn(LayerMut, Context) + 'static,
     {
         let callback: Box<Box<DrawCallback>> = Box::new(Box::new(draw_logic));
 

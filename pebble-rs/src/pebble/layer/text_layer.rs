@@ -3,7 +3,7 @@ use crate::system::fonts::Font;
 use alloc::ffi::CString;
 use core::ffi::CStr;
 use pebble_sys::GTextAlignment;
-use crate::graphics::types::GRect;
+use crate::graphics::types::Rect;
 
 pub struct TextLayer {
     internal: *mut pebble_sys::TextLayer,
@@ -11,7 +11,7 @@ pub struct TextLayer {
 }
 
 impl TextLayer {
-    pub fn new(bounds: GRect) -> TextLayer {
+    pub fn new(bounds: Rect) -> TextLayer {
         unsafe {
             let internal = pebble_sys::text_layer_create(bounds.0);
 

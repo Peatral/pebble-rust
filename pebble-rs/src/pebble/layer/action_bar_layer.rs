@@ -6,7 +6,7 @@ use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 use pebble_sys::Layer;
-use crate::graphics::types::GColor8;
+use crate::graphics::types::Color;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
@@ -44,7 +44,7 @@ impl ActionBarLayerRef {
     }
 
     /// Sets the background color of the action bar. Defaults to GColorBlack.
-    pub fn set_background_color(&self, background_color: GColor8) {
+    pub fn set_background_color(&self, background_color: Color) {
         unsafe {
             pebble_sys::action_bar_layer_set_background_color(self.internal, background_color.0);
         }

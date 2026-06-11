@@ -1,7 +1,7 @@
 use crate::layer::{ILayer, ILayerMut};
 use crate::types::Bitmap;
 use pebble_sys::GCompOp;
-use crate::graphics::types::GRect;
+use crate::graphics::types::Rect;
 
 #[repr(transparent)]
 pub struct BitmapLayer {
@@ -9,7 +9,7 @@ pub struct BitmapLayer {
 }
 
 impl BitmapLayer {
-    pub fn new(bounds: GRect) -> BitmapLayer {
+    pub fn new(bounds: Rect) -> BitmapLayer {
         unsafe {
             let internal = pebble_sys::bitmap_layer_create(bounds.0);
 

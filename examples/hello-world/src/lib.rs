@@ -7,7 +7,7 @@ extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
 use pebble::{app, window_stack};
-use pebble::graphics::types::{GPoint, GRect, GSize};
+use pebble::graphics::types::{Point, Rect, Size};
 use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::layer::{ILayer, ILayerMut, TextLayer};
 use pebble_sys::GTextAlignment;
@@ -26,9 +26,9 @@ impl WindowDelegate for HelloDelegate {
         let window_width = bounds.size.w;
         let window_height = bounds.size.h;
 
-        let text_bounds = GRect::new(
-            GPoint::new(0, window_height / 2 - 20),
-            GSize::new(window_width, 40)
+        let text_bounds = Rect::new(
+            Point::new(0, window_height / 2 - 20),
+            Size::new(window_width, 40)
         );
 
         // We can print whatever we want.

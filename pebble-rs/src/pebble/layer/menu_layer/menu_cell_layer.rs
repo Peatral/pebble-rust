@@ -1,4 +1,4 @@
-use crate::graphics::context::GContext;
+use crate::graphics::context::Context;
 use crate::layer::ILayer;
 use core::ffi::CStr;
 
@@ -13,7 +13,7 @@ impl MenuCellLayer {
     /// Draws a basic section cell with a title, subtitle, and optional icon.
     pub fn draw_basic(
         &self,
-        ctx: GContext,
+        ctx: Context,
         title: &CStr,
         subtitle: &CStr,
         icon: *mut pebble_sys::GBitmap,
@@ -30,14 +30,14 @@ impl MenuCellLayer {
     }
 
     /// Draws a cell layout with only one big title.
-    pub fn draw_title(&self, ctx: GContext, title: &CStr) {
+    pub fn draw_title(&self, ctx: Context, title: &CStr) {
         unsafe {
             pebble_sys::menu_cell_title_draw(ctx.as_ptr(), self.internal, title.as_ptr());
         }
     }
 
     /// Draws a basic section header cell layout with the title.
-    pub fn draw_basic_header(&self, ctx: GContext, title: &CStr) {
+    pub fn draw_basic_header(&self, ctx: Context, title: &CStr) {
         unsafe {
             pebble_sys::menu_cell_basic_header_draw(ctx.as_ptr(), self.internal, title.as_ptr());
         }

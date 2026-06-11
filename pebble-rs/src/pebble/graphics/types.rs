@@ -1,16 +1,16 @@
 use core::cmp::Eq;
 use core::ops::{Deref, DerefMut};
-use pebble_sys::{GOvalScaleMode};
+use pebble_sys::GOvalScaleMode;
 
 #[derive(Clone, Copy)]
-pub struct GColor8(pub(crate) pebble_sys::GColor8); // Added pub to .0 for easier access
+pub struct Color(pub(crate) pebble_sys::GColor8); // Added pub to .0 for easier access
 
-impl GColor8 {
+impl Color {
     pub const fn new(argb: u8) -> Self {
         Self(pebble_sys::GColor8 { argb })
     }
 
-    pub fn legible_over(background_color: GColor8) -> Self {
+    pub fn legible_over(background_color: Color) -> Self {
         unsafe {
             Self(pebble_sys::gcolor_legible_over(background_color.0))
         }
@@ -37,7 +37,7 @@ impl GColor8 {
     }
 }
 
-impl PartialEq for GColor8 {
+impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
         let self_argb = unsafe { self.argb };
         let other_argb = unsafe { other.argb };
@@ -49,73 +49,73 @@ impl PartialEq for GColor8 {
     }
 }
 
-impl Eq for GColor8 {}
+impl Eq for Color {}
 
-impl From<pebble_sys::GColor8> for GColor8 {
+impl From<pebble_sys::GColor8> for Color {
     fn from(raw: pebble_sys::GColor8) -> Self { Self(raw) }
 }
-impl Deref for GColor8 {
+impl Deref for Color {
     type Target = pebble_sys::GColor8;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for GColor8 {
+impl DerefMut for Color {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 #[derive(Clone, Copy)]
-pub struct GPoint(pub(crate) pebble_sys::GPoint);
+pub struct Point(pub(crate) pebble_sys::GPoint);
 
-impl GPoint {
+impl Point {
     pub const fn new(x: i16, y: i16) -> Self {
         Self(pebble_sys::GPoint { x, y })
     }
 
-    pub fn from_polar(rect: GRect, scale_mode: GOvalScaleMode, angle: i32) -> GPoint {
-        unsafe { GPoint(pebble_sys::gpoint_from_polar(rect.0, scale_mode, angle)) }
+    pub fn from_polar(rect: Rect, scale_mode: GOvalScaleMode, angle: i32) -> Point {
+        unsafe { Point(pebble_sys::gpoint_from_polar(rect.0, scale_mode, angle)) }
     }
 }
 
-impl From<pebble_sys::GPoint> for GPoint {
+impl From<pebble_sys::GPoint> for Point {
     fn from(raw: pebble_sys::GPoint) -> Self { Self(raw) }
 }
-impl Deref for GPoint {
+impl Deref for Point {
     type Target = pebble_sys::GPoint;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for GPoint {
+impl DerefMut for Point {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 #[derive(Clone, Copy)]
-pub struct GSize(pub(crate) pebble_sys::GSize);
+pub struct Size(pub(crate) pebble_sys::GSize);
 
-impl GSize {
+impl Size {
     pub const fn new(w: i16, h: i16) -> Self {
         Self(pebble_sys::GSize { w, h })
     }
 }
 
-impl From<pebble_sys::GSize> for GSize {
+impl From<pebble_sys::GSize> for Size {
     fn from(raw: pebble_sys::GSize) -> Self { Self(raw) }
 }
-impl Deref for GSize {
+impl Deref for Size {
     type Target = pebble_sys::GSize;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for GSize {
+impl DerefMut for Size {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 #[derive(Clone, Copy)]
-pub struct GRect(pub(crate) pebble_sys::GRect);
+pub struct Rect(pub(crate) pebble_sys::GRect);
 
-impl GRect {
-    pub const fn new(origin: GPoint, size: GSize) -> Self {
+impl Rect {
+    pub const fn new(origin: Point, size: Size) -> Self {
         Self(pebble_sys::GRect { origin: origin.0, size: size.0 })
     }
 
-    pub fn centered_from_polar(rect: GRect, scale_mode: GOvalScaleMode, angle: i32, size: GSize) -> GRect {
-        unsafe { GRect(pebble_sys::grect_centered_from_polar(rect.0, scale_mode, angle, size.0)) }
+    pub fn centered_from_polar(rect: Rect, scale_mode: GOvalScaleMode, angle: i32, size: Size) -> Rect {
+        unsafe { Rect(pebble_sys::grect_centered_from_polar(rect.0, scale_mode, angle, size.0)) }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -126,30 +126,30 @@ impl GRect {
         unsafe { pebble_sys::grect_standardize(&mut self.0) }
     }
 
-    pub fn clip(&mut self, clipper: &GRect) {
+    pub fn clip(&mut self, clipper: &Rect) {
         unsafe { pebble_sys::grect_clip(&mut self.0, &clipper.0) }
     }
 
-    pub fn contains_point(&self, point: &GPoint) -> bool {
+    pub fn contains_point(&self, point: &Point) -> bool {
         unsafe { pebble_sys::grect_contains_point(&self.0, &point.0) }
     }
 
-    pub fn center_point(&self) -> GPoint {
-        unsafe { GPoint(pebble_sys::grect_center_point(&self.0)) }
+    pub fn center_point(&self) -> Point {
+        unsafe { Point(pebble_sys::grect_center_point(&self.0)) }
     }
 
-    pub fn crop(&self, crop_size_px: i32) -> GRect {
-        unsafe { GRect(pebble_sys::grect_crop(self.0, crop_size_px)) }
+    pub fn crop(&self, crop_size_px: i32) -> Rect {
+        unsafe { Rect(pebble_sys::grect_crop(self.0, crop_size_px)) }
     }
 }
 
-impl From<pebble_sys::GRect> for GRect {
+impl From<pebble_sys::GRect> for Rect {
     fn from(raw: pebble_sys::GRect) -> Self { Self(raw) }
 }
-impl Deref for GRect {
+impl Deref for Rect {
     type Target = pebble_sys::GRect;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for GRect {
+impl DerefMut for Rect {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }

@@ -29,29 +29,29 @@ pub use canvas_layer::CanvasLayer;
 pub use menu_layer::{MenuCellLayer, MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
 pub use status_bar_layer::StatusBarLayer;
 pub use text_layer::TextLayer;
-use crate::graphics::types::{GPoint, GRect};
+use crate::graphics::types::{Point, Rect};
 
 pub trait ILayer {
     fn as_ptr(&self) -> *const pebble_sys::Layer;
 
-    fn get_bounds(&self) -> GRect {
-        unsafe { GRect(pebble_sys::layer_get_bounds(self.as_ptr())) }
+    fn get_bounds(&self) -> Rect {
+        unsafe { Rect(pebble_sys::layer_get_bounds(self.as_ptr())) }
     }
 
-    fn get_unobstructed_bounds(&self) -> GRect {
-        unsafe { GRect(pebble_sys::layer_get_unobstructed_bounds(self.as_ptr())) }
+    fn get_unobstructed_bounds(&self) -> Rect {
+        unsafe { Rect(pebble_sys::layer_get_unobstructed_bounds(self.as_ptr())) }
     }
 
-    fn convert_point_to_screen(&self, point: GPoint) -> GPoint {
-        unsafe { GPoint(pebble_sys::layer_convert_point_to_screen(self.as_ptr(), point.0)) }
+    fn convert_point_to_screen(&self, point: Point) -> Point {
+        unsafe { Point(pebble_sys::layer_convert_point_to_screen(self.as_ptr(), point.0)) }
     }
 
-    fn convert_rect_to_screen(&self, rect: GRect) -> GRect {
-        unsafe { GRect(pebble_sys::layer_convert_rect_to_screen(self.as_ptr(), rect.0)) }
+    fn convert_rect_to_screen(&self, rect: Rect) -> Rect {
+        unsafe { Rect(pebble_sys::layer_convert_rect_to_screen(self.as_ptr(), rect.0)) }
     }
 
-    fn get_frame(&self) -> GRect {
-        unsafe { GRect(pebble_sys::layer_get_frame(self.as_ptr())) }
+    fn get_frame(&self) -> Rect {
+        unsafe { Rect(pebble_sys::layer_get_frame(self.as_ptr())) }
     }
 
     fn get_hidden(&self) -> bool {
@@ -65,16 +65,16 @@ pub trait ILayer {
 pub trait ILayerMut: ILayer {
     fn as_mut_ptr(&self) -> *mut pebble_sys::Layer;
 
-    fn set_bounds(&self, bounds: GRect) {
+    fn set_bounds(&self, bounds: Rect) {
         unsafe {
             pebble_sys::layer_set_bounds(self.as_mut_ptr(), bounds.0);
         }
     }
-    fn get_unobstructed_bounds(&self) -> GRect {
-        unsafe { GRect(pebble_sys::layer_get_unobstructed_bounds(self.as_mut_ptr())) }
+    fn get_unobstructed_bounds(&self) -> Rect {
+        unsafe { Rect(pebble_sys::layer_get_unobstructed_bounds(self.as_mut_ptr())) }
     }
 
-    fn set_frame(&self, frame: GRect) {
+    fn set_frame(&self, frame: Rect) {
         unsafe {
             pebble_sys::layer_set_frame(self.as_mut_ptr(), frame.0);
         }
@@ -182,7 +182,7 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub fn new(bounds: GRect) -> Layer {
+    pub fn new(bounds: Rect) -> Layer {
         unsafe {
             Layer {
                 internal: pebble_sys::layer_create(bounds.0),

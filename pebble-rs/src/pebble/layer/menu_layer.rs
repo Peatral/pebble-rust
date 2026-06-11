@@ -1,7 +1,7 @@
 pub mod menu_cell_layer;
 pub mod menu_index;
 
-use crate::graphics::context::GContext;
+use crate::graphics::context::Context;
 use crate::layer::{ILayer, ILayerMut, LayerRef};
 use crate::pebble::window::WindowRef;
 use alloc::boxed::Box;
@@ -11,7 +11,7 @@ use core::ops::{Deref, DerefMut};
 pub use menu_cell_layer::MenuCellLayer;
 pub use menu_index::MenuIndexRef;
 use pebble_sys::Layer;
-use crate::graphics::types::GRect;
+use crate::graphics::types::Rect;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
@@ -136,16 +136,16 @@ pub trait MenuLayerDelegate {
     fn get_separator_height(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) -> i16 {
         0
     }
-    fn draw_row(&self, ctx: GContext, cell_layer: MenuCellLayer, cell_index: MenuIndexRef);
-    fn draw_header(&self, _ctx: GContext, _cell_layer: MenuCellLayer, _section_index: u16) {}
+    fn draw_row(&self, ctx: Context, cell_layer: MenuCellLayer, cell_index: MenuIndexRef);
+    fn draw_header(&self, _ctx: Context, _cell_layer: MenuCellLayer, _section_index: u16) {}
     fn draw_separator(
         &self,
-        _ctx: GContext,
+        _ctx: Context,
         _cell_layer: MenuCellLayer,
         _cell_index: MenuIndexRef,
     ) {
     }
-    fn draw_background(&self, _ctx: GContext, _bg_layer: LayerRef, _highlight: bool) {}
+    fn draw_background(&self, _ctx: Context, _bg_layer: LayerRef, _highlight: bool) {}
     fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
     fn select_long_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}
     fn selection_changed(
@@ -313,7 +313,7 @@ extern "C" fn trampoline_selection_will_change<T: MenuLayerDelegate>(
 }
 
 impl<T: MenuLayerDelegate> MenuLayer<T> {
-    pub fn new(bounds: GRect, delegate: T) -> Self {
+    pub fn new(bounds: Rect, delegate: T) -> Self {
         unsafe {
             let internal = pebble_sys::menu_layer_create(bounds.0);
 
