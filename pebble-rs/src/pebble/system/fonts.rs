@@ -16,10 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::functions::declarations::*;
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{GFont, ResHandle};
 use core::ffi::CStr;
+use pebble_sys::{GFont, ResHandle};
 
 pub const FONT_KEY_GOTHIC_18_BOLD: &CStr = c"RESOURCE_ID_GOTHIC_18_BOLD";
 pub const FONT_KEY_GOTHIC_24: &CStr = c"RESOURCE_ID_GOTHIC_24";
@@ -54,31 +52,39 @@ pub struct Font {
 
 impl Font {
     pub fn get_system(font_key: &CStr) -> Self {
-        let internal = interface::fonts_get_system_font(font_key.as_ptr());
-        Self {
-            internal,
-            is_custom: false,
+        unsafe {
+            let internal = pebble_sys::fonts_get_system_font(font_key.as_ptr());
+            Self {
+                internal,
+                is_custom: false,
+            }
         }
     }
 
     pub fn get_custom_from_handle(res_handle: ResHandle) -> Self {
-        let internal = interface::fonts_load_custom_font(res_handle);
-        Self {
-            internal,
-            is_custom: true,
+        unsafe {
+            let internal = pebble_sys::fonts_load_custom_font(res_handle);
+            Self {
+                internal,
+                is_custom: true,
+            }
         }
     }
 
     pub fn get_custom(resource_id: u32) -> Self {
-        let res_handle = interface::resource_get_handle(resource_id);
-        Self::get_custom_from_handle(res_handle)
+        unsafe {
+            let res_handle = pebble_sys::resource_get_handle(resource_id);
+            Self::get_custom_from_handle(res_handle)
+        }
     }
 }
 
 impl Drop for Font {
     fn drop(&mut self) {
         if self.is_custom && !self.internal.is_null() {
-            interface::fonts_unload_custom_font(self.internal);
+            unsafe {
+                pebble_sys::fonts_unload_custom_font(self.internal);
+            }
         }
     }
 }

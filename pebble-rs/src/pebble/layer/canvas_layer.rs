@@ -1,11 +1,9 @@
 use crate::graphics::context::GContext;
-use crate::layer::{ILayer, ILayerMut, Layer, LayerMut, LayerRef};
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
-use crate::types::GRect;
+use crate::layer::{ILayer, ILayerMut, Layer, LayerMut};
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
+use crate::graphics::types::GRect;
 
 type DrawCallback = dyn Fn(LayerMut, GContext);
 
@@ -14,9 +12,12 @@ pub struct CanvasLayer {
     _callback: Box<Box<DrawCallback>>,
 }
 
-extern "C" fn trampoline_update_proc(layer: *mut types::Layer, ctx: *mut types::GContext) {
+extern "C" fn trampoline_update_proc(
+    layer: *mut pebble_sys::Layer,
+    ctx: *mut pebble_sys::GContext,
+) {
     unsafe {
-        let data_ptr = interface::layer_get_data(layer as *const _) as *mut *const c_void;
+        let data_ptr = pebble_sys::layer_get_data(layer as *const _) as *mut *const c_void;
         let closure = &*(*data_ptr as *const Box<DrawCallback>);
 
         closure(layer.into(), ctx.into());
@@ -31,18 +32,19 @@ impl CanvasLayer {
     {
         let callback: Box<Box<DrawCallback>> = Box::new(Box::new(draw_logic));
 
-        let internal = interface::layer_create_with_data(bounds, size_of::<*const c_void>());
-
         unsafe {
-            let data_ptr = interface::layer_get_data(internal as *const _) as *mut *const c_void;
+            let internal = pebble_sys::layer_create_with_data(bounds.0, size_of::<*const c_void>());
+            
+            let data_ptr =
+                pebble_sys::layer_get_data(internal as *const _) as *mut *const c_void;
             *data_ptr = &*callback as *const Box<DrawCallback> as *const c_void;
-        }
 
-        interface::layer_set_update_proc(internal, trampoline_update_proc);
+            pebble_sys::layer_set_update_proc(internal, Some(trampoline_update_proc));
 
-        CanvasLayer {
-            layer_ref: Layer::from_raw_owned(internal),
-            _callback: callback,
+            CanvasLayer {
+                layer_ref: Layer::from_raw_owned(internal),
+                _callback: callback,
+            }
         }
     }
 }
@@ -62,13 +64,13 @@ impl DerefMut for CanvasLayer {
 }
 
 impl ILayer for CanvasLayer {
-    fn as_ptr(&self) -> *const types::Layer {
+    fn as_ptr(&self) -> *const pebble_sys::Layer {
         self.layer_ref.as_ptr()
     }
 }
 
 impl ILayerMut for CanvasLayer {
-    fn as_mut_ptr(&self) -> *mut types::Layer {
+    fn as_mut_ptr(&self) -> *mut pebble_sys::Layer {
         self.layer_ref.as_mut_ptr()
     }
 }

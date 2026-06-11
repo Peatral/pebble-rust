@@ -15,9 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-use crate::pebble::internal::functions::interface;
-
 /// Represents the application.
 /// # Example
 /// ```
@@ -44,6 +41,8 @@ impl App {
     /// Runs the app event loop.
     /// See: [Pebble SDK](https://developer.rebble.io/developer.pebble.com/docs/c/Foundation/App/index.html#app_event_loop)
     pub fn run_event_loop(self) {
-        interface::app_event_loop();
+        unsafe {
+            pebble_sys::app_event_loop();
+        }
     }
 }

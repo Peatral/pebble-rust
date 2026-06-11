@@ -16,14 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::functions::declarations;
-
 pub fn rand() -> i32 {
-    unsafe { declarations::rand() }
+    unsafe { pebble_sys::rand() }
 }
 
-pub fn seed_rand(seed: u32) -> i32 {
-    unsafe { declarations::srand(seed) }
+pub fn seed_rand(seed: u32) {
+    unsafe { pebble_sys::srand(seed) }
 }
 
 pub fn le_to_be_u32(num: u32) -> u32 {

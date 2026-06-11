@@ -15,22 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-use crate::pebble::internal::functions::interface::*;
-use crate::pebble::internal::types::{time_t, tm};
+use pebble_sys::{time_t, tm};
 
 pub fn get_time() -> time_t {
-    time()
+    unsafe { pebble_sys::time(core::ptr::null_mut()) }
 }
 
 pub fn is_clock_24h() -> bool {
-    clock_is_24h_style()
+    unsafe { pebble_sys::clock_is_24h_style() }
 }
 
 pub fn get_local_time(now: time_t) -> tm {
-    unsafe { *localtime(now) }
+    unsafe { *pebble_sys::localtime(&now) }
 }
 
 pub fn get_utc_time(now: time_t) -> tm {
-    unsafe { *gmtime(now) }
+    unsafe { *pebble_sys::gmtime(&now) }
 }

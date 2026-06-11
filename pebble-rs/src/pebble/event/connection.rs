@@ -15,25 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 use crate::pebble::event::Event;
-use crate::pebble::internal::functions::declarations::*;
-pub use crate::pebble::internal::types::ConnectionHandlers;
+use pebble_sys::ConnectionHandlers;
 
 pub struct ConnectionEvent;
 
 impl ConnectionEvent {
     pub fn peek_app() -> Result<bool, i32> {
-        unsafe { Ok(connection_service_peek_pebble_app_connection()) }
+        unsafe { Ok(pebble_sys::connection_service_peek_pebble_app_connection()) }
     }
 
     pub fn peek_pebblekit() -> Result<bool, i32> {
-        unsafe { Ok(connection_service_peek_pebblekit_connection()) }
+        unsafe { Ok(pebble_sys::connection_service_peek_pebblekit_connection()) }
     }
 
     pub fn subscribe(handlers: ConnectionHandlers) {
         unsafe {
-            connection_service_subscribe(handlers);
+            pebble_sys::connection_service_subscribe(handlers);
         }
     }
 }
@@ -46,7 +44,7 @@ impl Event<bool> for ConnectionEvent {
 
     fn unsubscribe() {
         unsafe {
-            connection_service_unsubscribe();
+            pebble_sys::connection_service_unsubscribe();
         }
     }
 

@@ -1,5 +1,3 @@
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
 use alloc::boxed::Box;
 use alloc::rc::Rc;
 use core::cell::Cell;
@@ -7,7 +5,9 @@ use core::ffi::c_void;
 
 /// Pauses the current thread for a specified amount of milliseconds.
 pub fn psleep(millis: i32) {
-    interface::psleep(millis);
+    unsafe {
+        pebble_sys::psleep(millis);
+    }
 }
 
 /// Internal context passed to the C API via the void pointer.
@@ -33,7 +33,7 @@ extern "C" fn timer_trampoline(data: *mut c_void) {
 
 /// A safe Rust wrapper around the C AppTimer handle.
 pub struct AppTimer {
-    handle: *mut types::AppTimer,
+    handle: *mut pebble_sys::AppTimer,
     context: *mut TimerContext,
     executed: Rc<Cell<bool>>,
 }
@@ -53,13 +53,18 @@ impl AppTimer {
 
         let context_ptr = Box::into_raw(context);
 
-        let handle =
-            interface::app_timer_register(timeout_ms, timer_trampoline, context_ptr as *mut c_void);
+        unsafe {
+            let handle = pebble_sys::app_timer_register(
+                timeout_ms,
+                Some(timer_trampoline),
+                context_ptr as *mut c_void,
+            );
 
-        Self {
-            handle,
-            context: context_ptr,
-            executed,
+            Self {
+                handle,
+                context: context_ptr,
+                executed,
+            }
         }
     }
 
@@ -69,7 +74,7 @@ impl AppTimer {
         if self.executed.get() {
             return false;
         }
-        interface::app_timer_reschedule(self.handle, new_timeout_ms)
+        unsafe { pebble_sys::app_timer_reschedule(self.handle, new_timeout_ms) }
     }
 
     /// Cancels the timer. Consumes the struct so it cannot be used again.
@@ -79,9 +84,9 @@ impl AppTimer {
 impl Drop for AppTimer {
     fn drop(&mut self) {
         if !self.executed.get() {
-            interface::app_timer_cancel(self.handle);
-
             unsafe {
+                pebble_sys::app_timer_cancel(self.handle);
+
                 let _ = Box::from_raw(self.context);
             }
 

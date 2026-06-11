@@ -1,14 +1,12 @@
 use crate::graphics::context::GContext;
 use crate::layer::ILayer;
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
 use core::ffi::CStr;
 
 /// A safe wrapper representing a single menu cell layer during a draw callback.
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct MenuCellLayer {
-    internal: *const types::Layer,
+    internal: *const pebble_sys::Layer,
 }
 
 impl MenuCellLayer {
@@ -18,35 +16,47 @@ impl MenuCellLayer {
         ctx: GContext,
         title: &CStr,
         subtitle: &CStr,
-        icon: *mut types::GBitmap,
+        icon: *mut pebble_sys::GBitmap,
     ) {
-        interface::menu_cell_basic_draw(ctx.as_ptr(), self.internal, title, subtitle, icon);
+        unsafe {
+            pebble_sys::menu_cell_basic_draw(
+                ctx.as_ptr(),
+                self.internal,
+                title.as_ptr(),
+                subtitle.as_ptr(),
+                icon,
+            );
+        }
     }
 
     /// Draws a cell layout with only one big title.
     pub fn draw_title(&self, ctx: GContext, title: &CStr) {
-        interface::menu_cell_title_draw(ctx.as_ptr(), self.internal, title);
+        unsafe {
+            pebble_sys::menu_cell_title_draw(ctx.as_ptr(), self.internal, title.as_ptr());
+        }
     }
 
     /// Draws a basic section header cell layout with the title.
     pub fn draw_basic_header(&self, ctx: GContext, title: &CStr) {
-        interface::menu_cell_basic_header_draw(ctx.as_ptr(), self.internal, title);
+        unsafe {
+            pebble_sys::menu_cell_basic_header_draw(ctx.as_ptr(), self.internal, title.as_ptr());
+        }
     }
 
     /// Returns whether or not this cell layer is currently highlighted.
     pub fn is_highlighted(&self) -> bool {
-        interface::menu_cell_layer_is_highlighted(self.internal)
+        unsafe { pebble_sys::menu_cell_layer_is_highlighted(self.internal) }
     }
 }
 
 impl ILayer for MenuCellLayer {
-    fn as_ptr(&self) -> *const types::Layer {
+    fn as_ptr(&self) -> *const pebble_sys::Layer {
         self.internal
     }
 }
 
-impl From<*const types::Layer> for MenuCellLayer {
-    fn from(internal: *const types::Layer) -> Self {
+impl From<*const pebble_sys::Layer> for MenuCellLayer {
+    fn from(internal: *const pebble_sys::Layer) -> Self {
         Self { internal }
     }
 }

@@ -16,4 +16,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub use crate::pebble::internal::functions::declarations::snprintf;
+pub use pebble_sys::snprintf;

@@ -17,9 +17,6 @@
  */
 
 use crate::layer::LayerMut;
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
-use crate::pebble::types::GColor;
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::Deref;
@@ -29,26 +26,30 @@ use core::ops::Deref;
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy)]
 pub struct WindowRef {
-    pub(crate) internal: *mut types::Window,
+    pub(crate) internal: *mut pebble_sys::Window,
 }
 
 impl WindowRef {
-    pub fn as_ptr(&self) -> *mut types::Window {
+    pub fn as_ptr(&self) -> *mut pebble_sys::Window {
         self.internal
     }
 
-    pub fn set_background_color(&self, color: GColor) {
-        interface::window_set_background_color(self.internal, color);
+    pub fn set_background_color(&self, color: pebble_sys::GColor) {
+        unsafe {
+            pebble_sys::window_set_background_color(self.internal, color);
+        }
     }
 
     pub fn get_root_layer(&self) -> LayerMut {
-        let layer_ptr = interface::window_get_root_layer(self.internal);
-        layer_ptr.into()
+        unsafe {
+            let layer_ptr = pebble_sys::window_get_root_layer(self.internal);
+            layer_ptr.into()
+        }
     }
 }
 
-impl From<*mut types::Window> for WindowRef {
-    fn from(internal: *mut types::Window) -> Self {
+impl From<*mut pebble_sys::Window> for WindowRef {
+    fn from(internal: *mut pebble_sys::Window) -> Self {
         Self { internal }
     }
 }
@@ -68,26 +69,28 @@ pub struct Window<T: WindowDelegate> {
 
 impl<T: WindowDelegate> Window<T> {
     pub fn new(delegate: T) -> Self {
-        let internal = interface::window_create();
+        unsafe {
+            let internal = pebble_sys::window_create();
 
-        let window = Window {
-            window_ref: internal.into(),
-            delegate: Box::new(delegate),
-        };
+            let window = Window {
+                window_ref: internal.into(),
+                delegate: Box::new(delegate),
+            };
 
-        let context_ptr = &*window.delegate as *const T as *mut c_void;
+            let context_ptr = &*window.delegate as *const T as *mut c_void;
 
-        interface::window_set_user_data(window.window_ref.internal, context_ptr);
+            pebble_sys::window_set_user_data(window.window_ref.internal, context_ptr);
 
-        let handlers = types::WindowHandlers {
-            load: Some(trampoline_load::<T>),
-            unload: Some(trampoline_unload::<T>),
-            appear: Some(trampoline_appear::<T>),
-            disappear: Some(trampoline_disappear::<T>),
-        };
-        interface::window_set_window_handlers(window.window_ref.internal, handlers);
+            let handlers = pebble_sys::WindowHandlers {
+                load: Some(trampoline_load::<T>),
+                unload: Some(trampoline_unload::<T>),
+                appear: Some(trampoline_appear::<T>),
+                disappear: Some(trampoline_disappear::<T>),
+            };
+            pebble_sys::window_set_window_handlers(window.window_ref.internal, handlers);
 
-        window
+            window
+        }
     }
 }
 
@@ -101,13 +104,15 @@ impl<T: WindowDelegate> Deref for Window<T> {
 
 impl<T: WindowDelegate> Drop for Window<T> {
     fn drop(&mut self) {
-        interface::window_destroy(self.window_ref.internal);
+        unsafe {
+            pebble_sys::window_destroy(self.window_ref.internal);
+        }
     }
 }
 
-extern "C" fn trampoline_load<T: WindowDelegate>(window_ptr: *mut types::Window) {
+extern "C" fn trampoline_load<T: WindowDelegate>(window_ptr: *mut pebble_sys::Window) {
     unsafe {
-        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        let user_data: *mut c_void = pebble_sys::window_get_user_data(window_ptr);
         if !user_data.is_null() {
             let delegate = &*(user_data as *const T);
             delegate.load(window_ptr.into());
@@ -115,9 +120,9 @@ extern "C" fn trampoline_load<T: WindowDelegate>(window_ptr: *mut types::Window)
     }
 }
 
-extern "C" fn trampoline_unload<T: WindowDelegate>(window_ptr: *mut types::Window) {
+extern "C" fn trampoline_unload<T: WindowDelegate>(window_ptr: *mut pebble_sys::Window) {
     unsafe {
-        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        let user_data: *mut c_void = pebble_sys::window_get_user_data(window_ptr);
         if !user_data.is_null() {
             let delegate = &*(user_data as *const T);
             delegate.unload(window_ptr.into());
@@ -125,9 +130,9 @@ extern "C" fn trampoline_unload<T: WindowDelegate>(window_ptr: *mut types::Windo
     }
 }
 
-extern "C" fn trampoline_appear<T: WindowDelegate>(window_ptr: *mut types::Window) {
+extern "C" fn trampoline_appear<T: WindowDelegate>(window_ptr: *mut pebble_sys::Window) {
     unsafe {
-        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        let user_data: *mut c_void = pebble_sys::window_get_user_data(window_ptr);
         if !user_data.is_null() {
             let delegate = &*(user_data as *const T);
             delegate.appear(window_ptr.into());
@@ -135,9 +140,9 @@ extern "C" fn trampoline_appear<T: WindowDelegate>(window_ptr: *mut types::Windo
     }
 }
 
-extern "C" fn trampoline_disappear<T: WindowDelegate>(window_ptr: *mut types::Window) {
+extern "C" fn trampoline_disappear<T: WindowDelegate>(window_ptr: *mut pebble_sys::Window) {
     unsafe {
-        let user_data: *mut c_void = interface::window_get_user_data(window_ptr);
+        let user_data: *mut c_void = pebble_sys::window_get_user_data(window_ptr);
         if !user_data.is_null() {
             let delegate = &*(user_data as *const T);
             delegate.disappear(window_ptr.into());

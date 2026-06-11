@@ -16,18 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::functions::declarations::setlocale;
 use core::ffi::{CStr, c_char};
 
 pub fn set_locale(category: i32, locale: &CStr) {
     unsafe {
-        setlocale(category, locale.as_ptr());
+        pebble_sys::setlocale(category, locale.as_ptr());
     }
 }
 
 pub fn get_locale<'a>(category: i32) -> Option<&'a str> {
     unsafe {
-        let ptr = setlocale(category, core::ptr::null());
+        let ptr = pebble_sys::setlocale(category, core::ptr::null());
 
         if ptr.is_null() {
             return None;

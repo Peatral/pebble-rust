@@ -1,81 +1,102 @@
 use crate::layer::{ILayer, ILayerMut};
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
-use crate::pebble::types::{Bitmap, GColor};
+use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 use crate::pebble::window::WindowRef;
+use crate::types::Bitmap;
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
-
-use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
-use crate::types::Layer;
+use pebble_sys::Layer;
+use crate::graphics::types::GColor8;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct ActionBarLayerRef {
-    internal: *mut types::ActionBarLayer,
+    internal: *mut pebble_sys::ActionBarLayer,
 }
 
 impl ActionBarLayerRef {
     /// Sets an action bar icon onto one of the 3 slots as identified by button_id.
-    pub fn set_icon(&self, button_id: types::ButtonId, icon: &Bitmap) {
-        interface::action_bar_layer_set_icon(self.internal, button_id, icon.internal);
+    pub fn set_icon(&self, button_id: pebble_sys::ButtonId, icon: &Bitmap) {
+        unsafe {
+            pebble_sys::action_bar_layer_set_icon(self.internal, button_id, icon.internal);
+        }
     }
 
     /// Convenience function to clear out an existing icon.
-    pub fn clear_icon(&self, button_id: types::ButtonId) {
-        interface::action_bar_layer_clear_icon(self.internal, button_id);
+    pub fn clear_icon(&self, button_id: pebble_sys::ButtonId) {
+        unsafe {
+            pebble_sys::action_bar_layer_clear_icon(self.internal, button_id);
+        }
     }
 
     /// Adds the action bar's layer on top of the window's root layer and adjusts the layout.
     pub fn add_to_window(&self, window: &WindowRef) {
-        interface::action_bar_layer_add_to_window(self.internal, window.as_ptr());
+        unsafe {
+            pebble_sys::action_bar_layer_add_to_window(self.internal, window.as_ptr());
+        }
     }
 
     /// Removes the action bar from the window and unconfigures the window's click configuration provider.
     pub fn remove_from_window(&self) {
-        interface::action_bar_layer_remove_from_window(self.internal);
+        unsafe {
+            pebble_sys::action_bar_layer_remove_from_window(self.internal);
+        }
     }
 
     /// Sets the background color of the action bar. Defaults to GColorBlack.
-    pub fn set_background_color(&self, background_color: GColor) {
-        interface::action_bar_layer_set_background_color(self.internal, background_color);
+    pub fn set_background_color(&self, background_color: GColor8) {
+        unsafe {
+            pebble_sys::action_bar_layer_set_background_color(self.internal, background_color.0);
+        }
     }
 
     /// Sets an action bar icon onto one of the 3 slots with an optional animation.
-    pub fn set_icon_animated(&self, button_id: types::ButtonId, icon: &Bitmap, animated: bool) {
-        interface::action_bar_layer_set_icon_animated(
-            self.internal,
-            button_id,
-            icon.internal,
-            animated,
-        );
+    pub fn set_icon_animated(
+        &self,
+        button_id: pebble_sys::ButtonId,
+        icon: &Bitmap,
+        animated: bool,
+    ) {
+        unsafe {
+            pebble_sys::action_bar_layer_set_icon_animated(
+                self.internal,
+                button_id,
+                icon.internal,
+                animated,
+            );
+        }
     }
 
     /// Sets the animation to use while a button is pressed on an ActionBarLayer.
     pub fn set_icon_press_animation(
         &self,
-        button_id: types::ButtonId,
-        animation: types::ActionBarLayerIconPressAnimation,
+        button_id: pebble_sys::ButtonId,
+        animation: pebble_sys::ActionBarLayerIconPressAnimation,
     ) {
-        interface::action_bar_layer_set_icon_press_animation(self.internal, button_id, animation);
+        unsafe {
+            pebble_sys::action_bar_layer_set_icon_press_animation(
+                self.internal,
+                button_id,
+                animation,
+            );
+        }
     }
 }
 
 impl ILayer for ActionBarLayerRef {
     fn as_ptr(&self) -> *const Layer {
-        interface::action_bar_layer_get_layer(self.internal)
+        unsafe { pebble_sys::action_bar_layer_get_layer(self.internal) }
     }
 }
 
 impl ILayerMut for ActionBarLayerRef {
     fn as_mut_ptr(&self) -> *mut Layer {
-        interface::action_bar_layer_get_layer(self.internal)
+        unsafe { pebble_sys::action_bar_layer_get_layer(self.internal) }
     }
 }
 
-impl From<*mut types::ActionBarLayer> for ActionBarLayerRef {
-    fn from(internal: *mut types::ActionBarLayer) -> Self {
+impl From<*mut pebble_sys::ActionBarLayer> for ActionBarLayerRef {
+    fn from(internal: *mut pebble_sys::ActionBarLayer) -> Self {
         Self { internal }
     }
 }
@@ -89,22 +110,24 @@ pub struct ActionBarLayer<T: ClickDelegate> {
 impl<T: ClickDelegate> ActionBarLayer<T> {
     /// Creates a new ActionBarLayer on the heap and initializes it with the given delegate.
     pub fn new(delegate: T) -> Self {
-        let internal = interface::action_bar_layer_create();
+        unsafe {
+            let internal = pebble_sys::action_bar_layer_create();
 
-        let layer = Self {
-            layer_ref: internal.into(),
-            delegate: Box::new(delegate),
-        };
+            let layer = Self {
+                layer_ref: internal.into(),
+                delegate: Box::new(delegate),
+            };
 
-        let context_ptr = &*layer.delegate as *const T as *mut c_void;
+            let context_ptr = &*layer.delegate as *const T as *mut c_void;
 
-        interface::action_bar_layer_set_context(internal, context_ptr);
-        interface::action_bar_layer_set_click_config_provider(
-            internal,
-            trampoline_click_config_provider::<T>,
-        );
+            pebble_sys::action_bar_layer_set_context(internal, context_ptr);
+            pebble_sys::action_bar_layer_set_click_config_provider(
+                internal,
+                Some(trampoline_click_config_provider::<T>),
+            );
 
-        layer
+            layer
+        }
     }
 }
 
@@ -136,6 +159,8 @@ impl<T: ClickDelegate> DerefMut for ActionBarLayer<T> {
 
 impl<T: ClickDelegate> Drop for ActionBarLayer<T> {
     fn drop(&mut self) {
-        interface::action_bar_layer_destroy(self.internal);
+        unsafe {
+            pebble_sys::action_bar_layer_destroy(self.internal);
+        }
     }
 }

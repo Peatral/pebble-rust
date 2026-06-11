@@ -19,4 +19,16 @@ include = [
 travis-ci = { repository = "pebble-rust/pebble-rust", branch = "master" }
 
 [dependencies]
-c2rust-bitfields = {version = "0.22.1", default-features = false, features = ["no_std"]}
+cty = "0.2.2"
+pebble-sys = { path = "../pebble-sys", default-features = false }
+
+[features]
+default = ["emery"]
+
+aplite = ["pebble-sys/aplite"]
+basalt = ["pebble-sys/basalt"]
+chalk = ["pebble-sys/chalk"]
+diorite = ["pebble-sys/diorite"]
+emery = ["pebble-sys/emery"]
+flint = ["pebble-sys/flint"]
+gabbro = ["pebble-sys/gabbro"]

@@ -3,88 +3,116 @@ pub mod menu_index;
 
 use crate::graphics::context::GContext;
 use crate::layer::{ILayer, ILayerMut, LayerRef};
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types;
 use crate::pebble::window::WindowRef;
-use crate::types::Layer;
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 
 pub use menu_cell_layer::MenuCellLayer;
 pub use menu_index::MenuIndexRef;
+use pebble_sys::Layer;
+use crate::graphics::types::GRect;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct MenuLayerRef {
-    internal: *mut types::MenuLayer,
+    internal: *mut pebble_sys::MenuLayer,
 }
 
 impl MenuLayerRef {
     pub fn set_click_config_onto_window(&self, window: &WindowRef) {
-        interface::menu_layer_set_click_config_onto_window(self.internal, window.as_ptr());
+        unsafe {
+            pebble_sys::menu_layer_set_click_config_onto_window(self.internal, window.as_ptr());
+        }
     }
 
     pub fn reload_data(&self) {
-        interface::menu_layer_reload_data(self.internal);
+        unsafe {
+            pebble_sys::menu_layer_reload_data(self.internal);
+        }
     }
 
-    pub fn set_selected_next(&self, up: bool, scroll_align: types::MenuRowAlign, animated: bool) {
-        interface::menu_layer_set_selected_next(self.internal, up, scroll_align, animated);
+    pub fn set_selected_next(
+        &self,
+        up: bool,
+        scroll_align: pebble_sys::MenuRowAlign,
+        animated: bool,
+    ) {
+        unsafe {
+            pebble_sys::menu_layer_set_selected_next(self.internal, up, scroll_align, animated);
+        }
     }
 
     pub fn set_selected_index(
         &self,
-        index: types::MenuIndex,
-        scroll_align: types::MenuRowAlign,
+        index: pebble_sys::MenuIndex,
+        scroll_align: pebble_sys::MenuRowAlign,
         animated: bool,
     ) {
-        interface::menu_layer_set_selected_index(self.internal, index, scroll_align, animated);
+        unsafe {
+            pebble_sys::menu_layer_set_selected_index(self.internal, index, scroll_align, animated);
+        }
     }
 
-    pub fn get_selected_index(&self) -> types::MenuIndex {
-        interface::menu_layer_get_selected_index(self.internal)
+    pub fn get_selected_index(&self) -> pebble_sys::MenuIndex {
+        unsafe { pebble_sys::menu_layer_get_selected_index(self.internal) }
     }
 
-    pub fn set_normal_colors(&self, background: types::GColor, foreground: types::GColor) {
-        interface::menu_layer_set_normal_colors(self.internal, background, foreground);
+    pub fn set_normal_colors(
+        &self,
+        background: pebble_sys::GColor,
+        foreground: pebble_sys::GColor,
+    ) {
+        unsafe {
+            pebble_sys::menu_layer_set_normal_colors(self.internal, background, foreground);
+        }
     }
 
-    pub fn set_highlight_colors(&self, background: types::GColor, foreground: types::GColor) {
-        interface::menu_layer_set_highlight_colors(self.internal, background, foreground);
+    pub fn set_highlight_colors(
+        &self,
+        background: pebble_sys::GColor,
+        foreground: pebble_sys::GColor,
+    ) {
+        unsafe {
+            pebble_sys::menu_layer_set_highlight_colors(self.internal, background, foreground);
+        }
     }
 
     pub fn pad_bottom_enable(&self, enable: bool) {
-        interface::menu_layer_pad_bottom_enable(self.internal, enable);
+        unsafe {
+            pebble_sys::menu_layer_pad_bottom_enable(self.internal, enable);
+        }
     }
 
     pub fn set_center_focused(&self, center_focused: bool) {
-        interface::menu_layer_set_center_focused(self.internal, center_focused);
+        unsafe {
+            pebble_sys::menu_layer_set_center_focused(self.internal, center_focused);
+        }
     }
 
     pub fn get_center_focused(&self) -> bool {
-        interface::menu_layer_get_center_focused(self.internal)
+        unsafe { pebble_sys::menu_layer_get_center_focused(self.internal) }
     }
 
-    pub fn is_index_selected(&self, index: &types::MenuIndex) -> bool {
-        interface::menu_layer_is_index_selected(self.internal, index as *const types::MenuIndex)
+    pub fn is_index_selected(&self, index: MenuIndexRef) -> bool {
+        unsafe { pebble_sys::menu_layer_is_index_selected(self.internal, index.as_ptr()) }
     }
 }
 
 impl ILayer for MenuLayerRef {
     fn as_ptr(&self) -> *const Layer {
-        interface::menu_layer_get_layer(self.internal)
+        unsafe { pebble_sys::menu_layer_get_layer(self.internal) }
     }
 }
 
 impl ILayerMut for MenuLayerRef {
     fn as_mut_ptr(&self) -> *mut Layer {
-        interface::menu_layer_get_layer(self.internal)
+        unsafe { pebble_sys::menu_layer_get_layer(self.internal) }
     }
 }
 
-impl From<*mut types::MenuLayer> for MenuLayerRef {
-    fn from(internal: *mut types::MenuLayer) -> Self {
+impl From<*mut pebble_sys::MenuLayer> for MenuLayerRef {
+    fn from(internal: *mut pebble_sys::MenuLayer) -> Self {
         Self { internal }
     }
 }
@@ -123,21 +151,21 @@ pub trait MenuLayerDelegate {
     fn selection_changed(
         &self,
         _menu_layer: MenuLayerRef,
-        _new_index: types::MenuIndex,
-        _old_index: types::MenuIndex,
+        _new_index: pebble_sys::MenuIndex,
+        _old_index: pebble_sys::MenuIndex,
     ) {
     }
     fn selection_will_change(
         &self,
         _menu_layer: MenuLayerRef,
         _new_index: MenuIndexRef,
-        _old_index: types::MenuIndex,
+        _old_index: pebble_sys::MenuIndex,
     ) {
     }
 }
 
 extern "C" fn trampoline_get_num_sections<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
+    layer: *mut pebble_sys::MenuLayer,
     ctx: *mut c_void,
 ) -> u16 {
     unsafe {
@@ -147,7 +175,7 @@ extern "C" fn trampoline_get_num_sections<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_get_num_rows<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
+    layer: *mut pebble_sys::MenuLayer,
     section_index: u16,
     ctx: *mut c_void,
 ) -> u16 {
@@ -158,8 +186,8 @@ extern "C" fn trampoline_get_num_rows<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_get_cell_height<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    cell_index: *mut types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    cell_index: *mut pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) -> i16 {
     unsafe {
@@ -169,7 +197,7 @@ extern "C" fn trampoline_get_cell_height<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_get_header_height<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
+    layer: *mut pebble_sys::MenuLayer,
     section_index: u16,
     ctx: *mut c_void,
 ) -> i16 {
@@ -180,8 +208,8 @@ extern "C" fn trampoline_get_header_height<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_get_separator_height<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    cell_index: *mut types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    cell_index: *mut pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) -> i16 {
     unsafe {
@@ -191,9 +219,9 @@ extern "C" fn trampoline_get_separator_height<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
-    ctx: *mut types::GContext,
+    ctx: *mut pebble_sys::GContext,
     cell_layer: *const Layer,
-    cell_index: *mut types::MenuIndex,
+    cell_index: *mut pebble_sys::MenuIndex,
     callback_context: *mut c_void,
 ) {
     unsafe {
@@ -203,8 +231,8 @@ extern "C" fn trampoline_draw_row<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
-    ctx: *mut types::GContext,
-    cell_layer: *const types::Layer,
+    ctx: *mut pebble_sys::GContext,
+    cell_layer: *const pebble_sys::Layer,
     section_index: u16,
     callback_context: *mut c_void,
 ) {
@@ -215,9 +243,9 @@ extern "C" fn trampoline_draw_header<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
-    ctx: *mut types::GContext,
+    ctx: *mut pebble_sys::GContext,
     cell_layer: *const Layer,
-    cell_index: *mut types::MenuIndex,
+    cell_index: *mut pebble_sys::MenuIndex,
     callback_context: *mut c_void,
 ) {
     unsafe {
@@ -227,7 +255,7 @@ extern "C" fn trampoline_draw_separator<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
-    ctx: *mut types::GContext,
+    ctx: *mut pebble_sys::GContext,
     bg_layer: *const Layer,
     highlight: bool,
     callback_context: *mut c_void,
@@ -239,8 +267,8 @@ extern "C" fn trampoline_draw_background<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_select_click<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    cell_index: *mut types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    cell_index: *mut pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) {
     unsafe {
@@ -250,8 +278,8 @@ extern "C" fn trampoline_select_click<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_select_long_click<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    cell_index: *mut types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    cell_index: *mut pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) {
     unsafe {
@@ -261,9 +289,9 @@ extern "C" fn trampoline_select_long_click<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_selection_changed<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    new_index: types::MenuIndex,
-    old_index: types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    new_index: pebble_sys::MenuIndex,
+    old_index: pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) {
     unsafe {
@@ -273,9 +301,9 @@ extern "C" fn trampoline_selection_changed<T: MenuLayerDelegate>(
 }
 
 extern "C" fn trampoline_selection_will_change<T: MenuLayerDelegate>(
-    layer: *mut types::MenuLayer,
-    new_index: *mut types::MenuIndex,
-    old_index: types::MenuIndex,
+    layer: *mut pebble_sys::MenuLayer,
+    new_index: *mut pebble_sys::MenuIndex,
+    old_index: pebble_sys::MenuIndex,
     ctx: *mut c_void,
 ) {
     unsafe {
@@ -285,35 +313,37 @@ extern "C" fn trampoline_selection_will_change<T: MenuLayerDelegate>(
 }
 
 impl<T: MenuLayerDelegate> MenuLayer<T> {
-    pub fn new(bounds: types::GRect, delegate: T) -> Self {
-        let internal = interface::menu_layer_create(bounds);
+    pub fn new(bounds: GRect, delegate: T) -> Self {
+        unsafe {
+            let internal = pebble_sys::menu_layer_create(bounds.0);
 
-        let layer = MenuLayer {
-            layer_ref: internal.into(),
-            delegate: Box::new(delegate),
-        };
+            let layer = MenuLayer {
+                layer_ref: internal.into(),
+                delegate: Box::new(delegate),
+            };
 
-        let context_ptr = &*layer.delegate as *const T as *mut c_void;
+            let context_ptr = &*layer.delegate as *const T as *mut c_void;
 
-        let callbacks = types::MenuLayerCallbacks {
-            get_num_sections: Some(trampoline_get_num_sections::<T>),
-            get_num_rows: Some(trampoline_get_num_rows::<T>),
-            get_cell_height: Some(trampoline_get_cell_height::<T>),
-            get_header_height: Some(trampoline_get_header_height::<T>),
-            draw_row: Some(trampoline_draw_row::<T>),
-            draw_header: Some(trampoline_draw_header::<T>),
-            select_click: Some(trampoline_select_click::<T>),
-            select_long_click: Some(trampoline_select_long_click::<T>),
-            selection_changed: Some(trampoline_selection_changed::<T>),
-            get_separator_height: Some(trampoline_get_separator_height::<T>),
-            draw_separator: Some(trampoline_draw_separator::<T>),
-            selection_will_change: Some(trampoline_selection_will_change::<T>),
-            draw_background: Some(trampoline_draw_background::<T>),
-        };
+            let callbacks = pebble_sys::MenuLayerCallbacks {
+                get_num_sections: Some(trampoline_get_num_sections::<T>),
+                get_num_rows: Some(trampoline_get_num_rows::<T>),
+                get_cell_height: Some(trampoline_get_cell_height::<T>),
+                get_header_height: Some(trampoline_get_header_height::<T>),
+                draw_row: Some(trampoline_draw_row::<T>),
+                draw_header: Some(trampoline_draw_header::<T>),
+                select_click: Some(trampoline_select_click::<T>),
+                select_long_click: Some(trampoline_select_long_click::<T>),
+                selection_changed: Some(trampoline_selection_changed::<T>),
+                get_separator_height: Some(trampoline_get_separator_height::<T>),
+                draw_separator: Some(trampoline_draw_separator::<T>),
+                selection_will_change: Some(trampoline_selection_will_change::<T>),
+                draw_background: Some(trampoline_draw_background::<T>),
+            };
 
-        interface::menu_layer_set_callbacks(layer.internal, context_ptr, callbacks);
+            pebble_sys::menu_layer_set_callbacks(layer.internal, context_ptr, callbacks);
 
-        layer
+            layer
+        }
     }
 }
 
@@ -345,6 +375,8 @@ impl<T: MenuLayerDelegate> DerefMut for MenuLayer<T> {
 
 impl<T: MenuLayerDelegate> Drop for MenuLayer<T> {
     fn drop(&mut self) {
-        interface::menu_layer_destroy(self.internal);
+        unsafe {
+            pebble_sys::menu_layer_destroy(self.internal);
+        }
     }
 }

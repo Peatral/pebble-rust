@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use crate::pebble::internal::functions::declarations::*;
 use core::ffi::{CStr, c_char};
 
 pub fn get_time_string() -> alloc::string::String {
@@ -24,7 +23,7 @@ pub fn get_time_string() -> alloc::string::String {
     let mut buf = [0u8; MAX_SIZE];
 
     unsafe {
-        clock_copy_time_string(buf.as_mut_ptr() as *mut c_char, MAX_SIZE as u8);
+        pebble_sys::clock_copy_time_string(buf.as_mut_ptr() as *mut c_char, MAX_SIZE as u8);
 
         let c_str = CStr::from_ptr(buf.as_ptr() as *const c_char);
         c_str.to_string_lossy().into_owned()
@@ -32,7 +31,7 @@ pub fn get_time_string() -> alloc::string::String {
 }
 
 pub fn is_24h() -> bool {
-    unsafe { clock_is_24h_style() != 0 }
+    unsafe { pebble_sys::clock_is_24h_style() }
 }
 
 pub fn get_timezone() -> alloc::string::String {
@@ -40,7 +39,7 @@ pub fn get_timezone() -> alloc::string::String {
     let mut buf = [0u8; MAX_SIZE];
 
     unsafe {
-        clock_get_timezone(buf.as_mut_ptr() as *mut c_char, MAX_SIZE);
+        pebble_sys::clock_get_timezone(buf.as_mut_ptr() as *mut c_char, MAX_SIZE);
 
         let c_str = CStr::from_ptr(buf.as_ptr() as *const c_char);
         c_str.to_string_lossy().into_owned()

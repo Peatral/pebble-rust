@@ -1,20 +1,24 @@
-use crate::pebble::internal::functions::interface;
+use pebble_sys::VibePattern;
 
 pub fn cancel() {
-    interface::vibes_cancel()
+    unsafe { pebble_sys::vibes_cancel() }
 }
 pub fn short_pulse() {
-    interface::vibes_short_pulse()
+    unsafe { pebble_sys::vibes_short_pulse() }
 }
 
 pub fn long_pulse() {
-    interface::vibes_long_pulse()
+    unsafe { pebble_sys::vibes_long_pulse() }
 }
 
 pub fn double_pulse() {
-    interface::vibes_double_pulse()
+    unsafe { pebble_sys::vibes_double_pulse() }
 }
 
 pub fn enqueue_custom_pattern(durations: &'static [u32]) {
-    interface::vibes_enqueue_custom_pattern(durations)
+    let pattern = VibePattern {
+        durations: durations.as_ptr(),
+        num_segments: durations.len() as u32,
+    };
+    unsafe { pebble_sys::vibes_enqueue_custom_pattern(pattern) }
 }

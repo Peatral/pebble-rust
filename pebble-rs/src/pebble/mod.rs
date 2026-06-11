@@ -39,12 +39,10 @@ pub mod window_stack;
 use crate::pebble;
 pub use internal::alloc;
 
-pub use internal::types::Window as RawWindow;
-
 pub type Result<T> = core::result::Result<T, &'static str>;
 
-pub use internal::functions::declarations::app_log as println;
-pub use internal::functions::declarations::snprintf;
+pub use pebble_sys::app_log as println;
+pub use pebble_sys::snprintf;
 
 #[cfg(not(test))]
 #[inline(never)]

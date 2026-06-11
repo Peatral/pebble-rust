@@ -19,6 +19,5 @@
 pub mod format;
 pub mod locale;
 pub mod math;
-pub mod memory;
 pub mod string;
 pub mod time;

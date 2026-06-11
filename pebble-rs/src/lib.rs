@@ -20,8 +20,6 @@
 #![no_builtins]
 
 extern crate alloc;
-#[macro_use]
-extern crate c2rust_bitfields;
 
 // Require the Pebble library
 pub mod pebble;

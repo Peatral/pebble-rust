@@ -1,13 +1,11 @@
-use crate::pebble::internal::types;
-
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct MenuIndexRef {
-    internal: *mut types::MenuIndex,
+    internal: *mut pebble_sys::MenuIndex,
 }
 
 impl MenuIndexRef {
-    pub fn as_ptr(&self) -> *mut types::MenuIndex {
+    pub fn as_ptr(&self) -> *mut pebble_sys::MenuIndex {
         self.internal
     }
 
@@ -36,8 +34,8 @@ impl MenuIndexRef {
     }
 }
 
-impl From<*mut types::MenuIndex> for MenuIndexRef {
-    fn from(internal: *mut types::MenuIndex) -> Self {
+impl From<*mut pebble_sys::MenuIndex> for MenuIndexRef {
+    fn from(internal: *mut pebble_sys::MenuIndex) -> Self {
         Self { internal }
     }
 }

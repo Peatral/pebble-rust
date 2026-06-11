@@ -1,6 +1,5 @@
-use crate::pebble::internal::functions::interface;
-use crate::pebble::internal::types::{StatusCode, WakeupId, time_t};
 use crate::types::GlobalCell;
+use pebble_sys::{StatusCode, WakeupId, time_t};
 
 // Since Pebble lacks a context pointer for Wakeups, we use a static variable to hold the user's Rust callback.
 static GLOBAL_WAKEUP_HANDLER: GlobalCell<Option<fn(WakeupId, i32)>> = GlobalCell::new(None);
@@ -15,7 +14,9 @@ extern "C" fn wakeup_trampoline(wakeup_id: WakeupId, cookie: i32) {
 /// Registers a callback to be called when wakeup events occur while the app is running.
 pub fn subscribe(handler: fn(WakeupId, i32)) {
     GLOBAL_WAKEUP_HANDLER.set(Some(handler));
-    interface::wakeup_service_subscribe(wakeup_trampoline);
+    unsafe {
+        pebble_sys::wakeup_service_subscribe(Some(wakeup_trampoline));
+    }
 }
 
 /// Registers a wakeup event that triggers at the specified time.
@@ -25,24 +26,29 @@ pub fn schedule(
     cookie: i32,
     notify_if_missed: bool,
 ) -> Result<WakeupId, StatusCode> {
-    let result = interface::wakeup_schedule(timestamp, cookie, notify_if_missed);
+    unsafe {
+        let result = pebble_sys::wakeup_schedule(timestamp, cookie, notify_if_missed);
 
-    // The Pebble API returns negative values for errors
-    if result < 0 {
-        Err(StatusCode::from(result))
-    } else {
-        Ok(result)
+        if result < 0 {
+            Err(StatusCode::from(result))
+        } else {
+            Ok(result)
+        }
     }
 }
 
 /// Cancels a specific scheduled wakeup event.
 pub fn cancel(wakeup_id: WakeupId) {
-    interface::wakeup_cancel(wakeup_id);
+    unsafe {
+        pebble_sys::wakeup_cancel(wakeup_id);
+    }
 }
 
 /// Cancels all wakeup events for the app.
 pub fn cancel_all() {
-    interface::wakeup_cancel_all();
+    unsafe {
+        pebble_sys::wakeup_cancel_all();
+    }
 }
 
 /// Retrieves the wakeup event info if the app was launched by a wakeup_event.
@@ -51,12 +57,14 @@ pub fn get_launch_event() -> Option<(WakeupId, i32)> {
     let mut wakeup_id: WakeupId = 0;
     let mut cookie: i32 = 0;
 
-    let was_wakeup = interface::wakeup_get_launch_event(&mut wakeup_id, &mut cookie);
+    unsafe {
+        let was_wakeup = pebble_sys::wakeup_get_launch_event(&mut wakeup_id, &mut cookie);
 
-    if was_wakeup {
-        Some((wakeup_id, cookie))
-    } else {
-        None
+        if was_wakeup {
+            Some((wakeup_id, cookie))
+        } else {
+            None
+        }
     }
 }
 
@@ -65,7 +73,9 @@ pub fn get_launch_event() -> Option<(WakeupId, i32)> {
 pub fn query(wakeup_id: WakeupId) -> Option<time_t> {
     let mut timestamp: time_t = 0;
 
-    let is_scheduled = interface::wakeup_query(wakeup_id, &mut timestamp);
+    unsafe {
+        let is_scheduled = pebble_sys::wakeup_query(wakeup_id, &mut timestamp);
 
-    if is_scheduled { Some(timestamp) } else { None }
+        if is_scheduled { Some(timestamp) } else { None }
+    }
 }

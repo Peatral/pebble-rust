@@ -15,30 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 use crate::pebble::event::Event;
-
-use crate::pebble::internal::functions::declarations::{
-    battery_state_service_peek, battery_state_service_subscribe, battery_state_service_unsubscribe,
-};
-pub use crate::pebble::internal::types::BatteryChargeState;
+use pebble_sys::BatteryChargeState;
 
 pub struct BatteryStateEvent;
 
 impl Event<BatteryChargeState> for BatteryStateEvent {
     fn subscribe(handler: extern "C" fn(state: BatteryChargeState)) {
         unsafe {
-            battery_state_service_subscribe(handler);
+            pebble_sys::battery_state_service_subscribe(Some(handler));
         }
     }
 
     fn unsubscribe() {
         unsafe {
-            battery_state_service_unsubscribe();
+            pebble_sys::battery_state_service_unsubscribe();
         }
     }
 
     fn peek() -> Result<BatteryChargeState, i32> {
-        unsafe { Ok(battery_state_service_peek()) }
+        unsafe { Ok(pebble_sys::battery_state_service_peek()) }
     }
 }
