@@ -18,6 +18,7 @@
 
 use crate::graphics::types::Color;
 use crate::layer::LayerMut;
+use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::Deref;
@@ -92,6 +93,32 @@ impl<T: WindowDelegate> Window<T> {
             pebble_sys::window_set_window_handlers(window.window_ref.internal, handlers);
 
             window
+        }
+    }
+}
+
+impl<T: WindowDelegate + ClickDelegate> Window<T> {
+    /// Safely binds this window's delegate to also handle all button click events.
+    pub fn enable_clicks(&self) {
+        unsafe {
+            let context_ptr = &*self.delegate as *const T as *mut c_void;
+
+            pebble_sys::window_set_click_config_provider_with_context(
+                self.window_ref.internal,
+                Some(trampoline_click_config_provider::<T>),
+                context_ptr,
+            );
+        }
+    }
+
+    /// Safely removes the click configuration, disabling button events for this window.
+    pub fn disable_clicks(&self) {
+        unsafe {
+            pebble_sys::window_set_click_config_provider_with_context(
+                self.window_ref.internal,
+                None,
+                core::ptr::null_mut(),
+            );
         }
     }
 }
