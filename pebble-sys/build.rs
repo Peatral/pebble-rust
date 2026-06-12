@@ -1,5 +1,5 @@
-use std::{env, fs};
 use std::path::PathBuf;
+use std::{env, fs};
 
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -33,7 +33,11 @@ fn main() {
         let pebble_h = include_dir.join("pebble.h");
 
         if !pebble_h.exists() {
-            panic!("Could not find pebble.h for {} at {}", platform, pebble_h.display());
+            panic!(
+                "Could not find pebble.h for {} at {}",
+                platform,
+                pebble_h.display()
+            );
         }
 
         // Create isolated dummy directories for each platform to avoid thread/build collisions
@@ -55,7 +59,7 @@ fn main() {
                      typedef int32_t time_t;\n\
                      #include \"{}\"",
                     pebble_h.display()
-                )
+                ),
             )
             .use_core()
             .ctypes_prefix("cty")
@@ -71,6 +75,8 @@ fn main() {
 
         // Write to a platform-specific filename!
         let output_file = out_dir.join(format!("bindings_{}.rs", platform));
-        bindings.write_to_file(output_file).expect("Couldn't write bindings!");
+        bindings
+            .write_to_file(output_file)
+            .expect("Couldn't write bindings!");
     }
 }

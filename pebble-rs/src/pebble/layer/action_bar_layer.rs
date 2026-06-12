@@ -1,3 +1,5 @@
+use crate::graphics::bitmap::{BitmapRef, IBitmap};
+use crate::graphics::types::Color;
 use crate::layer::{ILayer, ILayerMut};
 use crate::pebble::clicks::{ClickDelegate, trampoline_click_config_provider};
 use crate::pebble::window::WindowRef;
@@ -5,8 +7,6 @@ use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 use pebble_sys::Layer;
-use crate::graphics::bitmap::{BitmapRef, IBitmap};
-use crate::graphics::types::Color;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]

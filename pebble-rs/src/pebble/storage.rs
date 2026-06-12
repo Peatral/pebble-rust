@@ -1,9 +1,7 @@
 use alloc::string::String;
 use alloc::vec;
 use core::ffi::{CStr, c_char, c_void};
-use pebble_sys::{
-    PERSIST_DATA_MAX_LENGTH, StatusCode
-};
+use pebble_sys::{PERSIST_DATA_MAX_LENGTH, StatusCode};
 
 /// Checks whether a value has been set for a given key.
 pub fn exists(key: u32) -> bool {
@@ -27,7 +25,11 @@ pub fn delete(key: u32) -> Result<(), StatusCode> {
     unsafe {
         let status = pebble_sys::persist_delete(key);
         let code = StatusCode(status);
-        if code == StatusCode::S_TRUE { Ok(()) } else { Err(code) }
+        if code == StatusCode::S_TRUE {
+            Ok(())
+        } else {
+            Err(code)
+        }
     }
 }
 

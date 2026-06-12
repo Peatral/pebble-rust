@@ -1,14 +1,14 @@
-#![crate_type="staticlib"]
+#![crate_type = "staticlib"]
 #![no_std]
 #![no_builtins]
 
 extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
-use pebble::{app, include_message_keys, window_stack};
 use pebble::graphics::bitmap::Bitmap;
-use pebble::layer::{ILayerMut, BitmapLayer, ILayer};
+use pebble::layer::{BitmapLayer, ILayer, ILayerMut};
 use pebble::window::{Window, WindowDelegate, WindowRef};
+use pebble::{app, include_message_keys, window_stack};
 use pebble_sys::GCompOp;
 
 include_message_keys!();

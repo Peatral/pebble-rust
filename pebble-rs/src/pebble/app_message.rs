@@ -176,7 +176,11 @@ extern "C" fn trampoline_outbox_sent(dict_ptr: *mut DictionaryIterator, _ctx: *m
     }
 }
 
-extern "C" fn trampoline_outbox_failed(dict_ptr: *mut DictionaryIterator, reason: AppMessageResult, _ctx: *mut cty::c_void) {
+extern "C" fn trampoline_outbox_failed(
+    dict_ptr: *mut DictionaryIterator,
+    reason: AppMessageResult,
+    _ctx: *mut cty::c_void,
+) {
     unsafe {
         if let Some(handler) = OUTBOX_FAILED {
             handler(

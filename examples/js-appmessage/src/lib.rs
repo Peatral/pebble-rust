@@ -10,11 +10,11 @@ extern crate pebble_rs as pebble;
 use alloc::borrow::ToOwned;
 
 use pebble::app_message::*;
-use pebble::layer::{ILayerMut, ILayer, TextLayer};
+use pebble::graphics::types::{Point, Rect, Size};
+use pebble::layer::{ILayer, ILayerMut, TextLayer};
+use pebble::types::GlobalRefCell;
 use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::{app, window_stack};
-use pebble::graphics::types::{Point, Rect, Size};
-use pebble::types::GlobalRefCell;
 use pebble_sys::GTextAlignment;
 
 include_message_keys!();
@@ -33,7 +33,10 @@ impl WindowDelegate for AppMessageDelegate {
         let window_width = bounds.size.w;
         let window_height = bounds.size.h;
 
-        let text_bounds = Rect::new(Point::new(0, window_height / 2 - 20), Size::new(window_width, 40));
+        let text_bounds = Rect::new(
+            Point::new(0, window_height / 2 - 20),
+            Size::new(window_width, 40),
+        );
 
         let text = TextLayer::new(text_bounds);
         text.set_text_static(c"Loading...");

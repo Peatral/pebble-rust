@@ -1,9 +1,9 @@
+use crate::graphics::types::Rect;
 use crate::layer::{ILayer, ILayerMut};
 use crate::system::fonts::Font;
 use alloc::ffi::CString;
 use core::ffi::CStr;
 use pebble_sys::GTextAlignment;
-use crate::graphics::types::Rect;
 
 pub struct TextLayer {
     internal: *mut pebble_sys::TextLayer,

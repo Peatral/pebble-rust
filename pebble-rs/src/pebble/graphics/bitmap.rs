@@ -22,7 +22,7 @@ pub trait IBitmap {
     fn as_ptr(&self) -> *const pebble_sys::GBitmap;
 }
 
-pub trait IBitmapMut : IBitmap {
+pub trait IBitmapMut: IBitmap {
     fn as_mut_ptr(&self) -> *mut pebble_sys::GBitmap;
 }
 
@@ -39,7 +39,9 @@ impl IBitmap for BitmapRef {
 }
 
 impl From<*const pebble_sys::GBitmap> for BitmapRef {
-    fn from(raw: *const pebble_sys::GBitmap) -> Self { Self { internal: raw } }
+    fn from(raw: *const pebble_sys::GBitmap) -> Self {
+        Self { internal: raw }
+    }
 }
 
 #[repr(transparent)]
@@ -61,7 +63,9 @@ impl IBitmapMut for BitmapMut {
 }
 
 impl From<*mut pebble_sys::GBitmap> for BitmapMut {
-    fn from(raw: *mut pebble_sys::GBitmap) -> Self { Self { internal: raw } }
+    fn from(raw: *mut pebble_sys::GBitmap) -> Self {
+        Self { internal: raw }
+    }
 }
 
 #[repr(transparent)]

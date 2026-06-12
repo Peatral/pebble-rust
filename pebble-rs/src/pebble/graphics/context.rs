@@ -1,6 +1,5 @@
-use pebble_sys::GCompOp;
 use crate::graphics::types::Color;
-
+use pebble_sys::GCompOp;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
@@ -39,9 +38,7 @@ impl Context {
         }
     }
     pub fn set_stroke_width(&self, stroke_width: u8) {
-        unsafe {
-            pebble_sys::graphics_context_set_stroke_width(self.internal, stroke_width)
-        }
+        unsafe { pebble_sys::graphics_context_set_stroke_width(self.internal, stroke_width) }
     }
 }
 

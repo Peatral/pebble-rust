@@ -1,9 +1,9 @@
+use crate::graphics::bitmap::{BitmapMut, BitmapRef, IBitmap, IBitmapMut};
 use crate::graphics::context::Context;
+use crate::graphics::types::{Point, Rect};
 use core::ffi::c_int;
 use core::ops::{Deref, DerefMut};
 use pebble_sys::{GBitmapFormat, GCornerMask, GOvalScaleMode};
-use crate::graphics::bitmap::{BitmapMut, BitmapRef, IBitmap, IBitmapMut};
-use crate::graphics::types::{Point, Rect};
 
 /// An RAII guard that safely manages a captured frame buffer.
 /// When this goes out of scope, the frame buffer is automatically released.
@@ -39,28 +39,44 @@ impl<'a> Drop for FrameBufferGuard<'a> {
 
 impl Context {
     pub fn draw_pixel(&self, center: Point) {
-        unsafe { pebble_sys::graphics_draw_pixel(self.as_ptr(), center.0); }
+        unsafe {
+            pebble_sys::graphics_draw_pixel(self.as_ptr(), center.0);
+        }
     }
     pub fn draw_line(&self, p0: Point, p1: Point) {
-        unsafe { pebble_sys::graphics_draw_line(self.as_ptr(), p0.0, p1.0); }
+        unsafe {
+            pebble_sys::graphics_draw_line(self.as_ptr(), p0.0, p1.0);
+        }
     }
     pub fn draw_rect(&self, rect: Rect) {
-        unsafe { pebble_sys::graphics_draw_rect(self.as_ptr(), rect.0); }
+        unsafe {
+            pebble_sys::graphics_draw_rect(self.as_ptr(), rect.0);
+        }
     }
     pub fn fill_rect(&self, rect: Rect, corner_radius: u16, corner_mask: GCornerMask) {
-        unsafe { pebble_sys::graphics_fill_rect(self.as_ptr(), rect.0, corner_radius, corner_mask); }
+        unsafe {
+            pebble_sys::graphics_fill_rect(self.as_ptr(), rect.0, corner_radius, corner_mask);
+        }
     }
     pub fn draw_circle(&self, center: Point, radius: u16) {
-        unsafe { pebble_sys::graphics_draw_circle(self.as_ptr(), center.0, radius); }
+        unsafe {
+            pebble_sys::graphics_draw_circle(self.as_ptr(), center.0, radius);
+        }
     }
     pub fn fill_circle(&self, center: Point, radius: u16) {
-        unsafe { pebble_sys::graphics_fill_circle(self.as_ptr(), center.0, radius); }
+        unsafe {
+            pebble_sys::graphics_fill_circle(self.as_ptr(), center.0, radius);
+        }
     }
     pub fn draw_round_rect(&self, rect: Rect, radius: u16) {
-        unsafe { pebble_sys::graphics_draw_round_rect(self.as_ptr(), rect.0, radius); }
+        unsafe {
+            pebble_sys::graphics_draw_round_rect(self.as_ptr(), rect.0, radius);
+        }
     }
     pub fn draw_bitmap_in_rect(&self, bitmap: BitmapRef, rect: Rect) {
-        unsafe { pebble_sys::graphics_draw_bitmap_in_rect(self.as_ptr(), bitmap.as_ptr(), rect.0); }
+        unsafe {
+            pebble_sys::graphics_draw_bitmap_in_rect(self.as_ptr(), bitmap.as_ptr(), rect.0);
+        }
     }
 
     /// Captures the frame buffer safely.
@@ -81,7 +97,10 @@ impl Context {
     }
 
     /// Captures the frame buffer with a specific format safely.
-    pub fn capture_frame_buffer_format(&mut self, format: GBitmapFormat) -> Option<FrameBufferGuard<'_>> {
+    pub fn capture_frame_buffer_format(
+        &mut self,
+        format: GBitmapFormat,
+    ) -> Option<FrameBufferGuard<'_>> {
         unsafe {
             let ptr = pebble_sys::graphics_capture_frame_buffer_format(self.as_ptr(), format);
             if ptr.is_null() {
@@ -96,9 +115,7 @@ impl Context {
     }
 
     pub fn frame_buffer_is_captured(&self) -> bool {
-        unsafe {
-            pebble_sys::graphics_frame_buffer_is_captured(self.as_ptr())
-        }
+        unsafe { pebble_sys::graphics_frame_buffer_is_captured(self.as_ptr()) }
     }
 
     pub fn draw_rotated_bitmap(
@@ -109,7 +126,13 @@ impl Context {
         dest_ic: Point,
     ) {
         unsafe {
-            pebble_sys::graphics_draw_rotated_bitmap(self.as_ptr(), src.as_mut_ptr(), src_ic.0, rotation, dest_ic.0);
+            pebble_sys::graphics_draw_rotated_bitmap(
+                self.as_ptr(),
+                src.as_mut_ptr(),
+                src_ic.0,
+                rotation,
+                dest_ic.0,
+            );
         }
     }
     pub fn draw_arc(
@@ -119,7 +142,15 @@ impl Context {
         angle_start: i32,
         angle_end: i32,
     ) {
-        unsafe { pebble_sys::graphics_draw_arc(self.as_ptr(), rect.0, scale_mode, angle_start, angle_end); }
+        unsafe {
+            pebble_sys::graphics_draw_arc(
+                self.as_ptr(),
+                rect.0,
+                scale_mode,
+                angle_start,
+                angle_end,
+            );
+        }
     }
     pub fn fill_radial(
         &self,

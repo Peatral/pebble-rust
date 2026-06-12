@@ -1,7 +1,7 @@
-use crate::layer::{ILayer, ILayerMut};
-use pebble_sys::GCompOp;
 use crate::graphics::bitmap::{BitmapMut, IBitmapMut};
 use crate::graphics::types::Rect;
+use crate::layer::{ILayer, ILayerMut};
+use pebble_sys::GCompOp;
 
 #[repr(transparent)]
 pub struct BitmapLayer {

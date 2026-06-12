@@ -22,9 +22,7 @@ pub struct Allocator;
 
 unsafe impl GlobalAlloc for Allocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        unsafe {
-            pebble_sys::malloc(layout.size() as u32) as *mut u8
-        }
+        unsafe { pebble_sys::malloc(layout.size() as u32) as *mut u8 }
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
@@ -34,8 +32,6 @@ unsafe impl GlobalAlloc for Allocator {
     }
 
     unsafe fn realloc(&self, ptr: *mut u8, _layout: Layout, new_size: usize) -> *mut u8 {
-        unsafe {
-            pebble_sys::realloc(ptr as *mut core::ffi::c_void, new_size as u32) as *mut u8
-        }
+        unsafe { pebble_sys::realloc(ptr as *mut core::ffi::c_void, new_size as u32) as *mut u8 }
     }
 }

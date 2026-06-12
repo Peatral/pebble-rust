@@ -1,7 +1,7 @@
+use crate::graphics::bitmap::{BitmapMut, IBitmapMut};
 use crate::graphics::context::Context;
 use crate::layer::ILayer;
 use core::ffi::CStr;
-use crate::graphics::bitmap::{BitmapMut, IBitmapMut};
 
 /// A safe wrapper representing a single menu cell layer during a draw callback.
 #[repr(transparent)]
@@ -12,13 +12,7 @@ pub struct MenuCellLayer {
 
 impl MenuCellLayer {
     /// Draws a basic section cell with a title, subtitle, and optional icon.
-    pub fn draw_basic(
-        &self,
-        ctx: Context,
-        title: &CStr,
-        subtitle: &CStr,
-        icon: BitmapMut,
-    ) {
+    pub fn draw_basic(&self, ctx: Context, title: &CStr, subtitle: &CStr, icon: BitmapMut) {
         unsafe {
             pebble_sys::menu_cell_basic_draw(
                 ctx.as_ptr(),

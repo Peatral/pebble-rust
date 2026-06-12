@@ -23,13 +23,13 @@ pub mod menu_layer;
 pub mod status_bar_layer;
 pub mod text_layer;
 
+use crate::graphics::types::{Point, Rect};
 pub use action_bar_layer::ActionBarLayer;
 pub use bitmap_layer::BitmapLayer;
 pub use canvas_layer::CanvasLayer;
 pub use menu_layer::{MenuCellLayer, MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
 pub use status_bar_layer::StatusBarLayer;
 pub use text_layer::TextLayer;
-use crate::graphics::types::{Point, Rect};
 
 pub trait ILayer {
     fn as_ptr(&self) -> *const pebble_sys::Layer;
@@ -43,11 +43,21 @@ pub trait ILayer {
     }
 
     fn convert_point_to_screen(&self, point: Point) -> Point {
-        unsafe { Point(pebble_sys::layer_convert_point_to_screen(self.as_ptr(), point.0)) }
+        unsafe {
+            Point(pebble_sys::layer_convert_point_to_screen(
+                self.as_ptr(),
+                point.0,
+            ))
+        }
     }
 
     fn convert_rect_to_screen(&self, rect: Rect) -> Rect {
-        unsafe { Rect(pebble_sys::layer_convert_rect_to_screen(self.as_ptr(), rect.0)) }
+        unsafe {
+            Rect(pebble_sys::layer_convert_rect_to_screen(
+                self.as_ptr(),
+                rect.0,
+            ))
+        }
     }
 
     fn get_frame(&self) -> Rect {

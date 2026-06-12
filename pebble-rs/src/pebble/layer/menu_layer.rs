@@ -8,10 +8,10 @@ use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 
+use crate::graphics::types::Rect;
 pub use menu_cell_layer::MenuCellLayer;
 pub use menu_index::MenuIndexRef;
 use pebble_sys::Layer;
-use crate::graphics::types::Rect;
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
@@ -138,12 +138,7 @@ pub trait MenuLayerDelegate {
     }
     fn draw_row(&self, ctx: Context, cell_layer: MenuCellLayer, cell_index: MenuIndexRef);
     fn draw_header(&self, _ctx: Context, _cell_layer: MenuCellLayer, _section_index: u16) {}
-    fn draw_separator(
-        &self,
-        _ctx: Context,
-        _cell_layer: MenuCellLayer,
-        _cell_index: MenuIndexRef,
-    ) {
+    fn draw_separator(&self, _ctx: Context, _cell_layer: MenuCellLayer, _cell_index: MenuIndexRef) {
     }
     fn draw_background(&self, _ctx: Context, _bg_layer: LayerRef, _highlight: bool) {}
     fn select_click(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) {}

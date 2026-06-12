@@ -1,9 +1,9 @@
 use crate::graphics::context::Context;
+use crate::graphics::types::Rect;
 use crate::layer::{ILayer, ILayerMut, Layer, LayerMut};
 use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
-use crate::graphics::types::Rect;
 
 type DrawCallback = dyn Fn(LayerMut, Context);
 
@@ -34,9 +34,8 @@ impl CanvasLayer {
 
         unsafe {
             let internal = pebble_sys::layer_create_with_data(bounds.0, size_of::<*const c_void>());
-            
-            let data_ptr =
-                pebble_sys::layer_get_data(internal as *const _) as *mut *const c_void;
+
+            let data_ptr = pebble_sys::layer_get_data(internal as *const _) as *mut *const c_void;
             *data_ptr = &*callback as *const Box<DrawCallback> as *const c_void;
 
             pebble_sys::layer_set_update_proc(internal, Some(trampoline_update_proc));

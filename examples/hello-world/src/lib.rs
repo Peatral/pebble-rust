@@ -1,4 +1,4 @@
-#![crate_type="staticlib"]
+#![crate_type = "staticlib"]
 #![no_std]
 #![no_builtins]
 
@@ -6,10 +6,10 @@
 extern crate pebble_rs as pebble;
 
 use core::cell::RefCell;
-use pebble::{app, window_stack};
 use pebble::graphics::types::{Point, Rect, Size};
-use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::layer::{ILayer, ILayerMut, TextLayer};
+use pebble::window::{Window, WindowDelegate, WindowRef};
+use pebble::{app, window_stack};
 use pebble_sys::GTextAlignment;
 
 include_message_keys!();
@@ -28,11 +28,15 @@ impl WindowDelegate for HelloDelegate {
 
         let text_bounds = Rect::new(
             Point::new(0, window_height / 2 - 20),
-            Size::new(window_width, 40)
+            Size::new(window_width, 40),
         );
 
         // We can print whatever we want.
-        pbl_log!(c"This works like a %s, I can print numbers like %d", c"printf".as_ptr(), 25);
+        pbl_log!(
+            c"This works like a %s, I can print numbers like %d",
+            c"printf".as_ptr(),
+            25
+        );
 
         // Or we can use other logging levels.
         pbl_warn!(c"This is a warning.");
@@ -41,7 +45,9 @@ impl WindowDelegate for HelloDelegate {
         let mut text = TextLayer::new(text_bounds);
 
         text.set_text_static(c"Hello from Rust!");
-        text.set_font(pebble::system::fonts::Font::get_system(c"RESOURCE_ID_ROBOTO_CONDENSED_21"));
+        text.set_font(pebble::system::fonts::Font::get_system(
+            c"RESOURCE_ID_ROBOTO_CONDENSED_21",
+        ));
         text.set_text_alignment(GTextAlignment::GTextAlignmentCenter);
 
         root.add_child(&text);
@@ -49,8 +55,7 @@ impl WindowDelegate for HelloDelegate {
         *self.text_layer.borrow_mut() = Some(text);
     }
 
-    fn unload(&self, window: WindowRef) {
-    }
+    fn unload(&self, window: WindowRef) {}
 }
 
 #[unsafe(no_mangle)]
