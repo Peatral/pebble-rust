@@ -96,7 +96,7 @@ pub struct ScrollLayerRef {
 
 impl ScrollLayerRef {
     /// Adds a child layer to the scrollable content sub-layer.
-    pub fn add_child(&self, child: &dyn ILayerMut) {
+    pub fn add_scroll_child(&self, child: &dyn ILayerMut) {
         unsafe {
             pebble_sys::scroll_layer_add_child(self.internal, child.as_mut_ptr());
         }
