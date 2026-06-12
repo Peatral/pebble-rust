@@ -58,21 +58,13 @@ impl MenuLayerRef {
         unsafe { pebble_sys::menu_layer_get_selected_index(self.internal) }
     }
 
-    pub fn set_normal_colors(
-        &self,
-        background: Color,
-        foreground: Color,
-    ) {
+    pub fn set_normal_colors(&self, background: Color, foreground: Color) {
         unsafe {
             pebble_sys::menu_layer_set_normal_colors(self.internal, background.0, foreground.0);
         }
     }
 
-    pub fn set_highlight_colors(
-        &self,
-        background: Color,
-        foreground: Color,
-    ) {
+    pub fn set_highlight_colors(&self, background: Color, foreground: Color) {
         unsafe {
             pebble_sys::menu_layer_set_highlight_colors(self.internal, background.0, foreground.0);
         }

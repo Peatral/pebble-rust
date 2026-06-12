@@ -5,6 +5,7 @@ pub struct MenuIndexRef {
 }
 
 impl MenuIndexRef {
+    #[inline(always)]
     pub fn as_ptr(&self) -> *mut pebble_sys::MenuIndex {
         self.internal
     }

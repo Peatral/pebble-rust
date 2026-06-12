@@ -31,6 +31,7 @@ pub struct WindowRef {
 }
 
 impl WindowRef {
+    #[inline(always)]
     pub fn as_ptr(&self) -> *mut pebble_sys::Window {
         self.internal
     }
