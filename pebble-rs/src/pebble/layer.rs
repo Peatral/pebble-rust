@@ -20,14 +20,18 @@ pub mod action_bar_layer;
 pub mod bitmap_layer;
 pub mod canvas_layer;
 pub mod menu_layer;
+mod scroll_layer;
 pub mod status_bar_layer;
 pub mod text_layer;
 
 use crate::graphics::types::{Point, Rect};
-pub use action_bar_layer::ActionBarLayer;
+pub use action_bar_layer::{ActionBarLayer, ActionBarLayerRef};
 pub use bitmap_layer::BitmapLayer;
 pub use canvas_layer::CanvasLayer;
 pub use menu_layer::{MenuCellLayer, MenuIndexRef, MenuLayer, MenuLayerDelegate, MenuLayerRef};
+pub use scroll_layer::{
+    ContentIndicator, ContentIndicatorRef, ScrollDelegate, ScrollLayer, ScrollLayerRef,
+};
 pub use status_bar_layer::StatusBarLayer;
 pub use text_layer::TextLayer;
 

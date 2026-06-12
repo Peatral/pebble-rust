@@ -8,6 +8,13 @@ pub struct ClickRecognizer {
     internal: pebble_sys::ClickRecognizerRef,
 }
 
+impl ClickRecognizer {
+    #[inline(always)]
+    pub fn as_ptr(&self) -> pebble_sys::ClickRecognizerRef {
+        self.internal
+    }
+}
+
 impl From<pebble_sys::ClickRecognizerRef> for ClickRecognizer {
     fn from(internal: pebble_sys::ClickRecognizerRef) -> Self {
         Self { internal }
