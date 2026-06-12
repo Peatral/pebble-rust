@@ -36,7 +36,6 @@ pub mod wakeup;
 pub mod window;
 pub mod window_stack;
 
-use crate::pebble;
 pub use internal::alloc;
 
 pub type Result<T> = core::result::Result<T, &'static str>;
@@ -93,7 +92,7 @@ pub static __exidx_end: u32 = 0;
 macro_rules! pbl_print {
     ($lvl: expr, $name: expr, $fmt: expr $(, $arg:expr)*) => {
         unsafe {
-            pebble::println($lvl, $name.as_ptr(), 0, $fmt.as_ptr() $(, $arg)*);
+            pebble_sys::app_log($lvl, $name.as_ptr(), 0, $fmt.as_ptr() $(, $arg)*);
         }
     };
 }
