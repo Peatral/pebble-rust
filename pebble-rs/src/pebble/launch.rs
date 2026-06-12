@@ -2,7 +2,7 @@ use pebble_sys::AppLaunchReason;
 
 /// Provides the method used to launch the current application.
 pub fn get_reason() -> AppLaunchReason {
-    AppLaunchReason::from(unsafe { pebble_sys::launch_reason() })
+    unsafe { pebble_sys::launch_reason() }
 }
 
 /// Gets the argument passed to the app when it was launched.
