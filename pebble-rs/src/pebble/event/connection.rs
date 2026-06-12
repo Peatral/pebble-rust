@@ -15,40 +15,58 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use crate::pebble::event::Event;
+use crate::types::GlobalCell;
 use pebble_sys::ConnectionHandlers;
 
-pub struct ConnectionEvent;
+static APP_HANDLER: GlobalCell<Option<fn(bool)>> = GlobalCell::new(None);
+static KIT_HANDLER: GlobalCell<Option<fn(bool)>> = GlobalCell::new(None);
 
-impl ConnectionEvent {
-    pub fn peek_app() -> Result<bool, i32> {
-        unsafe { Ok(pebble_sys::connection_service_peek_pebble_app_connection()) }
-    }
-
-    pub fn peek_pebblekit() -> Result<bool, i32> {
-        unsafe { Ok(pebble_sys::connection_service_peek_pebblekit_connection()) }
-    }
-
-    pub fn subscribe(handlers: ConnectionHandlers) {
-        unsafe {
-            pebble_sys::connection_service_subscribe(handlers);
-        }
+extern "C" fn app_trampoline(connected: bool) {
+    if let Some(cb) = APP_HANDLER.get() {
+        cb(connected);
     }
 }
 
-impl Event<bool> for ConnectionEvent {
-    /// Do **NOT** use this. Use ConnectionEvent#subscribe instead.
-    fn subscribe(_handler: extern "C" fn(bool)) {
-        unimplemented!()
+extern "C" fn kit_trampoline(connected: bool) {
+    if let Some(cb) = KIT_HANDLER.get() {
+        cb(connected);
     }
+}
 
-    fn unsubscribe() {
-        unsafe {
-            pebble_sys::connection_service_unsubscribe();
-        }
-    }
+pub fn subscribe(app_handler: Option<fn(bool)>, kit_handler: Option<fn(bool)>) {
+    APP_HANDLER.set(app_handler);
+    KIT_HANDLER.set(kit_handler);
 
-    fn peek() -> Result<bool, i32> {
-        ConnectionEvent::peek_app()
+    let handlers = ConnectionHandlers {
+        pebble_app_connection_handler: if app_handler.is_some() {
+            Some(app_trampoline)
+        } else {
+            None
+        },
+        pebblekit_connection_handler: if kit_handler.is_some() {
+            Some(kit_trampoline)
+        } else {
+            None
+        },
+    };
+
+    unsafe {
+        pebble_sys::connection_service_subscribe(handlers);
     }
+}
+
+pub fn unsubscribe() {
+    unsafe {
+        pebble_sys::connection_service_unsubscribe();
+    }
+    APP_HANDLER.set(None);
+    KIT_HANDLER.set(None);
+}
+
+pub fn peek_app() -> bool {
+    unsafe { pebble_sys::connection_service_peek_pebble_app_connection() }
+}
+
+pub fn peek_pebblekit() -> bool {
+    unsafe { pebble_sys::connection_service_peek_pebblekit_connection() }
 }

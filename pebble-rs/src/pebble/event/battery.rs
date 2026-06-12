@@ -15,25 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use crate::pebble::event::Event;
+use crate::types::GlobalCell;
 use pebble_sys::BatteryChargeState;
+static USER_HANDLER: GlobalCell<Option<fn(BatteryChargeState)>> = GlobalCell::new(None);
 
-pub struct BatteryStateEvent;
-
-impl Event<BatteryChargeState> for BatteryStateEvent {
-    fn subscribe(handler: extern "C" fn(state: BatteryChargeState)) {
-        unsafe {
-            pebble_sys::battery_state_service_subscribe(Some(handler));
-        }
+extern "C" fn trampoline(state: BatteryChargeState) {
+    if let Some(cb) = USER_HANDLER.get() {
+        cb(state);
     }
+}
 
-    fn unsubscribe() {
-        unsafe {
-            pebble_sys::battery_state_service_unsubscribe();
-        }
+pub fn subscribe(handler: fn(BatteryChargeState)) {
+    USER_HANDLER.set(Some(handler));
+    unsafe {
+        pebble_sys::battery_state_service_subscribe(Some(trampoline));
     }
+}
 
-    fn peek() -> Result<BatteryChargeState, i32> {
-        unsafe { Ok(pebble_sys::battery_state_service_peek()) }
+pub fn unsubscribe() {
+    unsafe {
+        pebble_sys::battery_state_service_unsubscribe();
     }
+    USER_HANDLER.set(None);
+}
+
+pub fn peek() -> BatteryChargeState {
+    unsafe { pebble_sys::battery_state_service_peek() }
 }
