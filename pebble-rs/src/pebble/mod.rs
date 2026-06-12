@@ -47,8 +47,15 @@ pub use pebble_sys::snprintf;
 #[cfg(not(test))]
 #[inline(never)]
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    crate::pbl_err!(c"FATAL RUST PANIC! Forcing App Fault...");
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    if let Some(location) = info.location() {
+        let file = location.file();
+        let line = location.line();
+
+        crate::pbl_err!(c"FATAL PANIC at {}:{}! Forcing App Fault...", file, line);
+    } else {
+        crate::pbl_err!(c"FATAL PANIC! (Unknown location). Forcing App Fault...");
+    }
 
     unsafe {
         let crash: *mut u32 = core::ptr::null_mut();
