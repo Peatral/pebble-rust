@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use crate::graphics::types::Color;
 use crate::layer::LayerMut;
 use alloc::boxed::Box;
 use core::ffi::c_void;
@@ -34,9 +35,9 @@ impl WindowRef {
         self.internal
     }
 
-    pub fn set_background_color(&self, color: pebble_sys::GColor) {
+    pub fn set_background_color(&self, color: Color) {
         unsafe {
-            pebble_sys::window_set_background_color(self.internal, color);
+            pebble_sys::window_set_background_color(self.internal, color.0);
         }
     }
 

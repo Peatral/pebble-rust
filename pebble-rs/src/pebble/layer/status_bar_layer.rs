@@ -1,5 +1,6 @@
+use crate::graphics::types::Color;
 use crate::layer::{ILayer, ILayerMut};
-use pebble_sys::{GColor, Layer, StatusBarLayerSeparatorMode};
+use pebble_sys::{Layer, StatusBarLayerSeparatorMode};
 
 /// A layer that serves as a configurable status bar.
 #[repr(transparent)]
@@ -19,19 +20,19 @@ impl StatusBarLayer {
     }
 
     /// Gets background color of StatusBarLayer.
-    pub fn get_background_color(&self) -> GColor {
-        unsafe { pebble_sys::status_bar_layer_get_background_color(self.internal) }
+    pub fn get_background_color(&self) -> Color {
+        Color(unsafe { pebble_sys::status_bar_layer_get_background_color(self.internal) })
     }
 
     /// Gets foreground color of StatusBarLayer.
-    pub fn get_foreground_color(&self) -> GColor {
-        unsafe { pebble_sys::status_bar_layer_get_foreground_color(self.internal) }
+    pub fn get_foreground_color(&self) -> Color {
+        Color(unsafe { pebble_sys::status_bar_layer_get_foreground_color(self.internal) })
     }
 
     /// Sets the background and foreground colors of StatusBarLayer.
-    pub fn set_colors(&self, background: GColor, foreground: GColor) {
+    pub fn set_colors(&self, background: Color, foreground: Color) {
         unsafe {
-            pebble_sys::status_bar_layer_set_colors(self.internal, background, foreground);
+            pebble_sys::status_bar_layer_set_colors(self.internal, background.0, foreground.0);
         }
     }
 

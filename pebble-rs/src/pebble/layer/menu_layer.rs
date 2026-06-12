@@ -8,7 +8,7 @@ use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 
-use crate::graphics::types::Rect;
+use crate::graphics::types::{Color, Rect};
 pub use menu_cell_layer::MenuCellLayer;
 pub use menu_index::MenuIndexRef;
 use pebble_sys::Layer;
@@ -60,21 +60,21 @@ impl MenuLayerRef {
 
     pub fn set_normal_colors(
         &self,
-        background: pebble_sys::GColor,
-        foreground: pebble_sys::GColor,
+        background: Color,
+        foreground: Color,
     ) {
         unsafe {
-            pebble_sys::menu_layer_set_normal_colors(self.internal, background, foreground);
+            pebble_sys::menu_layer_set_normal_colors(self.internal, background.0, foreground.0);
         }
     }
 
     pub fn set_highlight_colors(
         &self,
-        background: pebble_sys::GColor,
-        foreground: pebble_sys::GColor,
+        background: Color,
+        foreground: Color,
     ) {
         unsafe {
-            pebble_sys::menu_layer_set_highlight_colors(self.internal, background, foreground);
+            pebble_sys::menu_layer_set_highlight_colors(self.internal, background.0, foreground.0);
         }
     }
 
