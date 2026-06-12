@@ -2,11 +2,11 @@ use alloc::boxed::Box;
 use core::ffi::c_void;
 use core::ops::{Deref, DerefMut};
 
-use crate::graphics::types::{Point, Rect};
+use crate::graphics::types::{Point, Rect, Size};
 use crate::layer::{ILayer, ILayerMut};
 use crate::pebble::clicks::{ClickDelegate, ClickRecognizer, trampoline_click_config_provider};
 use crate::pebble::window::WindowRef;
-use pebble_sys::{ContentIndicatorConfig, ContentIndicatorDirection, GSize, Layer};
+use pebble_sys::{ContentIndicatorConfig, ContentIndicatorDirection, Layer};
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
@@ -71,9 +71,8 @@ impl Drop for ContentIndicator {
     }
 }
 
-/// A delegate specifically for ScrollLayers. It inherits ClickDelegate
-/// to allow configuring the SELECT button and overriding UP/DOWN safely.
-pub trait ScrollDelegate: ClickDelegate {
+/// A delegate specifically for ScrollLayers.
+pub trait ScrollDelegate: Sized {
     fn content_offset_changed(&self, _scroll_layer: ScrollLayerRef) {}
 }
 
@@ -120,14 +119,14 @@ impl ScrollLayerRef {
         unsafe { Point(pebble_sys::scroll_layer_get_content_offset(self.internal)) }
     }
 
-    pub fn set_content_size(&self, size: GSize) {
+    pub fn set_content_size(&self, size: Size) {
         unsafe {
-            pebble_sys::scroll_layer_set_content_size(self.internal, size);
+            pebble_sys::scroll_layer_set_content_size(self.internal, size.0);
         }
     }
 
-    pub fn get_content_size(&self) -> GSize {
-        unsafe { pebble_sys::scroll_layer_get_content_size(self.internal) }
+    pub fn get_content_size(&self) -> Size {
+        unsafe { Size(pebble_sys::scroll_layer_get_content_size(self.internal)) }
     }
 
     pub fn set_frame(&self, frame: Rect) {
@@ -213,7 +212,6 @@ pub struct ScrollLayer<T: ScrollDelegate> {
 }
 
 impl<T: ScrollDelegate> ScrollLayer<T> {
-    /// Creates a new ScrollLayer and securely pins its delegate to the heap.
     pub fn new(frame: Rect, delegate: T) -> Self {
         unsafe {
             let internal = pebble_sys::scroll_layer_create(frame.0);
@@ -227,13 +225,42 @@ impl<T: ScrollDelegate> ScrollLayer<T> {
             pebble_sys::scroll_layer_set_context(internal, context_ptr);
 
             let callbacks = pebble_sys::ScrollLayerCallbacks {
-                click_config_provider: Some(trampoline_click_config_provider::<T>),
+                click_config_provider: None,
                 content_offset_changed_handler: Some(trampoline_content_offset_changed::<T>),
             };
 
             pebble_sys::scroll_layer_set_callbacks(internal, callbacks);
 
             layer
+        }
+    }
+}
+
+impl<T: ScrollDelegate + ClickDelegate> ScrollLayer<T> {
+
+    /// Overrides the ScrollLayer's internal callbacks to include your ClickDelegate.
+    /// This allows you to safely capture the SELECT button or override UP/DOWN.
+    pub fn enable_clicks_override(&self) {
+        unsafe {
+            let callbacks = pebble_sys::ScrollLayerCallbacks {
+                click_config_provider: Some(trampoline_click_config_provider::<T>),
+                content_offset_changed_handler: Some(trampoline_content_offset_changed::<T>),
+            };
+
+            pebble_sys::scroll_layer_set_callbacks(self.layer_ref.internal, callbacks);
+        }
+    }
+
+    /// Removes your custom ClickDelegate from the ScrollLayer,
+    /// reverting it entirely to the default Up/Down scrolling behavior.
+    pub fn disable_clicks_override(&self) {
+        unsafe {
+            let callbacks = pebble_sys::ScrollLayerCallbacks {
+                click_config_provider: None,
+                content_offset_changed_handler: Some(trampoline_content_offset_changed::<T>),
+            };
+
+            pebble_sys::scroll_layer_set_callbacks(self.layer_ref.internal, callbacks);
         }
     }
 }
