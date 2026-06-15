@@ -16,7 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-pub mod format;
 pub mod locale;
 pub mod math;
 pub mod string;

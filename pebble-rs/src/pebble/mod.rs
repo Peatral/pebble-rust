@@ -147,3 +147,23 @@ macro_rules! include_message_keys {
         $crate::include_generated!(message_keys, "message_keys.rs");
     };
 }
+
+#[macro_export]
+macro_rules! pbl_fmt {
+    (let $name:ident = size: $buf_size:expr, $fmt:expr, $($arg:expr),+ $(,)?) => {
+        let mut _buf = [0u8; $buf_size];
+        unsafe {
+            pebble_sys::snprintf(
+                _buf.as_mut_ptr() as *mut ::core::ffi::c_char,
+                _buf.len() as u32,
+                $fmt.as_ptr(),
+                $($arg),+
+            );
+        }
+        let $name = ::core::ffi::CStr::from_bytes_until_nul(&_buf).unwrap_or(c"");
+    };
+
+    (let $name:ident = $fmt:expr, $($arg:expr),+ $(,)?) => {
+        $crate::pbl_fmt!(let $name = size: 64, $fmt, $($arg),+)
+    };
+}
