@@ -123,7 +123,7 @@ pub trait MenuLayerDelegate {
         44
     }
     fn get_header_height(&self, _menu_layer: MenuLayerRef, _section_index: u16) -> i16 {
-        0
+        16
     }
     fn get_separator_height(&self, _menu_layer: MenuLayerRef, _cell_index: MenuIndexRef) -> i16 {
         0
