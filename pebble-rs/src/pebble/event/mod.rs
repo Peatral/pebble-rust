@@ -18,4 +18,5 @@
 
 pub mod battery;
 pub mod connection;
+pub mod tick_timer;
 pub mod touch;
