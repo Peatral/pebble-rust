@@ -32,3 +32,7 @@ pub fn get_local_time(now: time_t) -> tm {
 pub fn get_utc_time(now: time_t) -> tm {
     unsafe { *pebble_sys::gmtime(&now) }
 }
+
+pub fn start_of_today() -> time_t {
+    unsafe { pebble_sys::time_start_of_today() }
+}
