@@ -51,7 +51,7 @@ fn main() {
 
         println!("cargo:rerun-if-changed={}", pebble_h.display());
 
-        let bindings = bindgen::Builder::default()
+        let mut builder = bindgen::Builder::default()
             .header_contents(
                 &format!("{}_wrapper.h", platform),
                 &format!(
@@ -69,7 +69,13 @@ fn main() {
             .clang_arg("-Wno-macro-redefined")
             .clang_arg("-D_TIME_H_")
             .rustified_enum(".*")
-            .newtype_enum("StatusCode|AppMessageResult|DictionaryResult")
+            .newtype_enum("StatusCode|AppMessageResult|DictionaryResult");
+
+        if std::path::Path::new("/usr/include/newlib").exists() {
+            builder = builder.clang_arg("-I/usr/include/newlib");
+        }
+
+        let bindings = builder
             .generate()
             .unwrap_or_else(|_| panic!("Unable to generate bindings for {}", platform));
 
