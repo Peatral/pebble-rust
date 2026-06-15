@@ -237,7 +237,6 @@ impl<T: ScrollDelegate> ScrollLayer<T> {
 }
 
 impl<T: ScrollDelegate + ClickDelegate> ScrollLayer<T> {
-
     /// Overrides the ScrollLayer's internal callbacks to include your ClickDelegate.
     /// This allows you to safely capture the SELECT button or override UP/DOWN.
     pub fn enable_clicks_override(&self) {
