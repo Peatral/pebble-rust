@@ -1,7 +1,6 @@
 use crate::types::GlobalCell;
 use pebble_sys::{StatusCode, WakeupId, time_t};
 
-// Since Pebble lacks a context pointer for Wakeups, we use a static variable to hold the user's Rust callback.
 static GLOBAL_WAKEUP_HANDLER: GlobalCell<Option<fn(WakeupId, i32)>> = GlobalCell::new(None);
 
 /// The C trampoline that routes the event to the user's Rust function.
@@ -17,6 +16,14 @@ pub fn subscribe(handler: fn(WakeupId, i32)) {
     unsafe {
         pebble_sys::wakeup_service_subscribe(Some(wakeup_trampoline));
     }
+}
+
+/// Unsubscribes from the wakeup service, preventing the callback from firing.
+pub fn unsubscribe() {
+    unsafe {
+        pebble_sys::wakeup_service_subscribe(None);
+    }
+    GLOBAL_WAKEUP_HANDLER.set(None);
 }
 
 /// Registers a wakeup event that triggers at the specified time.
