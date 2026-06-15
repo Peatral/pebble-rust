@@ -95,6 +95,10 @@ impl<T: WindowDelegate> Window<T> {
             window
         }
     }
+
+    pub fn delegate(&self) -> &T {
+        &self.delegate
+    }
 }
 
 impl<T: WindowDelegate + ClickDelegate> Window<T> {
