@@ -48,10 +48,7 @@ pub use pebble_sys::snprintf;
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     if let Some(location) = info.location() {
-        let file = location.file();
-        let line = location.line();
-
-        crate::pbl_err!(c"FATAL PANIC at {}:{}! Forcing App Fault...", file, line);
+        crate::pbl_err!(c"FATAL PANIC at {}:{}! Forcing App Fault...", location.file(), location.line());
     } else {
         crate::pbl_err!(c"FATAL PANIC! (Unknown location). Forcing App Fault...");
     }
@@ -115,20 +112,6 @@ macro_rules! pbl_warn {
 macro_rules! pbl_err {
     ($fmt: expr $(, $arg: expr)*) => {
         $crate::pbl_print!(1, c"pebble-rs (Error)", $fmt $(, $arg)*);
-    };
-}
-
-#[macro_export]
-macro_rules! null_term {
-    ($content: tt) => {
-        concat!($content, "\0");
-    };
-}
-
-#[macro_export]
-macro_rules! nt {
-    ($content: tt) => {
-        null_term!($content);
     };
 }
 
