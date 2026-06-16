@@ -136,6 +136,13 @@ macro_rules! include_message_keys {
 }
 
 #[macro_export]
+macro_rules! include_resource_ids {
+    () => {
+        $crate::include_generated!(resources, "resource_ids.rs");
+    };
+}
+
+#[macro_export]
 macro_rules! pbl_fmt {
     (let $name:ident = size: $buf_size:expr, $fmt:expr, $($arg:expr),+ $(,)?) => {
         let mut _buf = [0u8; $buf_size];
