@@ -12,13 +12,21 @@ pub struct MenuCellLayer {
 
 impl MenuCellLayer {
     /// Draws a basic section cell with a title, subtitle, and optional icon.
-    pub fn draw_basic(&self, ctx: Context, title: &CStr, subtitle: &CStr, icon: Option<BitmapMut>) {
+    pub fn draw_basic(
+        &self,
+        ctx: Context,
+        title: &CStr,
+        subtitle: Option<&CStr>,
+        icon: Option<BitmapMut>,
+    ) {
         unsafe {
             pebble_sys::menu_cell_basic_draw(
                 ctx.as_ptr(),
                 self.internal,
                 title.as_ptr(),
-                subtitle.as_ptr(),
+                subtitle
+                    .map(|b| b.as_ptr())
+                    .unwrap_or(core::ptr::null_mut()),
                 icon.map(|b| b.as_mut_ptr())
                     .unwrap_or(core::ptr::null_mut()),
             );
