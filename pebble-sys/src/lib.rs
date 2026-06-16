@@ -25,3 +25,14 @@ cfg_if::cfg_if! {
         compile_error!("You must enable at least one Pebble platform feature (e.g., 'emery', 'basalt').");
     }
 }
+
+cfg_if::cfg_if! {
+    if #[cfg(feature = "chalk")] {
+        pub const ACTION_BAR_WIDTH: i16 = 40;
+    } else if #[cfg(any(feature = "emery", feature = "gabbro"))] {
+        pub const ACTION_BAR_WIDTH: i16 = 34;
+    } else {
+        // aplite, basalt, diorite, flint
+        pub const ACTION_BAR_WIDTH: i16 = 30;
+    }
+}
