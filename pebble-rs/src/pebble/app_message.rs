@@ -241,9 +241,13 @@ impl AppMessage {
             pebble_sys::app_message_register_outbox_failed(Some(trampoline_outbox_failed));
         }
     }
+}
 
+pub struct Outbox;
+
+impl Outbox {
     /// Prepares a new dictionary for outgoing transmission.
-    pub fn outbox_begin() -> Result<Dictionary, AppMessageResult> {
+    pub fn begin() -> Result<Dictionary, AppMessageResult> {
         unsafe {
             let mut iter: *mut DictionaryIterator = core::ptr::null_mut();
             let result = pebble_sys::app_message_outbox_begin(&mut iter);
