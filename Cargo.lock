@@ -41,6 +41,7 @@ checksum = "b4388bee8683e3d04af747c73422af53102d2bd24d9eadb6cbc100baef4b43f8"
 name = "bitmap"
 version = "0.1.0"
 dependencies = [
+ "pebble-build",
  "pebble-rs",
  "pebble-sys",
 ]
@@ -93,6 +94,7 @@ checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 name = "hello-world"
 version = "0.1.0"
 dependencies = [
+ "pebble-build",
  "pebble-rs",
  "pebble-sys",
 ]
@@ -110,6 +112,7 @@ dependencies = [
 name = "js-appmessage"
 version = "0.1.0"
 dependencies = [
+ "pebble-build",
  "pebble-rs",
  "pebble-sys",
 ]
@@ -157,6 +160,10 @@ dependencies = [
  "memchr",
  "minimal-lexical",
 ]
+
+[[package]]
+name = "pebble-build"
+version = "0.1.0"
 
 [[package]]
 name = "pebble-rs"

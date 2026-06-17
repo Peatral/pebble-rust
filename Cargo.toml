@@ -2,6 +2,7 @@
 members = [
     "pebble-sys",
     "pebble-rs",
+    "pebble-build",
     "examples/*"
 ]
 resolver = "2"
