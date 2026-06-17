@@ -122,6 +122,19 @@ impl Dictionary {
             );
         }
     }
+
+    /// Adds a key with a byte array value pair to the dictionary.
+    pub fn write_data(&self, key: u32, data: &[u8]) -> Result<(), DictionaryResult> {
+        unsafe {
+            let status =
+                pebble_sys::dict_write_data(self.internal, key, data.as_ptr(), data.len() as u16);
+            if status == DictionaryResult::DICT_OK {
+                Ok(())
+            } else {
+                Err(status)
+            }
+        }
+    }
 }
 
 pub trait Integer {
