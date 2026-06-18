@@ -1,7 +1,7 @@
+use serde::Deserialize;
 use std::fs;
 use std::path::Path;
 use std::process::{Command, exit};
-use serde::Deserialize;
 
 #[derive(Deserialize)]
 struct PackageJson {
@@ -47,13 +47,13 @@ pub fn run_build() {
             .join("release")
             .join("deps");
 
-        if deps_dir.exists() {
-            if let Ok(entries) = fs::read_dir(&deps_dir) {
-                for entry in entries.flatten() {
-                    let path = entry.path();
-                    if path.is_file() && path.extension().unwrap_or_default() == "o" {
-                        fs::remove_file(path).ok();
-                    }
+        if deps_dir.exists()
+            && let Ok(entries) = fs::read_dir(&deps_dir)
+        {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file() && path.extension().unwrap_or_default() == "o" {
+                    fs::remove_file(path).ok();
                 }
             }
         }

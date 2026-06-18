@@ -2,7 +2,6 @@ mod build;
 
 use crate::build::run_build;
 use clap::{Parser, Subcommand};
-use serde::Deserialize;
 
 /// The top-level Cargo command parser
 #[derive(Parser)]
