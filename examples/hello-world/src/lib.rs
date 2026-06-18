@@ -12,8 +12,6 @@ use pebble::window::{Window, WindowDelegate, WindowRef};
 use pebble::{app, window_stack};
 use pebble_sys::GTextAlignment;
 
-include_message_keys!();
-
 struct HelloDelegate {
     text_layer: RefCell<Option<TextLayer>>,
 }

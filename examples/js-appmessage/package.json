@@ -11,7 +11,6 @@
     "resources": {
       "media": []
     },
-    "projectType": "native",
     "uuid": "19a34205-309a-47fc-8833-30fd68f685f7",
     "messageKeys": [
       "EXAMPLE"
@@ -28,7 +27,8 @@
       "basalt",
       "diorite",
       "chalk",
-      "emery"
+      "emery",
+      "gabbro"
     ],
     "capabilities": []
   },

@@ -4,14 +4,15 @@
 
 extern crate pebble_rs as pebble;
 
+use crate::resources::RESOURCE_ID_LIGHTHOUSE;
 use core::cell::RefCell;
 use pebble::graphics::bitmap::Bitmap;
 use pebble::layer::{BitmapLayer, ILayer, ILayerMut};
 use pebble::window::{Window, WindowDelegate, WindowRef};
-use pebble::{app, include_message_keys, window_stack};
+use pebble::{app, include_resource_ids, window_stack};
 use pebble_sys::GCompOp;
 
-include_message_keys!();
+include_resource_ids!();
 
 struct BitmapExampleDelegate {
     bitmap: RefCell<Option<Bitmap>>,
@@ -23,7 +24,7 @@ impl WindowDelegate for BitmapExampleDelegate {
         let root = window.get_root_layer();
         let bounds = root.get_bounds();
 
-        let bitmap = Bitmap::new(1);
+        let bitmap = Bitmap::new(RESOURCE_ID_LIGHTHOUSE);
 
         let bitmap_layer = BitmapLayer::new(bounds);
         bitmap_layer.set_bitmap(bitmap.as_mut());
