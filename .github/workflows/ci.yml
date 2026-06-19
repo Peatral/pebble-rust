@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-2.0-0 libglib2.0-0 libpixman-1-0 zlib1g libsndio7.0 clang libclang-dev
+
+      - name: Install uv and pebble-tool
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          $HOME/.local/bin/uv tool install pebble-tool
+
+      - name: Install Pebble SDK
+        run: |
+          $HOME/.local/bin/pebble sdk install latest
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7m-none-eabi
+          components: clippy, rustfmt
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Cargo Check Workspace (Host crates)
+        run: |
+          cargo check -p pebble-build -p pebble-cli
+
+      - name: Cargo Check Watch Apps
+        run: |
+          cargo check --manifest-path examples/hello-world/Cargo.toml --target thumbv7m-none-eabi
+          cargo check --manifest-path examples/bitmap/Cargo.toml --target thumbv7m-none-eabi
+          cargo check --manifest-path examples/js-appmessage/Cargo.toml --target thumbv7m-none-eabi

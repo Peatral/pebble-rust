@@ -15,9 +15,6 @@ include = [
     "Cargo.toml",
 ]
 
-[badges]
-travis-ci = { repository = "Peatral/pebble-rust", branch = "master" }
-
 [dependencies]
 cty = "0.2.2"
 pebble-sys = { path = "../pebble-sys", default-features = false }
