@@ -2,6 +2,11 @@
 name = "pebble-build"
 version = "0.1.0"
 edition = "2024"
+authors = ["Peatral <contact@peatral.xyz>"]
+description = "A helper library for build.rs to generate Rust bindings for Pebble message keys and resource IDs from package.json."
+repository = "https://github.com/Peatral/pebble-rust"
+keywords = ["pebble", "watch", "build", "rebble"]
+categories = ["embedded"]
 
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }

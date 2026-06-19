@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["RoccoDev <hey@rocco.dev>", "Peatral <contact@peatral.xyz>"]
 description = "Pebble bindings for Rust. See repository for instructions."
 documentation = "https://docs.rs/pebble-rust"
-repository = "https://github.com/pebble-rust/pebble-rust"
+repository = "https://github.com/Peatral/pebble-rust"
 readme = "README.md"
 keywords = ["pebble", "watch", "cortex", "rebble", "arm"]
 categories = ["embedded", "no-std", "hardware-support", "external-ffi-bindings"]
@@ -16,7 +16,7 @@ include = [
 ]
 
 [badges]
-travis-ci = { repository = "pebble-rust/pebble-rust", branch = "master" }
+travis-ci = { repository = "Peatral/pebble-rust", branch = "master" }
 
 [dependencies]
 cty = "0.2.2"

@@ -1,7 +1,9 @@
 [package]
 name = "pebble-sys"
 version = "0.1.0"
-authors = ["Peatral <contact@peatral.xyz"]
+authors = ["Peatral <contact@peatral.xyz>"]
+description = "Raw FFI bindings to the Pebble SDK generated automatically using bindgen."
+repository = "https://github.com/Peatral/pebble-rust"
 keywords = ["pebble", "watch", "cortex", "rebble", "arm"]
 categories = ["embedded", "no-std", "hardware-support", "external-ffi-bindings"]
 edition = "2024"

@@ -2,6 +2,11 @@
 name = "pebble-cli"
 version = "0.1.0"
 edition = "2024"
+authors = ["Peatral <contact@peatral.xyz>"]
+description = "A build orchestrator CLI tool ('cargo pebble') for Pebble Rust applications."
+repository = "https://github.com/Peatral/pebble-rust"
+keywords = ["pebble", "watch", "cli", "cargo", "rebble"]
+categories = ["development-tool::cargo-plugins"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
