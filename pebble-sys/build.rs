@@ -25,18 +25,26 @@ fn main() {
     }
 
     for platform in enabled_platforms {
-        let sdk_base = PathBuf::from(&home)
+        let local_share_sdk = PathBuf::from(&home)
+            .join(".local/share/pebble-sdk/SDKs/current/sdk-core/pebble")
+            .join(platform);
+        let legacy_sdk = PathBuf::from(&home)
             .join(".pebble-sdk/SDKs/current/sdk-core/pebble")
             .join(platform);
+
+        let sdk_base = if local_share_sdk.join("include/pebble.h").exists() {
+            local_share_sdk
+        } else {
+            legacy_sdk
+        };
 
         let include_dir = sdk_base.join("include");
         let pebble_h = include_dir.join("pebble.h");
 
         if !pebble_h.exists() {
             panic!(
-                "Could not find pebble.h for {} at {}",
-                platform,
-                pebble_h.display()
+                "Could not find pebble.h for {} (checked both ~/.local/share/pebble-sdk and legacy ~/.pebble-sdk)",
+                platform
             );
         }
 
