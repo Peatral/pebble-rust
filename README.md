@@ -67,11 +67,9 @@ pebble install --emulator basalt
 
 ## Licensing
 
-Only the high-level wrapper crate [`pebble-rs`](./pebble-rs) is double-licensed under:
-- **GPLv3** ([`LICENSE-GPLv3`](./LICENSE-GPLv3))
-- **BSD 3-Clause** ([`LICENSE-BSD-3.0`](./LICENSE-BSD-3.0))
-
-Derivatives of `pebble-rs` should comply with both. Other packages in this workspace may have different licensing terms.
+This workspace uses different licensing terms for its components:
+- **`pebble-rs`**: Double-licensed under **GPLv3** ([`LICENSE-GPLv3`](./LICENSE-GPLv3)) and **BSD 3-Clause** ([`LICENSE-BSD-3.0`](./LICENSE-BSD-3.0)).
+- **`pebble-sys`**, **`pebble-build`**, and **`pebble-cli`**: Licensed under the permissive **MIT License** ([`LICENSE-MIT`](./LICENSE-MIT)).
 
 ---
 

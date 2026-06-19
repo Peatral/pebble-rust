@@ -35,3 +35,7 @@ pebble-sys = { version = "0.1.0", features = ["basalt"] }
 
 - Pebble SDK installed and configured at `~/.local/share/pebble-sdk/` (or legacy `~/.pebble-sdk/`).
 - Clang / LLVM installed on the host system to run `bindgen`.
+
+## License
+
+This package is licensed under the MIT License. See [LICENSE-MIT](../LICENSE-MIT) at the workspace root for details.

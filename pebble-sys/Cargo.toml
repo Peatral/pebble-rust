@@ -7,6 +7,7 @@ repository = "https://github.com/Peatral/pebble-rust"
 keywords = ["pebble", "watch", "cortex", "rebble", "arm"]
 categories = ["embedded", "no-std", "hardware-support", "external-ffi-bindings"]
 edition = "2024"
+license = "MIT"
 
 [features]
 default = ["emery"]

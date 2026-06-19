@@ -39,3 +39,7 @@ When `pebble_build::build()` is run during cargo compilation:
    - `pebble.resources.media` list -> generates a module mapping resource names to resource IDs.
 5. It writes `message_keys.rs` and `resource_ids.rs` inside the compilation output directory (`OUT_DIR`).
 6. The `pebble-rs` macros `include_message_keys!` and `include_resource_ids!` include these generated files into your application's crate structure.
+
+## License
+
+This package is licensed under the MIT License. See [LICENSE-MIT](../LICENSE-MIT) at the workspace root for details.

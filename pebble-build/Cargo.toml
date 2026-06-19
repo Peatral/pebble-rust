@@ -7,6 +7,7 @@ description = "A helper library for build.rs to generate Rust bindings for Pebbl
 repository = "https://github.com/Peatral/pebble-rust"
 keywords = ["pebble", "watch", "build", "rebble"]
 categories = ["embedded"]
+license = "MIT"
 
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }

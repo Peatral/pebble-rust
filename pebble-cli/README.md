@@ -32,3 +32,7 @@ Ensure that the Pebble SDK CLI (`pebble`) is installed and available in your `PA
 # Compile and build the Pebble project for all target platforms
 cargo pebble build
 ```
+
+## License
+
+This package is licensed under the MIT License. See [LICENSE-MIT](../LICENSE-MIT) at the workspace root for details.
