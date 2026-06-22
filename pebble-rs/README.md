@@ -31,11 +31,11 @@ use pebble::graphics::types::{Rect, Point, Size};
 use pebble::{app, window_stack};
 use core::cell::RefCell;
 
-struct AppDelegate {
+struct MainScreen {
     text_layer: RefCell<Option<TextLayer>>,
 }
 
-impl WindowDelegate for AppDelegate {
+impl WindowDelegate for MainScreen {
     fn load(&self, window: WindowRef) {
         let root = window.get_root_layer();
         let bounds = root.get_bounds();
@@ -55,8 +55,8 @@ impl WindowDelegate for AppDelegate {
 #[unsafe(no_mangle)]
 pub fn main() -> isize {
     let app = app::App::new();
-    let delegate = AppDelegate { text_layer: RefCell::new(None) };
-    let window = Window::new(delegate);
+    let screen = MainScreen { text_layer: RefCell::new(None) };
+    let window = Window::new(screen);
     
     window_stack::push(*window, false);
     app.run_event_loop();
