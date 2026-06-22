@@ -47,7 +47,9 @@ impl WindowDelegate for AppDelegate {
         *self.text_layer.borrow_mut() = Some(text);
     }
     
-    fn unload(&self, _window: WindowRef) {}
+    fn unload(&self, _window: WindowRef) {
+        self.text_layer.borrow_mut().take();
+    }
 }
 
 #[unsafe(no_mangle)]
